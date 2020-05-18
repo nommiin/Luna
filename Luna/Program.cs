@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Luna {
     class Program {
-        public static string Path = @"E:\Luna\Project\Project3.win";
+        public static string Path = @"E:\Luna\Sample\Project3.win";
         static void Main(string[] args) {
             IFF WAD = new IFF(Path, new Game());
             
