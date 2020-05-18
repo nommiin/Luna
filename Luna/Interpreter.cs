@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Luna {
+    public enum LOpcode {
+        popv = 5,
+        conv = 7,
+        mul = 8,
+        div = 9,
+        rem = 10,
+        mod = 11,
+        add = 12,
+        sub = 13,
+        and = 14,
+        or = 15,
+        xor = 16,
+        neg = 17,
+        not = 18,
+        shl = 19,
+        shr = 20,
+        set = 21,
+        pop = 69,
+        pushv = 128,
+        pushi = 132,
+        dup = 134,
+        call = 153,
+        ret = 156,
+        exit = 157,
+        popz = 158,
+        b = 182,
+        bt = 183,
+        bf = 184,
+        pushenv = 186,
+        popenv = 187,
+        push = 192,
+        pushl = 193,
+        pushg = 194,
+        pushb = 195,
+        //call = 217, ????????????
+        brk = 255
+    }
+
+    public enum LOperandType {
+        Error = 15,
+        Double = 0,
+        Single,
+        Integer,
+        Long,
+        Boolean,
+        Variable,
+        String,
+        Instance,
+        Delete,
+        Undefined,
+        UnsignedInteger
+    }
+
+    public enum LVariableType {
+        Global = -5,
+        Instance = -1,
+        Local = -7,
+        Static = 16,
+        Unknown = -6
+    }
+
+    class Interpreter {
+        public delegate void Instruction();
+        public delegate void Function();
+
+        Dictionary<LOpcode, Instruction> Handlers = new Dictionary<LOpcode, Instruction>() {
+            {LOpcode.b, () => {
+                Console.WriteLine("DO NOTHING");
+            }}
+        };
+
+        Dictionary<string, Function> Functions = new Dictionary<string, Function>() {
+            {"show_debug_message", () => {
+                Console.WriteLine("ABC");   
+            }}
+        };
+
+        public Interpreter(Game _game) {
+            
+        }
+    }
+}
