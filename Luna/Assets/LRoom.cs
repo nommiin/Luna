@@ -35,6 +35,9 @@ namespace Luna.Assets {
             this.CreationCode = _reader.ReadInt32();
             // TODO: Parse remaining data, such as phyiscs and layer data.
             _reader.BaseStream.Seek(this.Base, SeekOrigin.Begin);
+#if (DEBUG == true)
+            Console.WriteLine("Room: {0}, Size: {1}x{2}, Creation Code: {3}", this.Name, this.Width, this.Height, this.CreationCode);
+#endif
         }
     }
 }

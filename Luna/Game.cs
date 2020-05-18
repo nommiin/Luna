@@ -56,7 +56,6 @@ namespace Luna {
         public Int32 LocalVariables = 0;
         public Int32 InstanceVariables = 0;
         public Int32 GlobalVariables = 0;
-
         public List<LVariable> Variables = new List<LVariable>();
 
         // Special
@@ -66,11 +65,8 @@ namespace Luna {
             if (_offset == 0) return "";
             if (this.Strings.ContainsKey(_offset) == true) {
                 return this.Strings[_offset].Value;
-            } else {
-                Console.WriteLine("[WARNING] Could not find string at {0}, returning \"???\" instead.", _offset);
-                return "???";
             }
-            
+            throw new Exception(String.Format("Could not find string at {0}", _offset));
         }
     }
 
@@ -86,7 +82,9 @@ namespace Luna {
             this.Value = ASCIIEncoding.ASCII.GetString(_reader.ReadBytes(_reader.ReadInt32()));
             _reader.BaseStream.Seek(this.Base, SeekOrigin.Begin);
             this.Offset += 4;
+#if (DEBUG == true)
             Console.WriteLine("String: {0}, Offset: {1}", this.Value, this.Offset);
+#endif
         }
 
         public LString(string _value) {
@@ -114,21 +112,23 @@ namespace Luna {
     class LVariable {
         public string Name;
         public Int32 Type;
-        public Int32 Magic;
+        public Int32 String;
         public Int32 Count;
         public Int32 Offset;
         public long Base;
 
-        public LVariable(Game _game, BinaryReader _reader, BinaryWriter _writer) {
+        public LVariable(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());
             this.Type = _reader.ReadInt32();
-            this.Magic = _reader.ReadInt32(); // UNKNOWN
+            this.String = _reader.ReadInt32(); // UNKNOWN
             this.Count = _reader.ReadInt32();
             this.Offset = _reader.ReadInt32();
             this.Base = _reader.BaseStream.Position;
-            Console.WriteLine("Variable: {0}, Type: {1}, Magic: {2}, Count: {3}, Base: {4}", this.Name, this.Type, this.Magic, this.Count, this.Base);
+#if (DEBUG == true)
+            Console.WriteLine("Variable: {0}, Type: {1}, String Index: {2}, Count: {3}, Offset: {4}, Base: {5}", this.Name, this.Type, this.String, this.Count, this.Offset, this.Base);
+#endif
         }
-
+         
         public LVariable(string _name, Int32 _type) {
             this.Name = _name;
             this.Type = _type;

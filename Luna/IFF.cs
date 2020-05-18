@@ -65,7 +65,6 @@ namespace Luna {
         public static void GEN8(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
             _game.DebugEnabled = ((_reader.ReadInt32() - 4352) == 0 ? true : false);
             _game.Name = _game.GetString(_reader.ReadInt32());
-            Console.WriteLine("Game Name: {0}", _game.Name);
             _game.Configuration = _game.GetString(_reader.ReadInt32());
             _game.RoomMax = _reader.ReadInt32();
             _game.RoomMaxTile = _reader.ReadInt32();
@@ -90,6 +89,9 @@ namespace Luna {
             _game.MD5 = _reader.ReadBytes(16);
             _game.Timestamp = _reader.ReadInt64();
             _game.DisplayName = _game.GetString(_reader.ReadInt32());
+#if (DEBUG == true)
+            Console.WriteLine("Project: Name: {0}, Game Name: {1}, Display Name: {2}", _game.Name, _game.GameName, _game.DisplayName);
+#endif
             _game.Flags.Targets = _reader.ReadInt64();
             _game.Classifications = _reader.ReadInt64();
             _game.AppID = _reader.ReadInt32();
@@ -118,14 +120,23 @@ namespace Luna {
             _game.LocalVariables = _reader.ReadInt32();
             _game.InstanceVariables = _reader.ReadInt32();
             _game.GlobalVariables = _reader.ReadInt32();
+#if (DEBUG == true)
             Console.WriteLine("Local: {0}, Instance: {1}, Global: {2}", _game.LocalVariables, _game.InstanceVariables, _game.GlobalVariables);
-
+#endif
             while (_reader.BaseStream.Position < (_chunk.Base + _chunk.Length) - 4) {
-                LVariable _varGet = new LVariable(_game, _reader, _writer);
+                LVariable _varGet = new LVariable(_game, _reader);
+                //for(Int32 i = 0; i < _varGet.Count - 1; i++) {
+                if (_varGet.Offset != -1) {
+                    _reader.BaseStream.Seek(_varGet.Offset, SeekOrigin.Begin);
+                    Instruction _varInst = Instruction.Decode(_reader.ReadInt32());
+                    Console.WriteLine(_varInst);
+                    //Console.WriteLine(Enum.GetName(typeof(LOpcode), (_reader.ReadInt32() >> 24) & 0xFF));
+                    //}
+                    _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
+                }
+                    
                 _game.Variables.Add(_varGet);
-                Console.WriteLine("Variable: {0}", _varGet.Name);
             }
-            Console.WriteLine("Count: {0}", _game.Variables.Count);
         }
     }
 }

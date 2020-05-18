@@ -66,6 +66,26 @@ namespace Luna {
         Unknown = -6
     }
 
+    class Instruction {
+        public LOpcode Opcode;
+        public byte Argument;
+        public Int32 Data;
+
+        public Instruction(LOpcode _opcode, byte _argument, Int32 _data) {
+            this.Opcode = _opcode;
+            this.Argument = _argument;
+            this.Data = _data;
+        }
+
+        public static Instruction Decode(Int32 _instruction) {
+            return new Instruction((LOpcode)((_instruction >> 24) & 0xFF), (byte)((_instruction >> 16) & 0xFF), (Int32)(_instruction & 0xFFFF));
+        }
+
+        public override string ToString() {
+            return $"Opcode: LOpcode.{Enum.GetName(typeof(LOpcode), this.Opcode)}, Argument: {this.Argument}, Data: {this.Data}";
+        }
+    }
+
     class Interpreter {
         public delegate void Instruction();
         public delegate void Function();
