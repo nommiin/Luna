@@ -123,20 +123,38 @@ namespace Luna {
 #if (DEBUG == true)
             Console.WriteLine("Local: {0}, Instance: {1}, Global: {2}", _game.LocalVariables, _game.InstanceVariables, _game.GlobalVariables);
 #endif
-            while (_reader.BaseStream.Position < (_chunk.Base + _chunk.Length) - 4) {
+            while (_reader.BaseStream.Position < _chunk.Base + _chunk.Length) {
                 LVariable _varGet = new LVariable(_game, _reader);
-                //for(Int32 i = 0; i < _varGet.Count - 1; i++) {
-                if (_varGet.Offset != -1) {
-                    _reader.BaseStream.Seek(_varGet.Offset, SeekOrigin.Begin);
-                    Instruction _varInst = Instruction.Decode(_reader.ReadInt32());
-                    Console.WriteLine(_varInst);
-                    //Console.WriteLine(Enum.GetName(typeof(LOpcode), (_reader.ReadInt32() >> 24) & 0xFF));
-                    //}
-                    _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
+                if (_varGet.Count > 0) {
+                    _game.VariableMapping[_varGet.Offset + 4] = _game.Variables.Count;
+                    _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
+                    for (Int32 i = 0; i < _varGet.Count - 1; i++) {
+                        Int32 _varGoto = _reader.ReadInt32() & 0xFFFF;
+                        _varGet.Offset += _varGoto;
+                        _game.VariableMapping[(Int32)_reader.BaseStream.Position] = _game.Variables.Count;
+                        //_reader.BaseStream.Seek()
+                    }
                 }
-                    
+                /*if (_varGet.Offset != -1) {
+                    for (Int32 i = 0; i < _varGet.Count - 1; i++) {
+                        _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
+                        try {
+                            _game.VariableMapping.Add((int)_reader.BaseStream.Position, _game.Variables.Count);
+                        } catch (Exception e) { }
+                        Int32 _varOffset = _reader.ReadInt32() & 0xFFFF;
+                        _varGet.Offset += _varOffset;
+                    }
+                    _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
+                }*/
+                
                 _game.Variables.Add(_varGet);
             }
+
+#if (DEBUG == true)
+            foreach(KeyValuePair<int, int> _varMap in _game.VariableMapping) {
+                Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Type, _game.Variables[_varMap.Value].Name);
+            }
+#endif
         }
     }
 }

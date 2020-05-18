@@ -57,6 +57,7 @@ namespace Luna {
         public Int32 InstanceVariables = 0;
         public Int32 GlobalVariables = 0;
         public List<LVariable> Variables = new List<LVariable>();
+        public Dictionary<Int32, Int32> VariableMapping = new Dictionary<Int32, Int32>();
 
         // Special
         public Dictionary<string, Chunk> Chunks;
@@ -83,7 +84,7 @@ namespace Luna {
             _reader.BaseStream.Seek(this.Base, SeekOrigin.Begin);
             this.Offset += 4;
 #if (DEBUG == true)
-            Console.WriteLine("String: {0}, Offset: {1}", this.Value, this.Offset);
+            //Console.WriteLine("String: {0}, Offset: {1}", this.Value, this.Offset);
 #endif
         }
 
@@ -110,8 +111,9 @@ namespace Luna {
     }
 
     class LVariable {
+        public static Int32 Length = 20;
         public string Name;
-        public Int32 Type;
+        public LVariableType Type;
         public Int32 String;
         public Int32 Count;
         public Int32 Offset;
@@ -119,7 +121,7 @@ namespace Luna {
 
         public LVariable(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());
-            this.Type = _reader.ReadInt32();
+            this.Type = (LVariableType)_reader.ReadInt32();
             this.String = _reader.ReadInt32(); // UNKNOWN
             this.Count = _reader.ReadInt32();
             this.Offset = _reader.ReadInt32();
@@ -129,7 +131,7 @@ namespace Luna {
 #endif
         }
          
-        public LVariable(string _name, Int32 _type) {
+        public LVariable(string _name, LVariableType _type) {
             this.Name = _name;
             this.Type = _type;
         }

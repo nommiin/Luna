@@ -62,7 +62,7 @@ namespace Luna {
         Global = -5,
         Instance = -1,
         Local = -7,
-        Static = 16,
+        Static = -16,
         Unknown = -6
     }
 
