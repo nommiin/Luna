@@ -5,55 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Luna.Assets;
+using Luna.Types;
 
 namespace Luna {
-    class IFF {
-        public Game Data;
-        public MemoryStream Stream;
-        public BinaryReader Reader;
-        public BinaryWriter Writer;
-        public Dictionary<string, Chunk> Chunks;
-        public delegate void Handler(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk);
-        public Dictionary<string, Handler> Handlers = new Dictionary<string, Handler>() {
-            { "STRG", ChunkHandlers.STRG },
-            { "GEN8", ChunkHandlers.GEN8 },
-            { "ROOM", ChunkHandlers.ROOM },
-            { "VARI", ChunkHandlers.VARI }
-        };
-
-        public IFF(string _path, Game _data=null) {
-            if (File.Exists(_path) == true) {
-                this.Stream = new MemoryStream(File.ReadAllBytes(_path));
-                this.Reader = new BinaryReader(this.Stream);
-                this.Writer = new BinaryWriter(this.Stream);
-                using (Chunk _chunkHeader = new Chunk(this.Reader)) {
-                    if (_chunkHeader.Name == "FORM") {
-                        this.Data = _data;
-                        this.Chunks = new Dictionary<string, Chunk>();
-                        this.Data.Chunks = this.Chunks;
-                        while (this.Reader.BaseStream.Position < _chunkHeader.Base + _chunkHeader.Length) {
-                            Chunk _chunkGet = new Chunk(this.Reader);
-                            this.Chunks[_chunkGet.Name] = _chunkGet;
-                            this.Reader.BaseStream.Seek(_chunkGet.Length, SeekOrigin.Current);
-                        }
-                    } else throw new Exception("Invalid IFF file was given, got " + _chunkHeader.Name);
-                }
-            } else throw new FileNotFoundException("Could not find given IFF file", _path);
-        }
-
-        public void Parse() {
-            foreach(KeyValuePair<string, Handler> _handlerGet in this.Handlers) {
-                if (this.Chunks.ContainsKey(_handlerGet.Key) == true) {
-                    Chunk _chunkGet = this.Chunks[_handlerGet.Key];
-                    if (_chunkGet != null) {
-                        this.Reader.BaseStream.Seek(_chunkGet.Base, SeekOrigin.Begin);
-                        _handlerGet.Value(this.Data, this.Reader, this.Writer, _chunkGet);
-                    }
-                }
-            }
-        }
-    }
-
     static class ChunkHandlers {
         public static void STRG(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
             for (Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
@@ -136,7 +90,7 @@ namespace Luna {
             }
 
 #if (DEBUG == true)
-            foreach(KeyValuePair<int, int> _varMap in _game.VariableMapping) {
+            foreach (KeyValuePair<int, int> _varMap in _game.VariableMapping) {
                 Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Type, _game.Variables[_varMap.Value].Name);
             }
 #endif

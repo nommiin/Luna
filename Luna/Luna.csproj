@@ -43,16 +43,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interpreter.cs" />
+    <Compile Include="Data\ChunkHandlers.cs" />
+    <Compile Include="Runner\Instruction.cs" />
+    <Compile Include="Runner\Interpreter.cs" />
     <Compile Include="Assets\LRoom.cs" />
-    <Compile Include="Chunk.cs" />
+    <Compile Include="Data\Chunk.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="IFF.cs" />
+    <Compile Include="Data\IFF.cs" />
+    <Compile Include="Types\LValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\LBoolean.cs" />
+    <Compile Include="Types\LString.cs" />
+    <Compile Include="Types\LVariable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
