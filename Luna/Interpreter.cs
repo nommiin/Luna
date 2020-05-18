@@ -90,13 +90,13 @@ namespace Luna {
         public delegate void Instruction();
         public delegate void Function();
 
-        Dictionary<LOpcode, Instruction> Handlers = new Dictionary<LOpcode, Instruction>() {
+        public static Dictionary<LOpcode, Instruction> Handlers = new Dictionary<LOpcode, Instruction>() {
             {LOpcode.b, () => {
                 Console.WriteLine("DO NOTHING");
             }}
         };
 
-        Dictionary<string, Function> Functions = new Dictionary<string, Function>() {
+        public static Dictionary<string, Function> Functions = new Dictionary<string, Function>() {
             {"show_debug_message", () => {
                 Console.WriteLine("ABC");   
             }}

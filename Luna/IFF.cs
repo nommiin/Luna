@@ -120,34 +120,19 @@ namespace Luna {
             _game.LocalVariables = _reader.ReadInt32();
             _game.InstanceVariables = _reader.ReadInt32();
             _game.GlobalVariables = _reader.ReadInt32();
-#if (DEBUG == true)
-            Console.WriteLine("Local: {0}, Instance: {1}, Global: {2}", _game.LocalVariables, _game.InstanceVariables, _game.GlobalVariables);
-#endif
             while (_reader.BaseStream.Position < _chunk.Base + _chunk.Length) {
                 LVariable _varGet = new LVariable(_game, _reader);
                 if (_varGet.Count > 0) {
                     _game.VariableMapping[_varGet.Offset + 4] = _game.Variables.Count;
-                    _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
                     for (Int32 i = 0; i < _varGet.Count - 1; i++) {
-                        Int32 _varGoto = _reader.ReadInt32() & 0xFFFF;
-                        _varGet.Offset += _varGoto;
-                        _game.VariableMapping[(Int32)_reader.BaseStream.Position] = _game.Variables.Count;
-                        //_reader.BaseStream.Seek()
+                        if (i > 0) _game.VariableMapping[(Int32)_reader.BaseStream.Position] = _game.Variables.Count;
+                        _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
+                        _varGet.Offset += _reader.ReadInt32() & 0xFFFF;
                     }
                 }
-                /*if (_varGet.Offset != -1) {
-                    for (Int32 i = 0; i < _varGet.Count - 1; i++) {
-                        _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
-                        try {
-                            _game.VariableMapping.Add((int)_reader.BaseStream.Position, _game.Variables.Count);
-                        } catch (Exception e) { }
-                        Int32 _varOffset = _reader.ReadInt32() & 0xFFFF;
-                        _varGet.Offset += _varOffset;
-                    }
-                    _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
-                }*/
-                
                 _game.Variables.Add(_varGet);
+                _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
+                if ((_chunk.Base + _chunk.Length) - _reader.BaseStream.Position < LVariable.Length) break;
             }
 
 #if (DEBUG == true)
