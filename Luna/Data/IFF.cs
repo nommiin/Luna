@@ -39,8 +39,12 @@ namespace Luna {
                 if (this.Chunks.ContainsKey(_handlerGet.Key) == true) {
                     Chunk _chunkGet = this.Chunks[_handlerGet.Key];
                     if (_chunkGet != null) {
+#if (DEBUG == true)
+                        Console.WriteLine("--- Reading {0} (Length: {1} bytes, Offset: {2})", _chunkGet.Name, _chunkGet.Length, _chunkGet.Base);
+#endif
                         this.Reader.BaseStream.Seek(_chunkGet.Base, SeekOrigin.Begin);
                         _handlerGet.Value(this.Data, this.Reader, this.Writer, _chunkGet);
+                        Console.Write("\n");
                     }
                 }
             }

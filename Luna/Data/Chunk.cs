@@ -10,10 +10,12 @@ namespace Luna {
         #region Handlers
         public delegate void Handler(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk);
         public static Dictionary<string, Handler> Handlers = new Dictionary<string, Handler>() {
-            { "STRG", ChunkHandlers.STRG },
-            { "GEN8", ChunkHandlers.GEN8 },
-            { "ROOM", ChunkHandlers.ROOM },
-            { "VARI", ChunkHandlers.VARI }
+            { "STRG", ChunkHandler.STRG },
+            { "GEN8", ChunkHandler.GEN8 },
+            { "ROOM", ChunkHandler.ROOM },
+            { "CODE", ChunkHandler.CODE },
+            { "VARI", ChunkHandler.VARI },
+            { "FUNC", ChunkHandler.FUNC }
         };
 
         #endregion

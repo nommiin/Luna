@@ -40,7 +40,8 @@ namespace Luna {
         pushg = 194,
         pushb = 195,
         //call = 217, ????????????
-        brk = 255
+        brk = 255,
+        unknown = 1000
     }
 
     class Instruction {
@@ -59,7 +60,7 @@ namespace Luna {
         }
 
         public override string ToString() {
-            return $"Opcode: LOpcode.{Enum.GetName(typeof(LOpcode), this.Opcode)}, Argument: {this.Argument}, Data: {this.Data}";
+            return $"Opcode: {((Enum.IsDefined(typeof(LOpcode), this.Opcode) == true) ? "LOpcode." + Enum.GetName(typeof(LOpcode), this.Opcode) : "???")}, Argument: {this.Argument}, Data: {this.Data}";
         }
     }
 }

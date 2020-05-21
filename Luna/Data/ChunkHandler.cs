@@ -8,12 +8,24 @@ using Luna.Assets;
 using Luna.Types;
 
 namespace Luna {
-    static class ChunkHandlers {
-        public static void STRG(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            for (Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
-                LString _stringGet = new LString(_reader);
-                _game.Strings.Add(_stringGet.Offset, _stringGet);
+    static class ChunkHandler {
+        public delegate void KVP(Int32 _base);
+        private static void HandleKVP(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk, KVP _handler) {
+            Int32 _keyCount = _reader.ReadInt32();
+            for(Int32 i = 0; i < _keyCount; i++) {
+                Int32 _keyOffset = _reader.ReadInt32(), _keyBase = (Int32)_reader.BaseStream.Position;
+                _reader.BaseStream.Seek(_keyOffset, SeekOrigin.Begin);
+                _handler(_keyOffset);
+                _reader.BaseStream.Seek(_keyBase, SeekOrigin.Begin);
             }
+        }
+
+        public static void STRG(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
+            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
+                LString _stringGet = new LString(_reader, _offset + 4);
+                _game.Strings.Add(_stringGet.Offset, _stringGet);
+            });
+            Console.WriteLine("Read {0} strings", _game.Strings.Count);
         }
 
         public static void GEN8(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
@@ -70,6 +82,13 @@ namespace Luna {
             }
         }
 
+        public static void CODE(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
+            for (Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+                LCode _codeGet = new LCode(_game, _reader);
+                _game.Code.Add(_codeGet.Name, _codeGet);
+            }
+        }
+
         public static void VARI(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
             _game.LocalVariables = _reader.ReadInt32();
             _game.InstanceVariables = _reader.ReadInt32();
@@ -94,6 +113,42 @@ namespace Luna {
                 Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Type, _game.Variables[_varMap.Value].Name);
             }
 #endif
+        }
+
+        public static void FUNC(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
+            Int32 _funcCount = _reader.ReadInt32();
+            Console.WriteLine("Function Count: {0}", _funcCount);
+            for (Int32 i = 0; i < _funcCount; i++) {
+                LFunction _funcGet = new LFunction(_game, _reader);
+                if (_funcGet.Count > 0) {
+                    _game.FunctionMapping[_funcGet.Offset + 4] = _game.Functions.Count;
+                    for(Int32 j = 0; j < _funcGet.Count - 1; j++) {
+                        if (j > 0) _game.FunctionMapping[(Int32)_reader.BaseStream.Position] = _game.Functions.Count;
+                        _reader.BaseStream.Seek(_funcGet.Offset + 4, SeekOrigin.Begin);
+                        _funcGet.Offset += _reader.ReadInt32();
+                    }
+                    _reader.BaseStream.Seek(_funcGet.Base, SeekOrigin.Begin);
+                }
+                _game.Functions.Add(_funcGet);
+            }
+
+#if (DEBUG == true)
+            foreach (KeyValuePair<int, int> _funcMap in _game.FunctionMapping) {
+                Console.WriteLine("Call {0} at {1}", _game.Functions[_funcMap.Value].Name, _funcMap.Key);
+            }
+#endif
+
+            Int32 _localCount = _reader.ReadInt32();
+            Console.WriteLine("Local Count: {0}", _localCount);
+            for (Int32 i = 0; i < _localCount; i++) {
+                Int32 _localUses = _reader.ReadInt32();
+                string _codeName = _game.GetString(_reader.ReadInt32());
+                for(Int32 j = 0; j < _localUses; j++) {
+                    Int32 _localInd = _reader.ReadInt32();
+                    string _localName = _game.GetString(_reader.ReadInt32());
+                    Console.WriteLine("{0} in {1} ({2}/{3})", _localName, _codeName, j + 1, _localUses);
+                }
+            }
         }
     }
 }
