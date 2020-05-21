@@ -7,9 +7,6 @@ using System.IO;
 
 namespace Luna.Assets {
     class LRoom {
-        public Int32 Offset;
-        public long Base;
-
         public string Name;
         public string Caption;
         public Int32 Width;
@@ -21,9 +18,6 @@ namespace Luna.Assets {
         public Int32 CreationCode;
 
         public LRoom(Game _game, BinaryReader _reader) {
-            this.Offset = _reader.ReadInt32();
-            this.Base = _reader.BaseStream.Position;
-            _reader.BaseStream.Seek(this.Offset, SeekOrigin.Begin);
             this.Name = _game.GetString(_reader.ReadInt32());
             this.Caption = _game.GetString(_reader.ReadInt32());
             this.Width = _reader.ReadInt32();
@@ -34,10 +28,13 @@ namespace Luna.Assets {
             this.ShowColour = _reader.ReadBoolean();
             this.CreationCode = _reader.ReadInt32();
             // TODO: Parse remaining data, such as phyiscs and layer data.
-            _reader.BaseStream.Seek(this.Base, SeekOrigin.Begin);
 #if (DEBUG == true)
-            Console.WriteLine("Room: {0}, Size: {1}x{2}, Creation Code: {3}", this.Name, this.Width, this.Height, this.CreationCode);
+            Console.WriteLine(this);
 #endif
+        }
+
+        public override string ToString() {
+            return $"Room: {this.Name}, Size: {this.Width}x{this.Height}, Creation Code: {this.CreationCode}";
         }
     }
 }

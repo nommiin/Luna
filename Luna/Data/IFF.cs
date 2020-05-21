@@ -44,7 +44,9 @@ namespace Luna {
 #endif
                         this.Reader.BaseStream.Seek(_chunkGet.Base, SeekOrigin.Begin);
                         _handlerGet.Value(this.Data, this.Reader, this.Writer, _chunkGet);
+#if (DEBUG == true)
                         Console.Write("\n");
+#endif
                     }
                 }
             }

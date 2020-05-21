@@ -22,10 +22,12 @@ namespace Luna {
 
         public static void STRG(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
             HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
-                LString _stringGet = new LString(_reader, _offset + 4);
+                LString _stringGet = new LString(_reader, _offset);
                 _game.Strings.Add(_stringGet.Offset, _stringGet);
             });
+#if (DEBUG == true)
             Console.WriteLine("Read {0} strings", _game.Strings.Count);
+#endif
         }
 
         public static void GEN8(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
@@ -76,17 +78,17 @@ namespace Luna {
         }
 
         public static void ROOM(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            for (Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
                 LRoom _roomGet = new LRoom(_game, _reader);
                 _game.Rooms.Add(_roomGet.Name, _roomGet);
-            }
+            });
         }
 
         public static void CODE(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            for (Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
                 LCode _codeGet = new LCode(_game, _reader);
                 _game.Code.Add(_codeGet.Name, _codeGet);
-            }
+            });
         }
 
         public static void VARI(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {

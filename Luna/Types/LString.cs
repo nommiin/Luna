@@ -11,13 +11,8 @@ namespace Luna.Types {
         public Int32 Offset;
 
         public LString(BinaryReader _reader, Int32 _offset) {
-            
             this.Value = ASCIIEncoding.ASCII.GetString(_reader.ReadBytes(_reader.ReadInt32()));
-            this.Offset = _offset;
-            
-#if (DEBUG == true)
-            //Console.WriteLine("String: {0}, Offset: {1}", this.Value, this.Offset);
-#endif
+            this.Offset = _offset + 4;
         }
 
         public LString(string _value) {

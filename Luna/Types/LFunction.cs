@@ -18,8 +18,12 @@ namespace Luna.Types {
             this.Offset = _reader.ReadInt32();
             this.Base = _reader.BaseStream.Position;
 #if (DEBUG == true)
-            Console.WriteLine("Function: {0}, Count: {1}, Offset: {2}", this.Name, this.Count, this.Offset);
+            Console.WriteLine(this);
 #endif
+        }
+
+        public override string ToString() {
+            return $"Function: {0}, Uses: {this.Count}, Offset: {this.Offset}";
         }
     }
 }
