@@ -56,10 +56,24 @@ namespace Luna {
                 _vm.Stack.Push(_inst.Data);
             }},
             {LOpcode.push, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                switch ((LArgumentType)_inst.Argument) {
+                LArgumentType _argType = (LArgumentType)_inst.Argument;
+                switch (_argType) {
+                    case LArgumentType.Variable: {
+                        _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
+                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position)]];
+                        dynamic a = _vm.GetVariable(_varGet);
+                        Console.WriteLine("{0} is equal to {1}", _varGet.Name, a);
+                        _vm.Stack.Push(a);
+                        break;
+                    }
+
                     case LArgumentType.String: {
                         _vm.Stack.Push(_vm.Data.StringMapping[_reader.ReadInt32()]);
                         break;
+                    }
+
+                    default: {
+                        throw new Exception(String.Format("Could not push unimplemented type: \"{0}\"", _argType));
                     }
                 }
             }},
@@ -73,7 +87,7 @@ namespace Luna {
                     }
 
                     default: {
-                        throw new Exception(String.Format("Could not pushl unimplemented type: \"{0}\"", _inst.Argument));
+                        throw new Exception(String.Format("Could not pushl unimplemented type: \"{0}\"", _argType));
                     }
                 }
             }},
@@ -125,37 +139,38 @@ namespace Luna {
             }},
             {LOpcode.call, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position) + 4)]];
+                Console.WriteLine("Call:{0}", _funcGet.Name);
                 Functions[_funcGet.Name](_vm, _inst.Data);
                 _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
             }},
             {LOpcode.add, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft + _valRight);
             }},
             {LOpcode.sub, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft - _valRight);
             }},
             {LOpcode.mul, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft * _valRight);
             }},
             {LOpcode.div, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft / _valRight);
             }},
             {LOpcode.rem, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(Math.Round(_valLeft / _valRight));
             }},
             {LOpcode.mod, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                double _valRight = _vm.Stack.Pop();
+                double _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft % _valRight);
             }},
             {LOpcode.xor, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
@@ -187,6 +202,10 @@ namespace Luna {
 
         public dynamic GetVariable(LVariableType _scope, string _name) {
             return this.Variables[_scope].First(x => x.Key.Name == _name).Value;
+        }
+
+        public dynamic GetVariable(LVariable _var) {
+            return this.Variables[_var.Type][_var];
         }
 
         public void SetVariable(LVariable _var, dynamic _value) {
@@ -223,10 +242,10 @@ namespace Luna {
 #endif
                 Instructions[_instGet.Opcode](this, _code, _codeReader, _instGet);
 #if (DEBUG == true)
-                /*Console.WriteLine("Stack Size: {0}", this.Stack.Count);
+                Console.WriteLine("Stack Size: {0}", this.Stack.Count);
                 foreach(dynamic _stackItem in this.Stack.ToArray()) {
                     Console.WriteLine("- " + _stackItem);
-                }*/
+                }
 #endif
             }
 

@@ -130,7 +130,7 @@ namespace Luna {
                     for(Int32 j = 0; j < _funcGet.Count - 1; j++) {
                         if (j > 0) _game.FunctionMapping[(Int32)_reader.BaseStream.Position] = _game.Functions.Count;
                         _reader.BaseStream.Seek(_funcGet.Offset + 4, SeekOrigin.Begin);
-                        _funcGet.Offset += _reader.ReadInt32();
+                        _funcGet.Offset += _reader.ReadInt32() & 0xFFFF;
                     }
                     _reader.BaseStream.Seek(_funcGet.Base, SeekOrigin.Begin);
                 }
