@@ -53,6 +53,7 @@ namespace Luna {
         public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
         public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
         public Dictionary<long, LString> Strings = new Dictionary<long, LString>();
+        public List<LString> StringMapping = new List<LString>();
 
         // Code
         public Int32 LocalVariables = 0;

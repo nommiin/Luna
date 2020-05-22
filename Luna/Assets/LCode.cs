@@ -13,7 +13,6 @@ namespace Luna.Assets {
         public Int16 LocalCount;
         public Int16 ArgCount;
         public byte Flags;
-        public Int32 Magic;
         public Int32 Offset;
         public MemoryStream Bytecode;
         public BinaryReader Reader;
@@ -25,10 +24,14 @@ namespace Luna.Assets {
             this.ArgCount = _reader.ReadInt16();
             this.Flags = (byte)((this.ArgCount >> 13) & 7);
             this.ArgCount = (short)(this.ArgCount & 0x1FFF);
-            this.Magic = _reader.ReadInt32();
-            this.Offset = _reader.ReadInt32();
-#if (DEBUG)
+            this.Offset = _reader.ReadInt32() - 4;
+            _reader.BaseStream.Seek(this.Offset, SeekOrigin.Current);
+            this.Base = _reader.BaseStream.Position;
+            this.Bytecode = new MemoryStream(_reader.ReadBytes(this.Length));
+            this.Reader = new BinaryReader(this.Bytecode);
+#if (DEBUG == true)
             Console.WriteLine(this);
+            Console.WriteLine("Bytecode:\n{0}", BitConverter.ToString(this.Bytecode.ToArray()).Replace("-", " "));
 #endif
         }
 

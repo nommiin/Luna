@@ -24,6 +24,7 @@ namespace Luna {
             HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
                 LString _stringGet = new LString(_reader, _offset);
                 _game.Strings.Add(_stringGet.Offset, _stringGet);
+                _game.StringMapping.Add(_stringGet);
             });
 #if (DEBUG == true)
             Console.WriteLine("Read {0} strings", _game.Strings.Count);
@@ -119,7 +120,9 @@ namespace Luna {
 
         public static void FUNC(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
             Int32 _funcCount = _reader.ReadInt32();
+#if (DEBUG == true)
             Console.WriteLine("Function Count: {0}", _funcCount);
+#endif
             for (Int32 i = 0; i < _funcCount; i++) {
                 LFunction _funcGet = new LFunction(_game, _reader);
                 if (_funcGet.Count > 0) {
@@ -141,14 +144,18 @@ namespace Luna {
 #endif
 
             Int32 _localCount = _reader.ReadInt32();
+#if (DEBUG == true)
             Console.WriteLine("Local Count: {0}", _localCount);
+#endif
             for (Int32 i = 0; i < _localCount; i++) {
                 Int32 _localUses = _reader.ReadInt32();
                 string _codeName = _game.GetString(_reader.ReadInt32());
                 for(Int32 j = 0; j < _localUses; j++) {
                     Int32 _localInd = _reader.ReadInt32();
                     string _localName = _game.GetString(_reader.ReadInt32());
+#if (DEBUG == true)
                     Console.WriteLine("{0} in {1} ({2}/{3})", _localName, _codeName, j + 1, _localUses);
+#endif
                 }
             }
         }

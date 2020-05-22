@@ -23,7 +23,7 @@ namespace Luna.Types {
         }
 
         public override string ToString() {
-            return $"Function: {0}, Uses: {this.Count}, Offset: {this.Offset}";
+            return $"Function: {this.Name}, Uses: {this.Count}, Offset: {this.Offset}";
         }
     }
 }

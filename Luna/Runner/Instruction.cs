@@ -26,7 +26,7 @@ namespace Luna {
         pushv = 128,
         pushi = 132,
         dup = 134,
-        call = 153,
+        callv = 153,
         ret = 156,
         exit = 157,
         popz = 158,
@@ -39,7 +39,7 @@ namespace Luna {
         pushl = 193,
         pushg = 194,
         pushb = 195,
-        //call = 217, ????????????
+        call = 217,
         brk = 255,
         unknown = 1000
     }
@@ -49,16 +49,16 @@ namespace Luna {
         public byte Argument;
         public Int32 Data;
 
+        public static Instruction Decode(Int32 _instruction) {
+            return new Instruction((LOpcode)((_instruction >> 24) & 0xFF), (byte)((_instruction >> 16) & 0xFF), (Int32)(_instruction & 0xFFFF));
+        }
+
         public Instruction(LOpcode _opcode, byte _argument, Int32 _data) {
             this.Opcode = _opcode;
             this.Argument = _argument;
             this.Data = _data;
         }
-
-        public static Instruction Decode(Int32 _instruction) {
-            return new Instruction((LOpcode)((_instruction >> 24) & 0xFF), (byte)((_instruction >> 16) & 0xFF), (Int32)(_instruction & 0xFFFF));
-        }
-
+        
         public override string ToString() {
             return $"Opcode: {((Enum.IsDefined(typeof(LOpcode), this.Opcode) == true) ? "LOpcode." + Enum.GetName(typeof(LOpcode), this.Opcode) : "???")}, Argument: {this.Argument}, Data: {this.Data}";
         }

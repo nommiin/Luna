@@ -29,12 +29,14 @@ namespace Luna {
             this.Length = _reader.ReadInt32();
             this.Base = _reader.BaseStream.Position;
 #if (DEBUG == true)
-            Console.WriteLine("Chunk: {0}, Length: {1} bytes", this.Name, this.Length);
+            Console.WriteLine(this);
 #endif
         }
 
-        public void Dispose() {
-            //
+        public void Dispose() { }
+
+        public override string ToString() {
+            return $"Chunk: {this.Name}, Length: {this.Length} bytes";
         }
     }
 }
