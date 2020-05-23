@@ -52,8 +52,8 @@ namespace Luna {
             }
         }
 
-        public void Convert(LType _type) {
-            if (this.Type == _type) return;
+        public LValue Convert(LType _type) {
+            if (this.Type == _type) return this;
             switch (this.Type) {
                 case LType.Number: {
                     switch (_type) {
@@ -80,45 +80,7 @@ namespace Luna {
                 }
             }
             this.Type = _type;
-            /*
-            switch (_type) {
-                case LType.Number: {
-                    switch (this.Type) {
-                        case LType.String: {
-                            this.String = this.Value.ToString();
-                            Console.WriteLine("SetToString: {0}", this.String);
-                            break;
-                        }
-                    }
-                    this.Type = _type;
-                    break;
-                }
-
-                case LType.String: {
-                    switch (this.Type) {
-                        case LType.Number: {
-                            Console.WriteLine("this.Type = {0}", this.Type);
-                            Console.WriteLine("this.Value = {0}", this.Value);
-                            this.Number = System.Convert.ToDouble(this.Value);
-                            this.Type = _type;
-                            Console.WriteLine("this.Type = {0}", this.Type);
-                            Console.WriteLine("this.Value = {0}", this.Value);
-                            break;
-                        }
-
-                        default: {
-                            throw new Exception(String.Format("Unsupported conversion from {0} to {1}", this.Type, _type));
-                        }
-                    }
-                    this.Type = _type;
-                    break;
-                }
-
-                default: {
-                    throw new Exception(String.Format("Could not convert {0} from {1} to {2}", this.Value, this.Type, _type));
-                }
-            }*/
-            Console.WriteLine("CovertedAs: {0} ({1})", this.Value, _type); 
+            return this;
         }
 
         public dynamic Value {

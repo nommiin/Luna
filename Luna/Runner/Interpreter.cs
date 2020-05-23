@@ -48,6 +48,12 @@ namespace Luna {
         public static Dictionary<string, FunctionHandler> Functions = new Dictionary<string, FunctionHandler>() {
             {"show_debug_message", (Interpreter _vm, Int32 _count) => {
                 Console.WriteLine(_vm.Stack.Pop().Value);
+            }},
+            {"string", (Interpreter _vm, Int32 _count) => {
+                _vm.Stack.Push(_vm.Stack.Pop().Convert(LType.String));
+            }},
+            {"real", (Interpreter _vm, Int32 _count) => {
+                _vm.Stack.Push(_vm.Stack.Pop().Convert(LType.Number));
             }}
         };
 
@@ -64,7 +70,7 @@ namespace Luna {
                     }
 
                     case LArgumentType.Variable: {
-                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position) - 4)]];
+                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]];
                         _vm.Stack.Push(_vm.GetVariable(_varGet));
                         _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
                         break;
@@ -82,7 +88,7 @@ namespace Luna {
                 LArgumentType _argFrom = (LArgumentType)((_inst.Argument >> 4) & 0xF), _argTo = (LArgumentType)(_inst.Argument & 0xF);
                 switch (_argTo) {
                     case LArgumentType.Variable: {
-                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position)]];
+                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position) - 4]];
                         _vm.SetVariable(_varGet, _vm.Stack.Pop());
                         _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
                         break;
@@ -129,7 +135,11 @@ namespace Luna {
             }},
             {LOpcode.call, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]];
-                Functions[_funcGet.Name](_vm, _inst.Data);
+                if (Functions.ContainsKey(_funcGet.Name) == true) {
+                    Functions[_funcGet.Name](_vm, _inst.Data);
+                } else {
+                    throw new Exception(String.Format("Could not execute function named \"{0}\" at instruction {1}", _funcGet.Name, _vm.Count));
+                }
                 _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
             }},
             {LOpcode.add, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
@@ -202,6 +212,7 @@ namespace Luna {
             this.Variables[_var.Scope][_var] = _value;
         }
 
+        public Int32 Count;
         public Game Data;
         public Stack<LValue> Stack = new Stack<LValue>();
         public Dictionary<LVariableScope, Dictionary<LVariable, LValue>> Variables = new Dictionary<LVariableScope, Dictionary<LVariable, LValue>>();
@@ -215,24 +226,24 @@ namespace Luna {
         public void ExecuteScript(string _script) {
 #if (DEBUG == true)
             if (this.Data.Code.ContainsKey(_script) == false) {
-                throw new Exception(String.Format("Could not execute non-existent script named \"{0}\"", _script));
+                throw new Exception(String.Format("Could not execute script named \"{0}\"", _script));
             }
 #endif
+            this.Count = 0;
             this.ExecuteScript(this.Data.Code[_script]);
         }
 
         public void ExecuteScript(LCode _code) {
             BinaryReader _codeReader = _code.Reader;
-            Int32 _instCount = 0;
             while (_codeReader.BaseStream.Position < _codeReader.BaseStream.Length) {
                 Instruction _instGet = Instruction.Decode(_codeReader.ReadInt32());
 #if (DEBUG == true)
                 if (Instructions.ContainsKey(_instGet.Opcode) == false) {
-                    throw new Exception(String.Format("Could not process unimplemented opcode: \"{0}\" at instruction {1} ({2} bytes)", _instGet.Opcode, _instCount, _codeReader.BaseStream.Position));
+                    throw new Exception(String.Format("Could not process unimplemented opcode: \"{0}\" at instruction {1} ({2} bytes)", _instGet.Opcode, this.Count, _codeReader.BaseStream.Position));
                 }
 #endif
                 Instructions[_instGet.Opcode](this, _code, _codeReader, _instGet);
-                _instCount++;
+                this.Count++;
             }
 
 #if (DEBUG == true)

@@ -99,7 +99,7 @@ namespace Luna {
             while (_reader.BaseStream.Position < _chunk.Base + _chunk.Length) {
                 LVariable _varGet = new LVariable(_game, _reader);
                 if (_varGet.Count > 0) {
-                    _game.VariableMapping[_varGet.Offset + 4] = _game.Variables.Count;
+                    _game.VariableMapping[_varGet.Offset] = _game.Variables.Count;
                     for (Int32 i = 0; i < _varGet.Count - 1; i++) {
                         if (i > 0) _game.VariableMapping[_varGet.Offset] = _game.Variables.Count;
                         _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
