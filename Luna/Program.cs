@@ -8,11 +8,34 @@ using System.IO;
 namespace Luna {
     class Program {
         static void Main(string[] args) {
-            IFF WAD = new IFF(@"E:\Luna\Sample\LunaMath.win", new Game());
+            IFF WAD = new IFF(@"E:\Luna\Sample\Luna2Vars.win", new Game());
             WAD.Parse();
 
             Interpreter _int = new Interpreter(WAD.Data);
             _int.ExecuteScript("gml_GlobalScript_Script2");
+            /*
+            LunaTypes
+            00000000 : 02000f84                   pushi.e   2
+            00000004 : ffff 25 45 030000a0        pop.v.i   $a$
+            0000000c : 0000 06 c0 04000000        push.s    "1"
+            00000014 : ffff 65 45 050000a0        pop.v.s   $b$
+            0000001c : ffff 05 c0 030000a0        push.v    $a$
+            00000024 : ffff 05 c0 050000a0        push.v    $b$
+            0000002c : 0006 55 15                 set.v.v
+            00000030 : 0800 00 b8                 bf        0x00000050
+
+            00000034 : 0000 06 c0 06000000        push.s    "PASS"
+            0000003c : 0000 56 07                 conv.s.v
+            00000040 : 0100 02 d9 07000000        call.i    $show_debug_message$
+            00000048 : 0000 05 9e                 popz.v
+            0000004c : 0700 00 b6                 b         0x00000068
+
+            00000050 : 0000 06 c0 08000000        push.s    "FAIL"
+            00000058 : 0000 56 07                 conv.s.v
+            0000005c : 0100 02 d9 07000000        call.i    $show_debug_message$
+            00000064 : 0000 05 9e                 popz.v
+            */
+
             /*
             Luna2Vars
             00000000 : 2000 0f 84                  pushi.e   32

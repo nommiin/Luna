@@ -47,16 +47,18 @@ namespace Luna {
     class Instruction {
         public LOpcode Opcode;
         public byte Argument;
-        public Int32 Data;
+        public Int16 Data;
+        public Int32 Raw;
 
         public static Instruction Decode(Int32 _instruction) {
-            return new Instruction((LOpcode)((_instruction >> 24) & 0xFF), (byte)((_instruction >> 16) & 0xFF), (Int32)(_instruction & 0xFFFF));
+            return new Instruction((LOpcode)((_instruction >> 24) & 0xFF), (byte)((_instruction >> 16) & 0xFF), (Int16)(_instruction & 0xFFFF), _instruction);
         }
 
-        public Instruction(LOpcode _opcode, byte _argument, Int32 _data) {
+        public Instruction(LOpcode _opcode, byte _argument, Int16 _data, Int32 _raw) {
             this.Opcode = _opcode;
             this.Argument = _argument;
             this.Data = _data;
+            this.Raw = _raw;
         }
         
         public override string ToString() {

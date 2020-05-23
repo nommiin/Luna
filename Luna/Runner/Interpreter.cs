@@ -23,7 +23,7 @@ namespace Luna {
         UnsignedInteger
     }
 
-    public enum LVariableType {
+    public enum LVariableScope {
         Global = -5,
         Instance = -1,
         Local = -7,
@@ -47,28 +47,26 @@ namespace Luna {
 
         public static Dictionary<string, FunctionHandler> Functions = new Dictionary<string, FunctionHandler>() {
             {"show_debug_message", (Interpreter _vm, Int32 _count) => {
-                Console.WriteLine(_vm.Stack.Pop());
+                Console.WriteLine(_vm.Stack.Pop().Value);
             }}
         };
 
         public static Dictionary<LOpcode, InstructionHandler> Instructions = new Dictionary<LOpcode, InstructionHandler>() {
             {LOpcode.pushi, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                _vm.Stack.Push(_inst.Data);
+                _vm.Stack.Push(new LValue(LType.Number, _inst.Data));
             }},
             {LOpcode.push, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LArgumentType _argType = (LArgumentType)_inst.Argument;
                 switch (_argType) {
-                    case LArgumentType.Variable: {
-                        _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
-                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position)]];
-                        dynamic a = _vm.GetVariable(_varGet);
-                        Console.WriteLine("{0} is equal to {1}", _varGet.Name, a);
-                        _vm.Stack.Push(a);
+                    case LArgumentType.String: {
+                        _vm.Stack.Push(new LValue(LType.String, _vm.Data.StringMapping[_reader.ReadInt32()].Value));
                         break;
                     }
 
-                    case LArgumentType.String: {
-                        _vm.Stack.Push(_vm.Data.StringMapping[_reader.ReadInt32()]);
+                    case LArgumentType.Variable: {
+                        LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position) - 4)]];
+                        _vm.Stack.Push(_vm.GetVariable(_varGet));
+                        _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
                         break;
                     }
 
@@ -77,20 +75,9 @@ namespace Luna {
                     }
                 }
             }},
-            {LOpcode.pushl, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                LArgumentType _argType = (LArgumentType)_inst.Argument;
-                switch (_argType) {
-                    case LArgumentType.Variable: {
-                        string _varName = _vm.Data.StringMapping[_reader.ReadInt32() & 0xFFFF].Value;
-                        _vm.Stack.Push(_vm.GetVariable((LVariableType)(Int16)_inst.Data, _varName));
-                        break;
-                    }
-
-                    default: {
-                        throw new Exception(String.Format("Could not pushl unimplemented type: \"{0}\"", _argType));
-                    }
-                }
-            }},
+            /*{LOpcode.pushl, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+                
+            }},*/
             {LOpcode.pop, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LArgumentType _argFrom = (LArgumentType)((_inst.Argument >> 4) & 0xF), _argTo = (LArgumentType)(_inst.Argument & 0xF);
                 switch (_argTo) {
@@ -107,8 +94,8 @@ namespace Luna {
                 }
             }},
             {LOpcode.set, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 switch ((LConditionType)((_inst.Data >> 8) & 0xFF)) {
                     case LConditionType.Equal:        _vm.Stack.Push(_valLeft == _valRight); break;
                     case LConditionType.NotEqual:     _vm.Stack.Push(_valLeft != _valRight); break;
@@ -122,14 +109,17 @@ namespace Luna {
                 }
             }},
             {LOpcode.bf, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                if (_vm.Stack.Pop() == false) {
-                    // TODO: BRANCH FALSE
+                if (_vm.Stack.Pop().Value == 0) {
+                    _reader.BaseStream.Seek((_reader.BaseStream.Position - 4) + (_inst.Raw << 9 >> 7), SeekOrigin.Begin);
                 }
             }},
             {LOpcode.bt, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                if (_vm.Stack.Pop() == false) {
-                    // TODO: BRANCH TRUE
+                if (_vm.Stack.Pop().Value == 1) {
+                    _reader.BaseStream.Seek((_reader.BaseStream.Position - 4) + (_inst.Raw << 9 >> 7), SeekOrigin.Begin);
                 }
+            }},
+            {LOpcode.b, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+                _reader.BaseStream.Seek((_reader.BaseStream.Position - 4) + (_inst.Raw << 9 >> 7), SeekOrigin.Begin);
             }},
             {LOpcode.conv, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 // ?!
@@ -138,86 +128,86 @@ namespace Luna {
                 // ?!
             }},
             {LOpcode.call, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position) + 4)]];
-                Console.WriteLine("Call:{0}", _funcGet.Name);
+                LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]];
                 Functions[_funcGet.Name](_vm, _inst.Data);
                 _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
             }},
             {LOpcode.add, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft + _valRight);
             }},
             {LOpcode.sub, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft - _valRight);
             }},
             {LOpcode.mul, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft * _valRight);
             }},
             {LOpcode.div, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft / _valRight);
             }},
             {LOpcode.rem, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(Math.Round(_valLeft / _valRight));
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                LValue _valResult = Math.Floor(_valLeft.Value / _valRight.Value);
+                _vm.Stack.Push(_valResult);
             }},
             {LOpcode.mod, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                double _valRight = _vm.Stack.Pop();
-                double _valLeft = _vm.Stack.Pop();
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
                 _vm.Stack.Push(_valLeft % _valRight);
             }},
             {LOpcode.xor, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(_valLeft ^ _valRight);
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                _vm.Stack.Push(_valLeft ^ _valRight.Value);
             }},
             {LOpcode.and, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(_valLeft & _valRight);
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                _vm.Stack.Push(_valLeft & _valRight.Value);
             }},
             {LOpcode.or, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(_valLeft | _valRight);
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                _vm.Stack.Push(_valLeft | _valRight.Value);
             }},
             {LOpcode.shl, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(_valLeft << _valRight);
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                _vm.Stack.Push(_valLeft << _valRight.Value);
             }},
             {LOpcode.shr, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                dynamic _valRight = _vm.Stack.Pop();
-                dynamic _valLeft = _vm.Stack.Pop();
-                _vm.Stack.Push(_valLeft >> _valRight);
+                LValue _valRight = _vm.Stack.Pop();
+                LValue _valLeft = _vm.Stack.Pop();
+                _vm.Stack.Push(_valLeft >> _valRight.Value);
             }}
         };
 
-        public dynamic GetVariable(LVariableType _scope, string _name) {
+        public LValue GetVariable(LVariableScope _scope, string _name) {
             return this.Variables[_scope].First(x => x.Key.Name == _name).Value;
         }
 
-        public dynamic GetVariable(LVariable _var) {
-            return this.Variables[_var.Type][_var];
+        public LValue GetVariable(LVariable _var) {
+            return this.Variables[_var.Scope][_var];
         }
 
-        public void SetVariable(LVariable _var, dynamic _value) {
-            this.Variables[_var.Type][_var] = _value;
+        public void SetVariable(LVariable _var, LValue _value) {
+            this.Variables[_var.Scope][_var] = _value;
         }
 
         public Game Data;
-        public Stack<dynamic> Stack = new Stack<dynamic>();
-        public Dictionary<LVariableType, Dictionary<LVariable, dynamic>> Variables = new Dictionary<LVariableType, Dictionary<LVariable, dynamic>>();
+        public Stack<LValue> Stack = new Stack<LValue>();
+        public Dictionary<LVariableScope, Dictionary<LVariable, LValue>> Variables = new Dictionary<LVariableScope, Dictionary<LVariable, LValue>>();
         public Interpreter(Game _game) {
-            foreach(LVariableType _type in Enum.GetValues(typeof(LVariableType))) {
-                this.Variables[_type] = new Dictionary<LVariable, dynamic>();
+            foreach(LVariableScope _type in Enum.GetValues(typeof(LVariableScope))) {
+                this.Variables[_type] = new Dictionary<LVariable, LValue>();
             }
             this.Data = _game;
         }
@@ -233,27 +223,23 @@ namespace Luna {
 
         public void ExecuteScript(LCode _code) {
             BinaryReader _codeReader = _code.Reader;
+            Int32 _instCount = 0;
             while (_codeReader.BaseStream.Position < _codeReader.BaseStream.Length) {
                 Instruction _instGet = Instruction.Decode(_codeReader.ReadInt32());
 #if (DEBUG == true)
                 if (Instructions.ContainsKey(_instGet.Opcode) == false) {
-                    throw new Exception(String.Format("Could not process unimplemented opcode: \"{0}\"", _instGet.Opcode));
+                    throw new Exception(String.Format("Could not process unimplemented opcode: \"{0}\" at instruction {1} ({2} bytes)", _instGet.Opcode, _instCount, _codeReader.BaseStream.Position));
                 }
 #endif
                 Instructions[_instGet.Opcode](this, _code, _codeReader, _instGet);
-#if (DEBUG == true)
-                Console.WriteLine("Stack Size: {0}", this.Stack.Count);
-                foreach(dynamic _stackItem in this.Stack.ToArray()) {
-                    Console.WriteLine("- " + _stackItem);
-                }
-#endif
+                _instCount++;
             }
 
 #if (DEBUG == true)
             Console.WriteLine("\nVariables:");
-            foreach(KeyValuePair<LVariableType, Dictionary<LVariable, dynamic>> _v in this.Variables) {
-                foreach(KeyValuePair<LVariable, dynamic> _vv in _v.Value) {
-                    Console.WriteLine("{0}.{1} = {2}", _vv.Key.Type, _vv.Key.Name, _vv.Value);
+            foreach(KeyValuePair<LVariableScope, Dictionary<LVariable, LValue>> _v in this.Variables) {
+                foreach(KeyValuePair<LVariable, LValue> _vv in _v.Value) {
+                    Console.WriteLine("{0}.{1} = {2} ({3})", _vv.Key.Scope, _vv.Key.Name, _vv.Value.Value, _vv.Value.Type);
                 }
                 //Console.WriteLine("{0}.{1} = {2}", _v.Key.Type, _v.Key.Name, _v.Value);
             }

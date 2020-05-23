@@ -101,7 +101,7 @@ namespace Luna {
                 if (_varGet.Count > 0) {
                     _game.VariableMapping[_varGet.Offset + 4] = _game.Variables.Count;
                     for (Int32 i = 0; i < _varGet.Count - 1; i++) {
-                        if (i > 0) _game.VariableMapping[(Int32)_reader.BaseStream.Position] = _game.Variables.Count;
+                        if (i > 0) _game.VariableMapping[_varGet.Offset] = _game.Variables.Count;
                         _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
                         _varGet.Offset += _reader.ReadInt32() & 0xFFFF;
                     }
@@ -113,7 +113,7 @@ namespace Luna {
 
 #if (DEBUG == true)
             foreach (KeyValuePair<int, int> _varMap in _game.VariableMapping) {
-                Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Type, _game.Variables[_varMap.Value].Name);
+                Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Scope, _game.Variables[_varMap.Value].Name);
             }
 #endif
         }
@@ -126,11 +126,11 @@ namespace Luna {
             for (Int32 i = 0; i < _funcCount; i++) {
                 LFunction _funcGet = new LFunction(_game, _reader);
                 if (_funcGet.Count > 0) {
-                    _game.FunctionMapping[_funcGet.Offset + 4] = _game.Functions.Count;
-                    for(Int32 j = 0; j < _funcGet.Count - 1; j++) {
-                        if (j > 0) _game.FunctionMapping[(Int32)_reader.BaseStream.Position] = _game.Functions.Count;
-                        _reader.BaseStream.Seek(_funcGet.Offset + 4, SeekOrigin.Begin);
-                        _funcGet.Offset += _reader.ReadInt32() & 0xFFFF;
+                    _game.FunctionMapping[_funcGet.Offset] = _game.Functions.Count;
+                    for(Int32 j = 0; j < _funcGet.Count; j++) {
+                        if (j > 0) _game.FunctionMapping[_funcGet.Offset] = _game.Functions.Count;
+                        _reader.BaseStream.Seek(_funcGet.Offset, SeekOrigin.Begin);
+                        _funcGet.Offset += _reader.ReadInt32();
                     }
                     _reader.BaseStream.Seek(_funcGet.Base, SeekOrigin.Begin);
                 }
