@@ -15,3 +15,4 @@ Here's just a small list of things that I wanna do, so stuff works properly!
 - proper error catching
 - parsing EVERY chunk
 - implement support for running pre-2.3 WADs (probably not)
+- multithreading?!
