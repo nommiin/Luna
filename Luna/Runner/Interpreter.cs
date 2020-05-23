@@ -82,7 +82,7 @@ namespace Luna {
                 }
             }},
             /*{LOpcode.pushl, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                
+                // ?!
             }},*/
             {LOpcode.pop, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LArgumentType _argFrom = (LArgumentType)((_inst.Argument >> 4) & 0xF), _argTo = (LArgumentType)(_inst.Argument & 0xF);
@@ -127,12 +127,12 @@ namespace Luna {
             {LOpcode.b, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 _reader.BaseStream.Seek((_reader.BaseStream.Position - 4) + (_inst.Raw << 9 >> 7), SeekOrigin.Begin);
             }},
-            {LOpcode.conv, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+            /*{LOpcode.conv, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 // ?!
-            }},
-            {LOpcode.popz, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+            }},*/
+            /*{LOpcode.popz, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 // ?!
-            }},
+            }},*/
             {LOpcode.call, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]];
                 if (Functions.ContainsKey(_funcGet.Name) == true) {
