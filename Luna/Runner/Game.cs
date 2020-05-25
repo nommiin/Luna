@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using Luna.Assets;
+using OpenTK;
 using Luna.Types;
+using Luna.Assets;
+using Luna.Runner;
 
 namespace Luna {
     class Game {
@@ -64,8 +66,41 @@ namespace Luna {
         public List<LFunction> Functions = new List<LFunction>();
         public Dictionary<Int32, Int32> FunctionMapping = new Dictionary<int, int>();
 
+        // Runner
+        public GameWindow Window;
+        public Interpreter Runner;
+
         // Special
         public Dictionary<string, Chunk> Chunks;
+
+        public void Initalize() {
+            this.Runner = new Interpreter(this);
+
+            // Window
+            this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
+            this.Window.Title = this.DisplayName;
+            this.Window.Load += OnLoad;
+            this.Window.Closing += OnClose;
+            this.Window.UpdateFrame += OnUpdate;
+            this.Window.RenderFrame += OnRender;
+            this.Window.Run();
+        }
+
+        private void OnLoad(object sender, EventArgs e) {
+            this.Runner.ExecuteScript("gml_GlobalScript_Script2");
+        }
+
+        private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
+
+        }
+
+        private void OnUpdate(object sender, FrameEventArgs e) {
+
+        }
+
+        private void OnRender(object sender, FrameEventArgs e) {
+
+        }
 
         public string GetString(Int32 _offset) {
             if (_offset == 0) return "";

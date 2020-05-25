@@ -7,7 +7,7 @@ using System.IO;
 using Luna.Assets;
 using Luna.Types;
 
-namespace Luna {
+namespace Luna.Runner {
     public enum LArgumentType {
         Error = 15,
         Double = 0,
@@ -236,6 +236,7 @@ namespace Luna {
 
         public void ExecuteScript(LCode _code) {
             BinaryReader _codeReader = _code.Reader;
+
             while (_codeReader.BaseStream.Position < _codeReader.BaseStream.Length) {
                 Instruction _instGet = Instruction.Decode(_codeReader.ReadInt32());
 #if (DEBUG == true)

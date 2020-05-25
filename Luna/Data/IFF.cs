@@ -50,6 +50,7 @@ namespace Luna {
                     }
                 }
             }
+            this.Data.Initalize();
         }
     }
 }

@@ -54,6 +54,7 @@
     <Compile Include="Data\Chunk.cs" />
     <Compile Include="Runner\Game.cs" />
     <Compile Include="Data\IFF.cs" />
+    <Compile Include="Runner\Window.cs" />
     <Compile Include="Types\LFunction.cs" />
     <Compile Include="Types\LValue.cs" />
     <Compile Include="Program.cs" />
