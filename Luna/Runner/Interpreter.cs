@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 using Luna.Assets;
 using Luna.Types;
 
@@ -49,6 +50,11 @@ namespace Luna.Runner {
             {"show_debug_message", (Interpreter _vm, Int32 _count) => {
                 Console.WriteLine(_vm.Stack.Pop().Value);
                 _vm.Stack.Push(new LValue(LType.Number, 0));
+            }},
+            {"show_message", (Interpreter _vm, Int32 _count) => {
+                MessageBox.Show(_vm.Stack.Pop().Value, _vm.Data.DisplayName, MessageBoxButtons.OK);
+                _vm.Stack.Push(new LValue(LType.Number, 0));
+                
             }},
             {"string", (Interpreter _vm, Int32 _count) => {
                 _vm.Stack.Push(_vm.Stack.Pop().Convert(LType.String));
