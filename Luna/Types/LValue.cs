@@ -102,7 +102,7 @@ namespace Luna {
 
         public static LValue operator +(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, a.Value + a.Value);
+                return new LValue(LType.Number, a.Value + b.Value);
             } else if (a.Type == LType.String && b.Type == LType.String) {
                 return new LValue(LType.String, a.Value + b.Value);
             }

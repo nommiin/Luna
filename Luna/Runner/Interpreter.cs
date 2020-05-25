@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define PRINT_EXEC
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,8 +40,8 @@ namespace Luna.Runner {
         LessEqual,
         Equal,
         NotEqual,
-        GreaterThan,
-        GreaterEqual
+        GreaterEqual,
+        GreaterThan
     }
 
     class Interpreter {
@@ -57,6 +59,8 @@ namespace Luna.Runner {
             { LOpcode.bt, InstructionHandlers.DoBranchTrue },
             { LOpcode.b, InstructionHandlers.DoBranch },
             { LOpcode.popz, InstructionHandlers.DoDiscard },
+            { LOpcode.dup, InstructionHandlers.DoDuplicate },
+            { LOpcode.conv, InstructionHandlers.DoConvert },
             { LOpcode.call, InstructionHandlers.DoCall },
             { LOpcode.add, InstructionHandlers.DoAdd },
             { LOpcode.sub, InstructionHandlers.DoSubtract },
@@ -80,6 +84,9 @@ namespace Luna.Runner {
         }
 
         public void SetVariable(LVariable _var, LValue _value) {
+#if (PRINT_EXEC)
+            Console.WriteLine("SetVariable({0}) = {1}", _var.Name, _value.Value);
+#endif
             this.Variables[_var.Scope][_var] = _value;
         }
 
