@@ -49,7 +49,9 @@
   <ItemGroup>
     <Compile Include="Assets\LCode.cs" />
     <Compile Include="Data\ChunkHandler.cs" />
+    <Compile Include="Runner\FunctionHandlers.cs" />
     <Compile Include="Runner\Instruction.cs" />
+    <Compile Include="Runner\InstructionHandlers.cs" />
     <Compile Include="Runner\Interpreter.cs" />
     <Compile Include="Assets\LRoom.cs" />
     <Compile Include="Data\Chunk.cs" />

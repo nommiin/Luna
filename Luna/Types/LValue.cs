@@ -182,13 +182,13 @@ namespace Luna {
         public static LValue operator <(LValue a, LValue b) {
             a.Convert(LType.Number);
             b.Convert(LType.Number);
-            return new LValue(LType.Number, (a.Value > b.Value) ? 1 : 0);
+            return new LValue(LType.Number, (a.Value < b.Value) ? 1 : 0);
         }
 
         public static LValue operator >(LValue a, LValue b) {
             a.Convert(LType.Number);
             b.Convert(LType.Number);
-            return new LValue(LType.Number, (a.Value < b.Value) ? 1 : 0);
+            return new LValue(LType.Number, (a.Value > b.Value) ? 1 : 0);
         }
 
         public static LValue operator <=(LValue a, LValue b) {
