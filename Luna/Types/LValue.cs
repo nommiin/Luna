@@ -49,6 +49,7 @@ namespace Luna {
             switch (this.Type) {
                 case LType.Number: this.Number = (double)_value; break;
                 case LType.String: this.String = (string)_value; break;
+                case LType.Undefined: this.Undefined = (byte)_value; break;
             }
         }
 
@@ -68,7 +69,12 @@ namespace Luna {
                 case LType.String: {
                     switch (_type) {
                         case LType.Number: {
-                            this.Number = System.Convert.ToDouble(this.String);
+                            int i = 0;
+                            while (Char.IsNumber(this.String[i]) == true) {
+                                i++;
+                            }
+                            if (i > 0) this.Number = System.Convert.ToDouble(this.String.Substring(0, i));
+                            else throw new Exception(String.Format("Could not convert {0} from {1} to {2}", this.String, this.Type, _type));
                             break;
                         }
                     }
@@ -88,6 +94,7 @@ namespace Luna {
                 switch (this.Type) {
                     case LType.Number: return Number;
                     case LType.String: return String;
+                    case LType.Undefined: return Undefined;
                 }
                 throw new Exception(String.Format("Could not return LValue.Value for type {0}", Type));
             }
@@ -104,28 +111,28 @@ namespace Luna {
 
         public static LValue operator -(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, a.Value - a.Value);
+                return new LValue(LType.Number, a.Value - b.Value);
             }
             throw new Exception(String.Format("Could not subtract {0} (Type: {2}) from {1} (Type: {3})", a.Value, b.Value, a.Type, b.Type));
         }
 
         public static LValue operator *(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, a.Value * a.Value);
+                return new LValue(LType.Number, a.Value * b.Value);
             }
             throw new Exception(String.Format("Could not multiply {0} (Type: {2}) by {1} (Type: {3})", a.Value, b.Value, a.Type, b.Type));
         }
 
         public static LValue operator /(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, a.Value / a.Value);
+                return new LValue(LType.Number, a.Value / b.Value);
             }
             throw new Exception(String.Format("Could not divide {0} (Type: {2}) by {1} (Type: {3})", a.Value, b.Value, a.Type, b.Type));
         }
 
         public static LValue operator %(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, a.Value / a.Value);
+                return new LValue(LType.Number, a.Value / b.Value);
             }
             throw new Exception(String.Format("Could not modulo {0} (Type: {2}) by {1} (Type: {3})", a.Value, b.Value, a.Type, b.Type));
         }

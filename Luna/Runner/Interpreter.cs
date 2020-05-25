@@ -48,6 +48,7 @@ namespace Luna {
         public static Dictionary<string, FunctionHandler> Functions = new Dictionary<string, FunctionHandler>() {
             {"show_debug_message", (Interpreter _vm, Int32 _count) => {
                 Console.WriteLine(_vm.Stack.Pop().Value);
+                _vm.Stack.Push(new LValue(LType.Number, 0));
             }},
             {"string", (Interpreter _vm, Int32 _count) => {
                 _vm.Stack.Push(_vm.Stack.Pop().Convert(LType.String));
@@ -130,9 +131,9 @@ namespace Luna {
             /*{LOpcode.conv, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 // ?!
             }},*/
-            /*{LOpcode.popz, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
-                // ?!
-            }},*/
+            {LOpcode.popz, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+                _vm.Stack.Pop();
+            }},
             {LOpcode.call, delegate (Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
                 LFunction _funcGet = _vm.Data.Functions[_vm.Data.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]];
                 if (Functions.ContainsKey(_funcGet.Name) == true) {
