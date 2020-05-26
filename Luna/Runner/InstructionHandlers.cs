@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define PRINT_EXEC
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,6 +45,46 @@ namespace Luna.Runner {
 #if (PRINT_EXEC)
             Console.WriteLine("Push(Type: {0}, {1})", _argType, _vm.Stack.Peek().Value);
 #endif
+        }
+
+        public static void DoPushGlobal(Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+            LArgumentType _argType = (LArgumentType)_inst.Argument;
+            switch (_argType) {
+                case LArgumentType.Error: {
+                    _vm.Stack.Push(new LValue(LType.Number, _inst.Data));
+                    break;
+                }
+
+                case LArgumentType.String: {
+                    _vm.Stack.Push(new LValue(LType.String, _vm.Data.StringMapping[_reader.ReadInt32()].Value));
+                    break;
+                }
+
+                case LArgumentType.Variable: {
+                    LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]];
+                    _vm.Stack.Push(_vm.GetVariable(_varGet));
+                    _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not push unimplemented type: \"{0}\"", _argType));
+                }
+            }
+#if (PRINT_EXEC)
+            Console.WriteLine("PushGlobal(Type: {0}, {1})", _argType, _vm.Stack.Peek().Value);
+#endif
+        }
+
+        public static void DoPushBuiltin(Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {
+            LVariable _varGet = _vm.Data.Variables[_vm.Data.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]];
+            switch (_varGet.Name) {
+                case "current_time": {
+                    _vm.Stack.Push(new LValue(LType.Number, _vm.Timer.ElapsedMilliseconds));
+                    break;
+                }
+            }
+            _reader.BaseStream.Seek(sizeof(Int32), SeekOrigin.Current);
         }
 
         public static void DoPop(Interpreter _vm, LCode _code, BinaryReader _reader, Instruction _inst) {

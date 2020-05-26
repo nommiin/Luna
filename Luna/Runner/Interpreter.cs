@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using Luna.Assets;
 using Luna.Types;
+using System.Diagnostics;
 
 namespace Luna.Runner {
     public enum LArgumentType {
@@ -53,6 +54,8 @@ namespace Luna.Runner {
             { LOpcode.pushi, InstructionHandlers.DoPushImmediate },
             { LOpcode.push, InstructionHandlers.DoPush },
             { LOpcode.pushl, InstructionHandlers.DoPush },
+            { LOpcode.pushg, InstructionHandlers.DoPushGlobal },
+            { LOpcode.pushb, InstructionHandlers.DoPushBuiltin },
             { LOpcode.pop, InstructionHandlers.DoPop },
             { LOpcode.set, InstructionHandlers.DoConditional },
             { LOpcode.bf, InstructionHandlers.DoBranchFalse },
@@ -92,6 +95,7 @@ namespace Luna.Runner {
 
         public Int32 Count;
         public Game Data;
+        public Stopwatch Timer = new Stopwatch();
         public Stack<LValue> Stack = new Stack<LValue>();
         public Dictionary<LVariableScope, Dictionary<LVariable, LValue>> Variables = new Dictionary<LVariableScope, Dictionary<LVariable, LValue>>();
         public Interpreter(Game _game) {
@@ -109,6 +113,22 @@ namespace Luna.Runner {
             foreach (LVariableScope _type in Enum.GetValues(typeof(LVariableScope))) {
                 this.Variables[_type] = new Dictionary<LVariable, LValue>();
             }
+
+            /*
+            [WARNING] The opcode "popv" is not implemented.
+[WARNING] The opcode "neg" is not implemented.
+[WARNING] The opcode "not" is not implemented.
+[WARNING] The opcode "pushv" is not implemented.
+[WARNING] The opcode "callv" is not implemented.
+[WARNING] The opcode "ret" is not implemented.
+[WARNING] The opcode "exit" is not implemented.
+[WARNING] The opcode "pushenv" is not implemented.
+[WARNING] The opcode "popenv" is not implemented.
+[WARNING] The opcode "pushg" is not implemented.
+[WARNING] The opcode "pushb" is not implemented.
+[WARNING] The opcode "brk" is not implemented.
+[WARNING] The opcode "unknown" is not implemented.
+    */
             this.Data = _game;
         }
 

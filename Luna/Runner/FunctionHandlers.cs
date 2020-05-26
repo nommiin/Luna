@@ -21,7 +21,7 @@ namespace Luna.Runner {
         }
 
         public static void show_message(Interpreter _vm, Int32 _count) {
-            MessageBox.Show(_vm.Stack.Pop().Value, _vm.Data.DisplayName, MessageBoxButtons.OK);
+            MessageBox.Show(_vm.Stack.Pop().Convert(LType.String).Value, _vm.Data.DisplayName, MessageBoxButtons.OK);
             _vm.Stack.Push(new LValue(LType.Number, 0));
         }
 
@@ -31,6 +31,29 @@ namespace Luna.Runner {
 
         public static void real(Interpreter _vm, Int32 _count) {
             _vm.Stack.Push(_vm.Stack.Pop().Convert(LType.Number));
+        }
+
+        public static void ds_map_create(Interpreter _vm, Int32 _count) {
+            _vm.Stack.Push(new LValue(LType.Number, new LMap().Index));
+        }
+
+        public static void ds_map_set(Interpreter _vm, Int32 _count) {
+            double _mapIndex = _vm.Stack.Pop().Value;
+            dynamic _propertyKey = _vm.Stack.Pop();
+            LValue _propertyValue = _vm.Stack.Pop();
+            LMap.Registry[(int)_mapIndex].Data.Add(_propertyKey.Value, _propertyValue);
+            _vm.Stack.Push(new LValue(LType.Number, 0));
+        }
+
+        public static void ds_map_find_value(Interpreter _vm, Int32 _count) {
+            double _mapIndex = _vm.Stack.Pop().Value;
+            dynamic _propertyKey = _vm.Stack.Pop().Value;
+            LMap _mapGet = LMap.Registry[(int)_mapIndex];
+            if (_mapGet.Data.ContainsKey(_propertyKey) == true) {
+                _vm.Stack.Push(_mapGet.Data[_propertyKey]);
+            } else {
+                _vm.Stack.Push(new LValue(LType.Undefined));
+            }
         }
     }
 }

@@ -44,6 +44,10 @@ namespace Luna {
             this.Set(_type, _value);
         }
 
+        public LValue(LType _type) {
+            this.Set(_type, 0);
+        }
+
         public void Set(LType _type, dynamic _value) {
             this.Type = _type;
             switch (this.Type) {
@@ -81,6 +85,20 @@ namespace Luna {
                     break;
                 }
 
+                case LType.Undefined: {
+                    switch (_type) {
+                        case LType.String: {
+                            this.String = "undefined";
+                            break;
+                        }
+
+                        default: {
+                            throw new Exception(String.Format("Could not convert undefined to {0}", _type));
+                        }
+                    }
+                    break;
+                }
+
                 default: {
                     throw new Exception(String.Format("Could not convert {0} from {1} to {2}", this.Value, this.Type, _type));
                 }
@@ -94,7 +112,7 @@ namespace Luna {
                 switch (this.Type) {
                     case LType.Number: return Number;
                     case LType.String: return String;
-                    case LType.Undefined: return Undefined;
+                    case LType.Undefined: return "undefined";
                 }
                 throw new Exception(String.Format("Could not return LValue.Value for type {0}", Type));
             }
