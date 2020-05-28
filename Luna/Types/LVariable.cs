@@ -7,6 +7,14 @@ using System.IO;
 using Luna.Runner;
 
 namespace Luna.Types {
+    public enum LVariableScope {
+        Global = -5,
+        Instance = -1,
+        Local = -7,
+        Static = -16,
+        Unknown = -6
+    }
+
     class LVariable {
         public static Int32 Length = 20;
         public string Name;

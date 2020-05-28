@@ -13,9 +13,9 @@ namespace Luna {
             { "STRG", ChunkHandler.STRG },
             { "GEN8", ChunkHandler.GEN8 },
             { "ROOM", ChunkHandler.ROOM },
-            { "CODE", ChunkHandler.CODE },
             { "VARI", ChunkHandler.VARI },
-            { "FUNC", ChunkHandler.FUNC }
+            { "FUNC", ChunkHandler.FUNC },
+            { "CODE", ChunkHandler.CODE }
         };
 
         #endregion

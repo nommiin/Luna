@@ -79,7 +79,7 @@ namespace Luna {
             this.Runner = new Interpreter(this);
 
             // Window
-            this.Runner.Timer.Start();
+            //this.Runner.Timer.Start();
             if (this.Headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
                 this.Window.Title = this.DisplayName;
