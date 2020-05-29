@@ -104,7 +104,7 @@ namespace Luna.Instructions {
     class PushImmediate : Instruction {
         public LValue Value;
         public PushImmediate(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Value = new LValue(LType.Number, this.Data);
+            this.Value = new LValue(LType.Number, (double)this.Data);
         }
 
         public override void Perform(Interpreter _vm, Domain _domain, Stack<LValue> _stack) {
@@ -261,7 +261,7 @@ namespace Luna.Instructions {
         }
 
         public override string ToString() {
-            return $"Pop(To: {this.ArgTo}, From: {this.ArgFrom}, Variable: {this.Variable})";
+            return $"Pop(To: {this.ArgTo}, From: {this.ArgFrom}, Variable: {this.Variable.Name})";
         }
     }
 
@@ -301,14 +301,14 @@ namespace Luna.Instructions {
         }
 
         public override string ToString() {
-            return $"Branch({this.Offset})";
+            return $"Branch(Offset: {this.Offset}, Jump: {this.Jump})";
         }
     }
 
     class BranchTrue : Branch {
         public BranchTrue(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) {}
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            if (_stack.Pop().Value == 1.0) {
+            if ((double)_stack.Pop().Value == 1.0) {
                 _vm.ProgramCounter = this.Jump;
             }
         }
@@ -317,7 +317,7 @@ namespace Luna.Instructions {
     class BranchFalse : Branch {
         public BranchFalse(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) {}
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            if (_stack.Pop().Value == 0.0) {
+            if ((double)_stack.Pop().Value == 0.0) {
                 _vm.ProgramCounter = this.Jump;
             }
         }
@@ -384,7 +384,7 @@ namespace Luna.Instructions {
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
             LValue _valRight = _stack.Pop();
             LValue _valLeft = _stack.Pop();
-            _stack.Push(new LValue(LType.Number, Math.Floor(_valLeft.Value / _valRight.Value)));
+            _stack.Push(_valLeft.Set(LType.Number, _valLeft / _valRight));
         }
     }
 
@@ -400,63 +400,61 @@ namespace Luna.Instructions {
     class Xor : Instruction {
         public Xor(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            _stack.Push(_valLeft ^ _valRight.Value);
+            long _valRight = (long)_stack.Pop().Value;
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, _valLeft ^ _valRight));
         }
     }
 
     class And : Instruction {
         public And(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            _stack.Push(_valLeft & _valRight.Value);
+            long _valRight = (long)_stack.Pop().Value;
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, _valLeft & _valRight));
         }
     }
 
     class Not : Instruction {
         public Not(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            //_stack.Push(_valLeft / _valRight);
+            bool _valLeft = (bool)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, !_valLeft));
         }
     }
 
     class Negate : Instruction {
         public Negate(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            //_stack.Push(_valLeft / _valRight);
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, ~_valLeft));
         }
     }
 
     class Or : Instruction {
         public Or(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            _stack.Push(_valLeft | _valRight.Value);
+            long _valRight = (long)_stack.Pop().Value;
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, _valLeft | _valRight));
         }
     }
 
     class ShiftLeft : Instruction {
         public ShiftLeft(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            _stack.Push(_valLeft << _valRight.Value);
+            int _valRight = (int)_stack.Pop().Value;
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, _valLeft << _valRight));
         }
     }
 
     class ShiftRight : Instruction {
         public ShiftRight(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            LValue _valRight = _stack.Pop();
-            LValue _valLeft = _stack.Pop();
-            _stack.Push(_valLeft >> _valRight.Value);
+            int _valRight = (int)_stack.Pop().Value;
+            long _valLeft = (long)_stack.Pop().Value;
+            _stack.Push(new LValue(LType.Number, _valLeft >> _valRight));
         }
     }
 

@@ -43,10 +43,12 @@ namespace Luna.Runner {
         }
 
         public void ExecuteScript(LCode _code) {
+            Console.WriteLine("Start");
             for(this.ProgramCounter = 0; this.ProgramCounter < _code.InstructionList.Count; this.ProgramCounter++) {
                 //Console.WriteLine("PC: {0} - {1}", this.ProgramCounter, _code.InstructionList[this.ProgramCounter].Opcode);
                 _code.InstructionList[this.ProgramCounter].Perform(this, this.Environment, this.Environment.Stack);
             }
+            Console.WriteLine("End");
         }
     }
 }

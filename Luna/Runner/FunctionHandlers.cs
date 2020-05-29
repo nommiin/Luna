@@ -25,16 +25,16 @@ namespace Luna.Runner {
         }
 
         public static void ds_map_set(Stack<LValue> _stack) {
-            double _mapIndex = _stack.Pop().Value;
-            dynamic _propertyKey = _stack.Pop().Value;
+            double _mapIndex = (double)_stack.Pop().Value;
+            object _propertyKey = _stack.Pop().Value;
             LValue _propertyValue = _stack.Pop();
             LMap.Registry[(int)_mapIndex].Data.Add(_propertyKey, _propertyValue);
             _stack.Push(new LValue(LType.Number, 0));
         }
 
         public static void ds_map_find_value(Stack<LValue> _stack) {
-            double _mapIndex = _stack.Pop().Value;
-            dynamic _propertyKey = _stack.Pop().Value;
+            double _mapIndex = (double)_stack.Pop().Value;
+            object _propertyKey = _stack.Pop().Value;
             LMap _mapGet = LMap.Registry[(int)_mapIndex];
             if (_mapGet.Data.ContainsKey(_propertyKey) == true) {
                 _stack.Push(_mapGet.Data[_propertyKey]);

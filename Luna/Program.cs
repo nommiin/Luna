@@ -9,7 +9,7 @@ using Luna.Runner;
 namespace Luna {
     class Program {
         static void Main(string[] args) {
-            IFF _wad = new IFF(@"E:\Luna\Sample\LunaSmall.win", new Game());
+            IFF _wad = new IFF(@"E:\Luna\Sample\builds\LunaBenchmark2.win", new Game());
             _wad.Parse();
             /*
             LunaTypes
