@@ -45,6 +45,13 @@ namespace Luna {
         pushb = 195,
         call = 217,
         brk = 255,
+        setstatic = 256,
+        isstaticok = 257,
+        setowner = 258,
+        pushac = 259,
+        popaf = 260,
+        pushaf = 261,
+        chkindex = 271,
         unknown = 1000
     }
 
@@ -80,7 +87,7 @@ namespace Luna {
         public Int32 Raw;
 
         public Instruction(Int32 _instruction) {
-            this.Opcode = (LOpcode)((_instruction >> 24) & 0xFF);
+            this.Opcode = Instruction.GetOpcode(_instruction);
             this.Argument = (byte)((_instruction >> 16) & 0xFF);
             this.Data = (Int16)(_instruction & 0xFFFF);
             this.Raw = _instruction;
@@ -91,7 +98,21 @@ namespace Luna {
         }
 
         public static LOpcode GetOpcode(Int32 _instruction) {
-            return (LOpcode)((_instruction >> 24) & 0xFF);
+            int _opcodeGet = ((_instruction >> 24) & 0xFF);
+            if (_opcodeGet == 255) {
+                int _int = (_instruction & UInt16.MaxValue);
+                switch (_int) {
+                    case UInt16.MaxValue - 0: return LOpcode.chkindex;
+                    case UInt16.MaxValue - 1: return LOpcode.pushaf;
+                    case UInt16.MaxValue - 2: return LOpcode.popaf;
+                    case UInt16.MaxValue - 3: return LOpcode.pushac;
+                    case UInt16.MaxValue - 4: return LOpcode.setowner;
+                    case UInt16.MaxValue - 5: return LOpcode.isstaticok;
+                    case UInt16.MaxValue - 6: return LOpcode.setstatic;
+                }
+                return LOpcode.brk;
+            }
+            return (LOpcode)_opcodeGet;
         }
         
         public override string ToString() {
@@ -128,6 +149,11 @@ namespace Luna.Instructions {
                     break;
                 }
 
+                case LArgumentType.Integer: {
+                    this.Value = new LValue(LType.Number, _reader.ReadInt32());
+                    break;
+                }
+
                 case LArgumentType.Long: {
                     this.Value = new LValue(LType.Number, _reader.ReadInt64());
                     break;
@@ -142,6 +168,10 @@ namespace Luna.Instructions {
                     this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]];
                     _reader.ReadInt32();
                     break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not parse unimplemented push type {0}", this.Type));
                 }
             }
         }
@@ -192,7 +222,7 @@ namespace Luna.Instructions {
                 }
 
                 default: {
-                    throw new Exception(String.Format("Could not push unimplemented global type: \"{0}\"", (LArgumentType)this.Argument));
+                    throw new Exception(String.Format("Could not parse unimplemented global push type: \"{0}\"", (LArgumentType)this.Argument));
                 }
             }
         }

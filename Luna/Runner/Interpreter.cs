@@ -27,9 +27,8 @@ namespace Luna.Runner {
             // Load runner functions via reflection
             MethodInfo[] _functionHandlers = typeof(FunctionHandlers).GetMethods(BindingFlags.Public | BindingFlags.Static);
             for (int i = 0; i < _functionHandlers.Length; i++) {
-                string _functionName = _functionHandlers[i].Name;
-                while (_functionName[0] == '_') _functionName = _functionName.Substring(1);
-                Functions.Add(_functionName, (FunctionHandler)Delegate.CreateDelegate(typeof(FunctionHandler), _functionHandlers[i]));
+                MethodInfo _functionGet = _functionHandlers[i];
+                Functions.Add(_functionGet.GetCustomAttribute<FunctionDefinition>().Name, (FunctionHandler)Delegate.CreateDelegate(typeof(FunctionHandler), _functionHandlers[i]));
             }
 
             // Setup defaults
@@ -43,12 +42,10 @@ namespace Luna.Runner {
         }
 
         public void ExecuteScript(LCode _code) {
-            Console.WriteLine("Start");
             for(this.ProgramCounter = 0; this.ProgramCounter < _code.InstructionList.Count; this.ProgramCounter++) {
                 //Console.WriteLine("PC: {0} - {1}", this.ProgramCounter, _code.InstructionList[this.ProgramCounter].Opcode);
                 _code.InstructionList[this.ProgramCounter].Perform(this, this.Environment, this.Environment.Stack);
             }
-            Console.WriteLine("End");
         }
     }
 }

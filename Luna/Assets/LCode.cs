@@ -70,9 +70,7 @@ namespace Luna.Assets {
                 LOpcode _instructionOpcode = Instruction.GetOpcode(_instructionGet);
                 if (_instructionOpcode != LOpcode.conv) {
                     if (LCode.InstructionMapping.ContainsKey(_instructionOpcode) == true) {
-                        Instruction a = InstructionMapping[_instructionOpcode](_instructionGet, _game, this, this.Reader);
-                        Console.WriteLine(a);
-                        this.InstructionList.Add(a);
+                        this.InstructionList.Add(InstructionMapping[_instructionOpcode](_instructionGet, _game, this, this.Reader));
                     } else {
                         throw new Exception(String.Format("Could not find instruction mapping for \"{0}\"", _instructionOpcode));
                     }
