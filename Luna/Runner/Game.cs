@@ -7,7 +7,6 @@ using System.IO;
 using OpenTK;
 using Luna.Types;
 using Luna.Assets;
-using Luna.Runner;
 
 namespace Luna {
     class Game {
@@ -52,8 +51,11 @@ namespace Luna {
         public Guid GUID;
 
         // Assets
-        public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
         public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
+        public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
+        public List<LCode> CodeMapping = new List<LCode>();
+        public List<LScript> Scripts = new List<LScript>();
+        public Dictionary<Int32, LScript> ScriptMapping = new Dictionary<Int32, LScript>();
         public Dictionary<long, LString> Strings = new Dictionary<long, LString>();
         public List<LString> StringMapping = new List<LString>();
 
@@ -65,22 +67,25 @@ namespace Luna {
         public Dictionary<Int32, Int32> VariableMapping = new Dictionary<Int32, Int32>();
         public List<LFunction> Functions = new List<LFunction>();
         public Dictionary<Int32, Int32> FunctionMapping = new Dictionary<int, int>();
+        public List<LCode> GlobalScripts = new List<LCode>();
 
         // Runner
-        public bool Headless;
         public GameWindow Window;
-        public Interpreter Runner;
 
         // Special
         public Dictionary<string, Chunk> Chunks;
 
-        public void Initalize(bool _headless) {
-            this.Headless = _headless;
-            this.Runner = new Interpreter(this);
+        public string GetString(Int32 _offset) {
+            if (_offset == 0) return "";
+            if (this.Strings.ContainsKey(_offset) == true) {
+                return this.Strings[_offset].Value;
+            }
+            throw new Exception(String.Format("Could not find string at {0}", _offset));
+        }
 
+        public void Initalize(bool _headless) {
             // Window
-            //this.Runner.Timer.Start();
-            if (this.Headless == false) {
+            if (_headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
                 this.Window.Title = this.DisplayName;
                 this.Window.Load += OnLoad;
@@ -94,7 +99,7 @@ namespace Luna {
         }
 
         private void OnLoad(object sender, EventArgs e) {
-            this.Runner.ExecuteScript("gml_GlobalScript_Script2");
+            
         }
 
         private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -107,14 +112,6 @@ namespace Luna {
 
         private void OnRender(object sender, FrameEventArgs e) {
 
-        }
-
-        public string GetString(Int32 _offset) {
-            if (_offset == 0) return "";
-            if (this.Strings.ContainsKey(_offset) == true) {
-                return this.Strings[_offset].Value;
-            }
-            throw new Exception(String.Format("Could not find string at {0}", _offset));
         }
     }
 }

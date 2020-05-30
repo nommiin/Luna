@@ -49,21 +49,15 @@
   <ItemGroup>
     <Compile Include="Assets\LCode.cs" />
     <Compile Include="Data\ChunkHandler.cs" />
-    <Compile Include="Runner\Domain.cs" />
-    <Compile Include="Runner\FunctionHandlers.cs" />
-    <Compile Include="Runner\Instruction.cs" />
     <Compile Include="Assets\LRoom.cs" />
     <Compile Include="Data\Chunk.cs" />
     <Compile Include="Runner\Game.cs" />
     <Compile Include="Data\IFF.cs" />
-    <Compile Include="Runner\Interpreter.cs" />
     <Compile Include="Types\LFunction.cs" />
-    <Compile Include="Types\LInstance.cs" />
-    <Compile Include="Types\LMap.cs" />
+    <Compile Include="Types\LScript.cs" />
     <Compile Include="Types\LValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Types\LBoolean.cs" />
     <Compile Include="Types\LString.cs" />
     <Compile Include="Types\LVariable.cs" />
   </ItemGroup>

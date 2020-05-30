@@ -10,7 +10,7 @@ using Luna.Types;
 namespace Luna {
     static class ChunkHandler {
         public delegate void KVP(Int32 _base);
-        private static void HandleKVP(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk, KVP _handler) {
+        private static void HandleKVP(Game _assets, BinaryReader _reader, Chunk _chunk, KVP _handler) {
             Int32 _keyCount = _reader.ReadInt32();
             for(Int32 i = 0; i < _keyCount; i++) {
                 Int32 _keyOffset = _reader.ReadInt32(), _keyBase = (Int32)_reader.BaseStream.Position;
@@ -20,143 +20,133 @@ namespace Luna {
             }
         }
 
-        public static void STRG(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
+        public static void STRG(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
                 LString _stringGet = new LString(_reader, _offset);
-                _game.Strings.Add(_stringGet.Offset, _stringGet);
-                _game.StringMapping.Add(_stringGet);
+                _assets.Strings.Add(_stringGet.Offset, _stringGet);
+                _assets.StringMapping.Add(_stringGet);
             });
-#if (DEBUG == true)
-            Console.WriteLine("Read {0} strings", _game.Strings.Count);
-#endif
         }
 
-        public static void GEN8(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            _game.DebugEnabled = ((_reader.ReadInt32() - 4352) == 0 ? true : false);
-            _game.Name = _game.GetString(_reader.ReadInt32());
-            _game.Configuration = _game.GetString(_reader.ReadInt32());
-            _game.RoomMax = _reader.ReadInt32();
-            _game.RoomMaxTile = _reader.ReadInt32();
-            _game.ID = _reader.ReadInt32();
+        public static void GEN8(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            _assets.DebugEnabled = ((_reader.ReadInt32() - 4352) == 0 ? true : false);
+            _assets.Name = _assets.GetString(_reader.ReadInt32());
+            _assets.Configuration = _assets.GetString(_reader.ReadInt32());
+            _assets.RoomMax = _reader.ReadInt32();
+            _assets.RoomMaxTile = _reader.ReadInt32();
+            _assets.ID = _reader.ReadInt32();
             _reader.BaseStream.Seek(sizeof(Int32) * 4, SeekOrigin.Current);
-            _game.GameName = _game.GetString(_reader.ReadInt32());
-            _game.Build = new Version(_reader.ReadInt32(), _reader.ReadInt32(), _reader.ReadInt32(), _reader.ReadInt32());
-            _game.RoomWidth = _reader.ReadInt32();
-            _game.RoomHeight = _reader.ReadInt32();
+            _assets.GameName = _assets.GetString(_reader.ReadInt32());
+            _assets.Build = new Version(_reader.ReadInt32(), _reader.ReadInt32(), _reader.ReadInt32(), _reader.ReadInt32());
+            _assets.RoomWidth = _reader.ReadInt32();
+            _assets.RoomHeight = _reader.ReadInt32();
             Int32 _gameFlags = _reader.ReadInt32();
-            _game.Flags.Fullscreen = new LBoolean(_gameFlags & 1);
-            _game.Flags.Interpolate = new LBoolean((_gameFlags >> 3) & 1);
-            _game.Flags.Scale = new LBoolean((_gameFlags >> 4) & 1);
-            _game.Flags.ShowCursor = new LBoolean((_gameFlags >> 5) & 1);
-            _game.Flags.Resizable = new LBoolean((_gameFlags >> 6) & 1);
-            _game.Flags.Screenshot = new LBoolean((_gameFlags >> 7) & 1);
-            _game.Flags.IsSteam = new LBoolean((_gameFlags >> 13) & 1);
-            _game.Flags.IsPlayer = _game.Flags.IsSteam;
-            _game.Flags.Borderless = new LBoolean((_gameFlags >> 14) & 1);
-            _game.Flags.IsJavaScript = new LBoolean((_gameFlags >> 15) & 1);
-            _game.CRC = _reader.ReadInt32();
-            _game.MD5 = _reader.ReadBytes(16);
-            _game.Timestamp = _reader.ReadInt64();
-            _game.DisplayName = _game.GetString(_reader.ReadInt32());
-#if (DEBUG == true)
-            Console.WriteLine("Project: Name: {0}, Game Name: {1}, Display Name: {2}", _game.Name, _game.GameName, _game.DisplayName);
-#endif
-            _game.Flags.Targets = _reader.ReadInt64();
-            _game.Classifications = _reader.ReadInt64();
-            _game.AppID = _reader.ReadInt32();
-            _game.DebugPort = _reader.ReadInt32();
-            _game.RoomCount = _reader.ReadInt32();
-            for (Int32 i = 0; i < _game.RoomCount; i++) {
-                _game.RoomOrder.Add(_reader.ReadInt32());
+            _assets.Flags.Fullscreen = (_gameFlags & 1) == 1 ? true : false;
+            _assets.Flags.Interpolate = ((_gameFlags >> 3) & 1) == 1 ? true : false;
+            _assets.Flags.Scale = ((_gameFlags >> 4) & 1) == 1 ? true : false;
+            _assets.Flags.ShowCursor = ((_gameFlags >> 5) & 1) == 1 ? true : false;
+            _assets.Flags.Resizable = ((_gameFlags >> 6) & 1) == 1 ? true : false;
+            _assets.Flags.Screenshot = ((_gameFlags >> 7) & 1) == 1 ? true : false;
+            _assets.Flags.IsSteam = ((_gameFlags >> 13) & 1) == 1 ? true : false;
+            _assets.Flags.IsPlayer = _assets.Flags.IsSteam;
+            _assets.Flags.Borderless = ((_gameFlags >> 14) & 1) == 1 ? true : false;
+            _assets.Flags.IsJavaScript = ((_gameFlags >> 15) & 1) == 1 ? true : false;
+            _assets.CRC = _reader.ReadInt32();
+            _assets.MD5 = _reader.ReadBytes(16);
+            _assets.Timestamp = _reader.ReadInt64();
+            _assets.DisplayName = _assets.GetString(_reader.ReadInt32());
+            _assets.Flags.Targets = _reader.ReadInt64();
+            _assets.Classifications = _reader.ReadInt64();
+            _assets.AppID = _reader.ReadInt32();
+            _assets.DebugPort = _reader.ReadInt32();
+            _assets.RoomCount = _reader.ReadInt32();
+            for (Int32 i = 0; i < _assets.RoomCount; i++) {
+                _assets.RoomOrder.Add(_reader.ReadInt32());
             }
 
-            if (_game.Build.Major >= 2) {
+            if (_assets.Build.Major >= 2) {
                 _reader.BaseStream.Seek(sizeof(Int64) * 5, SeekOrigin.Current);
-                _game.GameSpeed = _reader.ReadSingle();
-                _game.AllowStats = _reader.ReadBoolean();
-                _game.GUID = new Guid(_reader.ReadBytes(16));
+                _assets.GameSpeed = _reader.ReadSingle();
+                _assets.AllowStats = _reader.ReadBoolean();
+                _assets.GUID = new Guid(_reader.ReadBytes(16));
             }
         }
 
-        public static void ROOM(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
-                LRoom _roomGet = new LRoom(_game, _reader);
-                _game.Rooms.Add(_roomGet.Name, _roomGet);
+        public static void ROOM(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LRoom _roomGet = new LRoom(_assets, _reader);
+                _assets.Rooms.Add(_roomGet.Name, _roomGet);
             });
         }
 
-        public static void CODE(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            HandleKVP(_game, _reader, _writer, _chunk, delegate (Int32 _offset) {
-                LCode _codeGet = new LCode(_game, _reader);
-                _game.Code.Add(_codeGet.Name, _codeGet);
-            });
-        }
-
-        public static void VARI(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
-            _game.LocalVariables = _reader.ReadInt32();
-            _game.InstanceVariables = _reader.ReadInt32();
-            _game.GlobalVariables = _reader.ReadInt32();
+        public static void VARI(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            _assets.LocalVariables = _reader.ReadInt32();
+            _assets.InstanceVariables = _reader.ReadInt32();
+            _assets.GlobalVariables = _reader.ReadInt32();
             while (_reader.BaseStream.Position < _chunk.Base + _chunk.Length) {
-                LVariable _varGet = new LVariable(_game, _reader);
+                LVariable _varGet = new LVariable(_assets, _reader);
                 if (_varGet.Count > 0) {
-                    _game.VariableMapping[_varGet.Offset] = _game.Variables.Count;
+                    _assets.VariableMapping[_varGet.Offset] = _assets.Variables.Count;
                     for (Int32 i = 0; i < _varGet.Count; i++) {
-                        if (i > 0) _game.VariableMapping[_varGet.Offset] = _game.Variables.Count;
+                        if (i > 0) _assets.VariableMapping[_varGet.Offset] = _assets.Variables.Count;
                         _reader.BaseStream.Seek(_varGet.Offset + 4, SeekOrigin.Begin);
                         _varGet.Offset += _reader.ReadInt32() & 0xFFFF;
                     }
                 }
-                _game.Variables.Add(_varGet);
+                _assets.Variables.Add(_varGet);
                 _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
                 if ((_chunk.Base + _chunk.Length) - _reader.BaseStream.Position < LVariable.Length) break;
             }
-
-#if (DEBUG == true)
-            foreach (KeyValuePair<int, int> _varMap in _game.VariableMapping) {
-                Console.WriteLine("{0} => {1}.{2}", _varMap.Key, _game.Variables[_varMap.Value].Scope, _game.Variables[_varMap.Value].Name);
-            }
-#endif
         }
 
-        public static void FUNC(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk) {
+        public static void FUNC(Game _assets, BinaryReader _reader, Chunk _chunk) {
             Int32 _funcCount = _reader.ReadInt32();
-#if (DEBUG == true)
-            Console.WriteLine("Function Count: {0}", _funcCount);
-#endif
             for (Int32 i = 0; i < _funcCount; i++) {
-                LFunction _funcGet = new LFunction(_game, _reader);
+                LFunction _funcGet = new LFunction(_assets, _reader);
                 if (_funcGet.Count > 0) {
-                    _game.FunctionMapping[_funcGet.Offset] = _game.Functions.Count;
+                    _assets.FunctionMapping[_funcGet.Offset] = _assets.Functions.Count;
                     for(Int32 j = 0; j < _funcGet.Count; j++) {
-                        if (j > 0) _game.FunctionMapping[_funcGet.Offset] = _game.Functions.Count;
+                        if (j > 0) _assets.FunctionMapping[_funcGet.Offset] = _assets.Functions.Count;
                         _reader.BaseStream.Seek(_funcGet.Offset, SeekOrigin.Begin);
-                        _funcGet.Offset += _reader.ReadInt32();
+                        _funcGet.Offset += _reader.ReadInt32() & 0xFFFF;
                     }
                     _reader.BaseStream.Seek(_funcGet.Base, SeekOrigin.Begin);
                 }
-                _game.Functions.Add(_funcGet);
+                _assets.Functions.Add(_funcGet);
             }
 
-#if (DEBUG == true)
-            foreach (KeyValuePair<int, int> _funcMap in _game.FunctionMapping) {
-                Console.WriteLine("Call {0} at {1}", _game.Functions[_funcMap.Value].Name, _funcMap.Key);
-            }
-#endif
-
+            /*
             Int32 _localCount = _reader.ReadInt32();
-#if (DEBUG == true)
-            Console.WriteLine("Local Count: {0}", _localCount);
-#endif
             for (Int32 i = 0; i < _localCount; i++) {
                 Int32 _localUses = _reader.ReadInt32();
-                string _codeName = _game.GetString(_reader.ReadInt32());
+                string _codeName = _assets.GetString(_reader.ReadInt32());
                 for(Int32 j = 0; j < _localUses; j++) {
                     Int32 _localInd = _reader.ReadInt32();
-                    string _localName = _game.GetString(_reader.ReadInt32());
-#if (DEBUG == true)
-                    Console.WriteLine("{0} in {1} ({2}/{3})", _localName, _codeName, j + 1, _localUses);
-#endif
+                    string _localName = _assets.GetString(_reader.ReadInt32());
                 }
+            }
+            */
+        }
+
+        public static void CODE(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LCode _codeGet = new LCode(_assets, _reader);
+                _assets.Code.Add(_codeGet.Name, _codeGet);
+                _assets.CodeMapping.Add(_codeGet);
+            });
+        }
+
+        public static void SCPT(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LScript _scriptGet = new LScript(_assets, _reader);
+                _assets.Scripts.Add(_scriptGet);
+                _assets.ScriptMapping[_scriptGet.Index] = _scriptGet;
+            });
+        }
+
+        public static void GLOB(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            for(Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+                _assets.GlobalScripts.Add(_assets.CodeMapping[_reader.ReadInt32()]);
             }
         }
     }

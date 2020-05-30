@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using Luna.Runner;
 
 namespace Luna.Types {
     public enum LVariableScope {
@@ -31,9 +30,6 @@ namespace Luna.Types {
             this.Count = _reader.ReadInt32();
             this.Offset = _reader.ReadInt32();
             this.Base = _reader.BaseStream.Position;
-#if (DEBUG == true)
-            Console.WriteLine(this);
-#endif
         }
 
         public LVariable(string _name, LVariableScope _type) {

@@ -7,18 +7,17 @@ using System.IO;
 
 namespace Luna {
     class Chunk : IDisposable {
-        #region Handlers
-        public delegate void Handler(Game _game, BinaryReader _reader, BinaryWriter _writer, Chunk _chunk);
+        public delegate void Handler(Game _game, BinaryReader _reader, Chunk _chunk);
         public static Dictionary<string, Handler> Handlers = new Dictionary<string, Handler>() {
             { "STRG", ChunkHandler.STRG },
             { "GEN8", ChunkHandler.GEN8 },
-            { "ROOM", ChunkHandler.ROOM },
             { "VARI", ChunkHandler.VARI },
             { "FUNC", ChunkHandler.FUNC },
-            { "CODE", ChunkHandler.CODE }
+            { "CODE", ChunkHandler.CODE },
+            { "SCPT", ChunkHandler.SCPT },
+            { "GLOB", ChunkHandler.GLOB },
+            { "ROOM", ChunkHandler.ROOM },
         };
-
-        #endregion
 
         public string Name;
         public Int32 Length;

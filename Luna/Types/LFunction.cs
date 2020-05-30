@@ -18,7 +18,7 @@ namespace Luna.Types {
             this.Offset = _reader.ReadInt32();
             this.Base = _reader.BaseStream.Position;
 #if (DEBUG == true)
-            Console.WriteLine(this);
+            //Console.WriteLine(this);
 #endif
         }
 

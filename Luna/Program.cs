@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using Luna.Runner;
 
 namespace Luna {
     class Program {
         static void Main(string[] args) {
-            IFF _wad = new IFF(@"E:\Luna\Sample\builds\LunaBenchmark2.win", new Game());
-            _wad.Parse();
+            IFF _wad = new IFF(@"E:\Luna\Sample\LunaPlayer.win", new Game());
+            _wad.Parse(delegate (Game _game) {
+                _game.Initalize(false);
+            });
             /*
             LunaTypes
             00000000 : 02000f84                   pushi.e   2

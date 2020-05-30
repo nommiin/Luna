@@ -15,11 +15,6 @@ namespace Luna.Types {
             this.Offset = _offset + 4;
         }
 
-        public LString(string _value) {
-            this.Value = _value;
-            this.Offset = -1;
-        }
-
         public override string ToString() {
             return this.Value;
         }
