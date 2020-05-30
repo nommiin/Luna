@@ -46,6 +46,11 @@ namespace Luna.Assets {
             { LOpcode.dup, (Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) => new Luna.Instructions.Duplicate(_instruction, _game, _code, _reader) },
             { LOpcode.popz, (Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) => new Luna.Instructions.Discard(_instruction, _game, _code, _reader) },
             { LOpcode.brk, (Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) => new Luna.Instructions.Discard(_instruction, _game, _code, _reader) },
+            { LOpcode.setowner, (Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) => new Luna.Instructions.SetOwner(_instruction, _game, _code, _reader) },
+        };
+
+        public static LOpcode[] InstructionIgnore = {
+            LOpcode.conv
         };
 
         public LCode(Game _game, BinaryReader _reader) {
@@ -68,7 +73,7 @@ namespace Luna.Assets {
                 BranchTable[this.Reader.BaseStream.Position] = this.InstructionList.Count;
                 Int32 _instructionGet = this.Reader.ReadInt32();
                 LOpcode _instructionOpcode = Instruction.GetOpcode(_instructionGet);
-                if (_instructionOpcode != LOpcode.conv) {
+                if (InstructionIgnore.Contains(_instructionOpcode) == false) {
                     if (LCode.InstructionMapping.ContainsKey(_instructionOpcode) == true) {
                         this.InstructionList.Add(InstructionMapping[_instructionOpcode](_instructionGet, _game, this, this.Reader));
                     } else {

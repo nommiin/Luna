@@ -25,19 +25,19 @@ namespace Luna {
 
     class LValue {
         public LType Type;
-        double Number;
-        string String;
-        LValue[] Array;
+        public double Number;
+        public string String;
+        public List<LValue> Array;
         // ?? Pointer;
         // ?? Vec3;
-        byte Undefined;
-        Int32 Int32;
+        public byte Undefined;
+        public Int32 Int32;
         // ?? Vec4;
         // ?? Vec44;
-        Int64 Int64;
+        public Int64 Int64;
         // ?? Accessor;
-        byte Null;
-        double Bool;
+        public byte Null;
+        public double Bool;
         // ?? Iterator;
 
         public LValue(LType _type, object _value) {
@@ -48,11 +48,16 @@ namespace Luna {
             this.Set(_type, 0);
         }
 
+        public LValue(LValue _value) {
+            this.Set(_value.Type, _value.Value);
+        }
+
         public LValue Set(LType _type, object _value) {
             this.Type = _type;
             switch (this.Type) {
                 case LType.Number: this.Number = System.Convert.ToDouble(_value); break;
                 case LType.String: this.String = System.Convert.ToString(_value); break;
+                case LType.Array: this.Array = (List<LValue>)_value; break;
                 case LType.Undefined: this.Undefined = System.Convert.ToByte(_value); break;
             }
             return this;
@@ -86,6 +91,32 @@ namespace Luna {
                     break;
                 }
 
+                case LType.Array: {
+                    switch (_type) {
+                        case LType.String: {
+                            this.String = "";
+                            for(int i = 0; i < this.Array.Count; i++) {
+                                LValue _valGet = new LValue(this.Array[i]);
+                                switch (this.Array[i].Type) {
+                                    case LType.String: {
+                                        this.String += '"' + (string)_valGet.Convert(LType.String).Value + '"';
+                                        break;
+                                    }
+
+                                    default: {
+                                        this.String += _valGet.Value;
+                                        break;
+                                    }
+                                }
+                                if (i < this.Array.Count - 1) this.String += ",";
+                            }
+                            this.String = "[ " + this.String + " ]";
+                            break;
+                        }
+                    }
+                    break;
+                }
+
                 case LType.Undefined: {
                     switch (_type) {
                         case LType.String: {
@@ -113,6 +144,7 @@ namespace Luna {
                 switch (this.Type) {
                     case LType.Number: return Number;
                     case LType.String: return String;
+                    case LType.Array: return Array;
                     case LType.Undefined: return "undefined";
                 }
                 throw new Exception(String.Format("Could not return LValue.Value for type {0}", Type));

@@ -181,12 +181,12 @@ namespace Luna.Instructions {
                 case LArgumentType.Variable: {
                     switch (this.Variable.Scope) {
                         case LVariableScope.Global: {
-                            _stack.Push(_vm.GlobalVariables[this.Variable.Name]);
+                            _stack.Push(_vm.Data.Instances[(Int32)LVariableScope.Global].Variables[this.Variable.Name]);
                             break;
                         }
 
                         case LVariableScope.Static: {
-                            _stack.Push(_vm.StaticVariables[this.Variable.Name]);
+                            _stack.Push(_vm.Data.Instances[(Int32)LVariableScope.Static].Variables[this.Variable.Name]);
                             break;
                         }
 
@@ -228,7 +228,7 @@ namespace Luna.Instructions {
         }
 
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            _stack.Push(_vm.GlobalVariables[this.Variable]);
+            _stack.Push(_vm.Data.Instances[(Int32)LVariableScope.Global].Variables[this.Variable]);
         }
 
         public override string ToString() {
@@ -274,18 +274,27 @@ namespace Luna.Instructions {
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
             switch (this.Variable.Scope) {
                 case LVariableScope.Global: {
-                    _vm.GlobalVariables[this.Variable.Name] = _stack.Pop();
+                    _vm.Data.Instances[(Int32)LVariableScope.Global].Variables[this.Variable.Name] = _stack.Pop();
                     break;
                 }
 
                 case LVariableScope.Static: {
-                    _vm.StaticVariables[this.Variable.Name] = _stack.Pop();
+                    _vm.Data.Instances[(Int32)LVariableScope.Static].Variables[this.Variable.Name] = _stack.Pop();
+                    break;
+                }
+
+                case LVariableScope.Instance: {
+                    _environment.Scope.Variables[this.Variable.Name] = _stack.Pop();
                     break;
                 }
 
                 case LVariableScope.Local: {
                     _environment.LocalVariables[this.Variable.Name] = _stack.Pop();
                     break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not pop variable to scope: {0}", this.Variable.Scope));
                 }
             }
         }
@@ -359,13 +368,16 @@ namespace Luna.Instructions {
 
     class Call : Instruction {
         public string Function;
+        public Int32 Count;
         public Call(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
             this.Function = _game.Functions[_game.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]].Name;
+            this.Count = this.Data;
             _reader.ReadInt32();
         }
 
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
-            Interpreter.Functions[this.Function](_stack);
+            Console.WriteLine("CALL WITH {0} ARGUMENTS", this.Count);
+            Interpreter.Functions[this.Function](_vm, this.Count, _stack);
         }
 
         public override string ToString() {
@@ -499,6 +511,13 @@ namespace Luna.Instructions {
         public Duplicate(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
         public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
             _stack.Push(_stack.Peek());
+        }
+    }
+
+    class SetOwner : Instruction {
+        public SetOwner(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Interpreter _vm, Domain _environment, Stack<LValue> _stack) {
+            _stack.Pop();
         }
     }
 }

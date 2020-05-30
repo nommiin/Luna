@@ -58,6 +58,7 @@
     <Compile Include="Data\IFF.cs" />
     <Compile Include="Runner\Interpreter.cs" />
     <Compile Include="Types\LFunction.cs" />
+    <Compile Include="Types\LInstance.cs" />
     <Compile Include="Types\LMap.cs" />
     <Compile Include="Types\LValue.cs" />
     <Compile Include="Program.cs" />
