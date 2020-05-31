@@ -8,9 +8,9 @@ using System.IO;
 namespace Luna {
     class Program {
         static void Main(string[] args) {
-            IFF _wad = new IFF(@"E:\Luna\Sample\LunaPlayer.win", new Game());
+            IFF _wad = new IFF(@"E:\Luna\Sample\LunaParent.win", new Game());
             _wad.Parse(delegate (Game _game) {
-                _game.Initalize(false);
+                _game.Initalize(true);
             });
             /*
             LunaTypes

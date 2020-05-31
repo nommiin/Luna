@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Luna.Assets;
 using System.IO;
 
-namespace Luna.Types {
+namespace Luna.Assets {
     class LScript {
         public string Name;
         public Int32 Index;

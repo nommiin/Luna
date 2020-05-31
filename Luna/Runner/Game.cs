@@ -51,23 +51,29 @@ namespace Luna {
         public Guid GUID;
 
         // Assets
-        public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
-        public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
-        public List<LCode> CodeMapping = new List<LCode>();
-        public List<LScript> Scripts = new List<LScript>();
-        public Dictionary<Int32, LScript> ScriptMapping = new Dictionary<Int32, LScript>();
         public Dictionary<long, LString> Strings = new Dictionary<long, LString>();
+        public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
+        public Dictionary<string, LScript> Scripts = new Dictionary<string, LScript>();
+        public Dictionary<string, LSprite> Sprites = new Dictionary<string, LSprite>();
+        public Dictionary<string, LObject> Objects = new Dictionary<string, LObject>();
+        public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
+
         public List<LString> StringMapping = new List<LString>();
+        public List<LCode> CodeMapping = new List<LCode>();
+        public List<LScript> ScriptMapping = new List<LScript>();
+        public List<LSprite> SpriteMapping = new List<LSprite>();
+        public List<LObject> ObjectMapping = new List<LObject>();
+        public List<LRoom> RoomMapping = new List<LRoom>();
 
         // Code
         public Int32 LocalVariables = 0;
         public Int32 InstanceVariables = 0;
         public Int32 GlobalVariables = 0;
+        public List<LCode> GlobalScripts = new List<LCode>();
         public List<LVariable> Variables = new List<LVariable>();
-        public Dictionary<Int32, Int32> VariableMapping = new Dictionary<Int32, Int32>();
         public List<LFunction> Functions = new List<LFunction>();
         public Dictionary<Int32, Int32> FunctionMapping = new Dictionary<int, int>();
-        public List<LCode> GlobalScripts = new List<LCode>();
+        public Dictionary<Int32, Int32> VariableMapping = new Dictionary<Int32, Int32>();
 
         // Runner
         public GameWindow Window;

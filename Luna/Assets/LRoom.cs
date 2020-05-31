@@ -15,7 +15,7 @@ namespace Luna.Assets {
         public bool Persistent;
         public Int32 Colour;
         public bool ShowColour;
-        public Int32 CreationCode;
+        public LCode CreationCode;
 
         public LRoom(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());
@@ -23,10 +23,13 @@ namespace Luna.Assets {
             this.Width = _reader.ReadInt32();
             this.Height = _reader.ReadInt32();
             this.Speed = _reader.ReadInt32();
-            this.Persistent = _reader.ReadBoolean();
+            this.Persistent = (_reader.ReadInt32() == 1 ? true : false);
             this.Colour = _reader.ReadInt32();
-            this.ShowColour = _reader.ReadBoolean();
-            this.CreationCode = _reader.ReadInt32();
+            this.ShowColour = (_reader.ReadInt32() == 1 ? true : false);
+            Int32 _codeIndex = _reader.ReadInt32();
+            if (_codeIndex != -1) {
+                this.CreationCode = _game.CodeMapping[_codeIndex];
+            } else this.CreationCode = null;
             // TODO: Parse remaining data, such as phyiscs and layer data.
 #if (DEBUG == true)
             Console.WriteLine(this);

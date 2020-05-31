@@ -67,16 +67,9 @@ namespace Luna {
             if (_assets.Build.Major >= 2) {
                 _reader.BaseStream.Seek(sizeof(Int64) * 5, SeekOrigin.Current);
                 _assets.GameSpeed = _reader.ReadSingle();
-                _assets.AllowStats = _reader.ReadBoolean();
+                _assets.AllowStats = (_reader.ReadInt32() == 1 ? true : false);
                 _assets.GUID = new Guid(_reader.ReadBytes(16));
             }
-        }
-
-        public static void ROOM(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
-                LRoom _roomGet = new LRoom(_assets, _reader);
-                _assets.Rooms.Add(_roomGet.Name, _roomGet);
-            });
         }
 
         public static void VARI(Game _assets, BinaryReader _reader, Chunk _chunk) {
@@ -139,8 +132,8 @@ namespace Luna {
         public static void SCPT(Game _assets, BinaryReader _reader, Chunk _chunk) {
             HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
                 LScript _scriptGet = new LScript(_assets, _reader);
-                _assets.Scripts.Add(_scriptGet);
-                _assets.ScriptMapping[_scriptGet.Index] = _scriptGet;
+                _assets.Scripts.Add(_scriptGet.Name, _scriptGet);
+                _assets.ScriptMapping.Insert(_scriptGet.Index, _scriptGet);
             });
         }
 
@@ -148,6 +141,29 @@ namespace Luna {
             for(Int32 i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
                 _assets.GlobalScripts.Add(_assets.CodeMapping[_reader.ReadInt32()]);
             }
+        }
+
+        public static void ROOM(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LRoom _roomGet = new LRoom(_assets, _reader);
+                _assets.Rooms.Add(_roomGet.Name, _roomGet);
+            });
+        }
+
+        public static void SPRT(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LSprite _spriteGet = new LSprite(_assets, _reader);
+                _assets.Sprites.Add(_spriteGet.Name, _spriteGet);
+                _assets.SpriteMapping.Add(_spriteGet);
+            });
+        }
+
+        public static void OBJT(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+                LObject _objectGet = new LObject(_assets, _reader);
+                _assets.Objects.Add(_objectGet.Name, _objectGet);
+                _assets.ObjectMapping.Add(_objectGet);
+            });
         }
     }
 }
