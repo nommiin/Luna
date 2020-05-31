@@ -45,7 +45,8 @@ namespace Luna {
         public Int32 AppID;
         public Int32 DebugPort;
         public Int32 RoomCount;
-        public List<Int32> RoomOrder = new List<int>();
+        public List<Int32> RoomIndices = new List<int>();
+        public List<LRoom> RoomOrder = new List<LRoom>();
         public float GameSpeed;
         public bool AllowStats;
         public Guid GUID;

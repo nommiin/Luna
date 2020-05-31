@@ -15,7 +15,7 @@ namespace Luna {
         Undefined,
         Int32 = 7,
         Vec4,
-        Vec44,
+        Matrix,
         Int64,
         Accessor,
         Null,

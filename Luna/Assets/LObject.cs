@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Luna.Types;
 
 namespace Luna.Assets {
     class LObject {
@@ -27,6 +28,7 @@ namespace Luna.Assets {
         public Single PhysFriction;
         public bool PhysAwake;
         public bool PhysKinematic;
+        public List<LEvent> Events = new List<LEvent>();
         
         public LObject(Game _assets, BinaryReader _reader) {
             this.Name = _assets.GetString(_reader.ReadInt32());
@@ -59,8 +61,14 @@ namespace Luna.Assets {
             this.PhysAwake = (_reader.ReadInt32() == 1 ? true : false);
             this.PhysKinematic = (_reader.ReadInt32() == 1 ? true : false);
             _reader.BaseStream.Seek(sizeof(Single) * this.PhysVertCount, SeekOrigin.Current);
-            Console.WriteLine("Event Offset: {0}", _reader.ReadInt32());
-
+            ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _eventOffset) {
+                ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _typeOffset) {
+                    Int32 _eventSubtype = _reader.ReadInt32();
+                    ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _actionOffset) {
+                        this.Events.Add(new LEvent(_assets, _reader, this, _eventSubtype));
+                    });
+                });
+            });
         }
     }
 }

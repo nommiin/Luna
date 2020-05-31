@@ -10,7 +10,7 @@ namespace Luna {
         static void Main(string[] args) {
             IFF _wad = new IFF(@"E:\Luna\Sample\LunaParent.win", new Game());
             _wad.Parse(delegate (Game _game) {
-                _game.Initalize(true);
+                _game.Initalize(false);
             });
             /*
             LunaTypes

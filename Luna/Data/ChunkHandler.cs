@@ -9,8 +9,8 @@ using Luna.Types;
 
 namespace Luna {
     static class ChunkHandler {
-        public delegate void KVP(Int32 _base);
-        private static void HandleKVP(Game _assets, BinaryReader _reader, Chunk _chunk, KVP _handler) {
+        public delegate void ChunkKVP(Int32 _offset);
+        public static void HandleKVP(Game _assets, BinaryReader _reader, ChunkKVP _handler) {
             Int32 _keyCount = _reader.ReadInt32();
             for(Int32 i = 0; i < _keyCount; i++) {
                 Int32 _keyOffset = _reader.ReadInt32(), _keyBase = (Int32)_reader.BaseStream.Position;
@@ -20,9 +20,24 @@ namespace Luna {
             }
         }
 
+        public delegate void ChunkList(Int32 _offset);
+        public static void HandleList(Game _asset, BinaryReader _reader, ChunkList _handler) {
+            Int32 _listOffset = _reader.ReadInt32(), _listBase = (Int32)_reader.BaseStream.Position;
+            _reader.BaseStream.Seek(_listOffset, SeekOrigin.Begin);
+            Int32 _itemCount = _reader.ReadInt32();
+            for(Int32 i = 0; i < _itemCount; i++) {
+                Int32 _itemOffset = _reader.ReadInt32(), _itemBase = (Int32)_reader.BaseStream.Position;
+                _reader.BaseStream.Seek(_itemOffset, SeekOrigin.Begin);
+                _handler(_itemOffset);
+                _reader.BaseStream.Seek(_itemBase, SeekOrigin.Begin);
+            }
+            _reader.BaseStream.Seek(_listBase, SeekOrigin.Begin);
+        }
+
         public static void STRG(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LString _stringGet = new LString(_reader, _offset);
+                Console.WriteLine("String: {0}, Offset: {1}", _stringGet.Value, _stringGet.Offset);
                 _assets.Strings.Add(_stringGet.Offset, _stringGet);
                 _assets.StringMapping.Add(_stringGet);
             });
@@ -61,7 +76,7 @@ namespace Luna {
             _assets.DebugPort = _reader.ReadInt32();
             _assets.RoomCount = _reader.ReadInt32();
             for (Int32 i = 0; i < _assets.RoomCount; i++) {
-                _assets.RoomOrder.Add(_reader.ReadInt32());
+                _assets.RoomIndices.Add(_reader.ReadInt32());
             }
 
             if (_assets.Build.Major >= 2) {
@@ -122,7 +137,7 @@ namespace Luna {
         }
 
         public static void CODE(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LCode _codeGet = new LCode(_assets, _reader);
                 _assets.Code.Add(_codeGet.Name, _codeGet);
                 _assets.CodeMapping.Add(_codeGet);
@@ -130,7 +145,7 @@ namespace Luna {
         }
 
         public static void SCPT(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LScript _scriptGet = new LScript(_assets, _reader);
                 _assets.Scripts.Add(_scriptGet.Name, _scriptGet);
                 _assets.ScriptMapping.Insert(_scriptGet.Index, _scriptGet);
@@ -144,14 +159,19 @@ namespace Luna {
         }
 
         public static void ROOM(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LRoom _roomGet = new LRoom(_assets, _reader);
                 _assets.Rooms.Add(_roomGet.Name, _roomGet);
+                _assets.RoomMapping.Add(_roomGet);
             });
+
+            for(Int32 i = 0; i < _assets.RoomIndices.Count; i++) {
+                _assets.RoomOrder.Insert(i, _assets.RoomMapping[_assets.RoomIndices[i]]);
+            }
         }
 
         public static void SPRT(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LSprite _spriteGet = new LSprite(_assets, _reader);
                 _assets.Sprites.Add(_spriteGet.Name, _spriteGet);
                 _assets.SpriteMapping.Add(_spriteGet);
@@ -159,10 +179,11 @@ namespace Luna {
         }
 
         public static void OBJT(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, _chunk, delegate (Int32 _offset) {
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LObject _objectGet = new LObject(_assets, _reader);
                 _assets.Objects.Add(_objectGet.Name, _objectGet);
                 _assets.ObjectMapping.Add(_objectGet);
+                Console.WriteLine("{0} = {1}", _assets.ObjectMapping.Count -1, _objectGet.Name);
             });
         }
     }
