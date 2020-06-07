@@ -43,6 +43,7 @@ namespace Luna {
                     }
                 }
             }
+            for (int i = 0; i < this.Assets.Threads.Count; i++) this.Assets.Threads[i].Join();
             _callback(this.Assets);
         }
     }

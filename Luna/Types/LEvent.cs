@@ -41,7 +41,7 @@ namespace Luna.Types {
         public bool IsRelative;
         public bool IsNot;
 
-        public LEvent(Game _assets, BinaryReader _reader, LObject _owner, Int32 _type) {
+        public LEvent(LObject _object, Game _assets, BinaryReader _reader, LObject _owner, Int32 _type) {
             this.Owner = _owner;
             this.Subtype = _type;
             this.LibraryID = _reader.ReadInt32();
@@ -57,6 +57,13 @@ namespace Luna.Types {
             this.Caller = _reader.ReadInt32();
             this.IsRelative = (_reader.ReadInt32() == 1 ? true : false);
             this.IsNot = (_reader.ReadInt32() == 1 ? true : false);
+
+            switch (this.Code.Name.Replace("gml_Object_" + _object.Name + "_", "")) {
+                case "PreCreate_0": _object.PreCreate = this.Code; break;
+                case "Create_0": _object.Create = this.Code; break;
+                case "Step_0": _object.Step = this.Code; break;
+                case "Draw_0": _object.Draw = this.Code; break;
+            }
             //this.
         }
     }

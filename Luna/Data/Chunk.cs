@@ -18,7 +18,7 @@ namespace Luna {
             { "GLOB", ChunkHandler.GLOB },
             { "SPRT", ChunkHandler.SPRT },
             { "OBJT", ChunkHandler.OBJT },
-            { "ROOM", ChunkHandler.ROOM },
+            { "ROOM", ChunkHandler.ROOM }
         };
 
         public string Name;

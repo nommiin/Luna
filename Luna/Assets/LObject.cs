@@ -8,6 +8,7 @@ using Luna.Types;
 
 namespace Luna.Assets {
     class LObject {
+        public long Index;
         public string Name;
         public LSprite Sprite;
         public bool Visible;
@@ -29,6 +30,10 @@ namespace Luna.Assets {
         public bool PhysAwake;
         public bool PhysKinematic;
         public List<LEvent> Events = new List<LEvent>();
+        public LCode PreCreate = null;
+        public LCode Create = null;
+        public LCode Step = null;
+        public LCode Draw = null;
         
         public LObject(Game _assets, BinaryReader _reader) {
             this.Name = _assets.GetString(_reader.ReadInt32());
@@ -65,7 +70,7 @@ namespace Luna.Assets {
                 ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _typeOffset) {
                     Int32 _eventSubtype = _reader.ReadInt32();
                     ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _actionOffset) {
-                        this.Events.Add(new LEvent(_assets, _reader, this, _eventSubtype));
+                        this.Events.Add(new LEvent(this, _assets, _reader, this, _eventSubtype));
                     });
                 });
             });

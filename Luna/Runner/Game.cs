@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using Luna.Types;
 using Luna.Assets;
+using Luna.Runner;
 
 namespace Luna {
     class Game {
@@ -78,9 +80,59 @@ namespace Luna {
 
         // Runner
         public GameWindow Window;
+        public Interpreter Runner;
+        public Dictionary<double, LInstance> Instances = new Dictionary<double, LInstance>();
+        public List<LInstance> InstanceList = new List<LInstance>();
+        public LInstance GlobalScope;
+        public LInstance StaticScope;
 
         // Special
         public Dictionary<string, Chunk> Chunks;
+        public List<System.Threading.Thread> Threads = new List<System.Threading.Thread>();
+
+        public void Initalize(bool _headless) {
+            // Game
+            this.Runner = new Interpreter(this);
+            this.Instances.Add((double)LVariableScope.Global, new LInstance((double)LVariableScope.Global));
+            this.GlobalScope = this.Instances[(Int32)LVariableScope.Global];
+            this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
+            this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
+
+            // Window
+            if (_headless == false) {
+                this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
+                this.Window.Title = this.DisplayName;
+                this.Window.Load += OnLoad;
+                this.Window.Closing += OnClose;
+                this.Window.UpdateFrame += OnUpdate;
+                this.Window.RenderFrame += OnRender;
+                Input.Initalize(this);
+                this.Window.Run();
+            } else {
+                OnLoad(null, null);
+            }
+        }
+
+        public void LoadRoom(LRoom _room) {
+            for(int i = 0; i < _room.Instances.Count; i++) {
+                LRoomInstance _instGet = _room.Instances[i];
+                LInstance _instCreate = new LInstance(this.InstanceList, _instGet.Index, _instGet.X, _instGet.Y);
+                _instCreate.RoomPreCreate = _instGet.PreCreate;
+                _instCreate.RoomCreate = _instGet.CreationCode;
+                _instCreate.Variables["image_xscale"] = new LValue(LType.Number, (double)_instGet.ScaleX);
+                _instCreate.Variables["image_yscale"] = new LValue(LType.Number, (double)_instGet.ScaleY);
+                _instCreate.Variables["image_speed"] = new LValue(LType.Number, (double)_instGet.ImageSpeed);
+                _instCreate.Variables["image_index"] = new LValue(LType.Number, (double)_instGet.ImageIndex);
+                _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
+                _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
+                this.Instances.Add((double)_instCreate.ID, _instCreate);
+                if (_instCreate.PreCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.PreCreate);
+                if (_instCreate.Create != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.Create);
+                if (_instCreate.RoomPreCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.RoomPreCreate);
+                if (_instCreate.RoomCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.RoomCreate);
+            }
+            if (_room.CreationCode != null) this.Runner.ExecuteCode(new Domain(new LInstance(-100)), _room.CreationCode);
+        }
 
         public string GetString(Int32 _offset) {
             if (_offset == 0) return "";
@@ -90,23 +142,11 @@ namespace Luna {
             throw new Exception(String.Format("Could not find string at {0}", _offset));
         }
 
-        public void Initalize(bool _headless) {
-            // Window
-            if (_headless == false) {
-                this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
-                this.Window.Title = this.DisplayName;
-                this.Window.Load += OnLoad;
-                this.Window.Closing += OnClose;
-                this.Window.UpdateFrame += OnUpdate;
-                this.Window.RenderFrame += OnRender;
-                this.Window.Run();
-            } else {
-                OnLoad(null, null);
-            }
-        }
-
         private void OnLoad(object sender, EventArgs e) {
-            
+            for(int i = 0; i < this.GlobalScripts.Count; i++) {
+                this.Runner.ExecuteCode(new Domain(this.GlobalScope), this.GlobalScripts[i]);
+            }
+            LoadRoom(this.RoomOrder[0]);
         }
 
         private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -114,11 +154,30 @@ namespace Luna {
         }
 
         private void OnUpdate(object sender, FrameEventArgs e) {
-
+            Input.OnKeyUpdate();
+            for (int i = 0; i < this.InstanceList.Count; i++) {
+                LInstance _instGet = this.InstanceList[i];
+                if (_instGet.Step != null) {
+                    this.Runner.ExecuteCode(_instGet.Environment, _instGet.Step);
+                }
+            }
         }
 
         private void OnRender(object sender, FrameEventArgs e) {
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, 0, this.RoomWidth, this.RoomHeight, 0f, 1.0f);
 
+            for (int i = 0; i < this.InstanceList.Count; i++) {
+                LInstance _instGet = this.InstanceList[i];
+                if (_instGet.Draw != null) {
+                    this.Runner.ExecuteCode(_instGet.Environment, _instGet.Draw);
+                }
+            }
+
+            GL.Flush();
+            Window.SwapBuffers();
         }
     }
 }

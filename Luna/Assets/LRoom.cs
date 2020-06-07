@@ -7,6 +7,7 @@ using System.IO;
 
 namespace Luna.Assets {
     class LRoom {
+        public long Index;
         public string Name;
         public string Caption;
         public Int32 Width;
@@ -28,7 +29,6 @@ namespace Luna.Assets {
         public Single PhysGravityY;
         public Single PhysConversion;
         public List<LRoomInstance> Instances = new List<LRoomInstance>();
-
 
         public LRoom(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());
@@ -52,7 +52,7 @@ namespace Luna.Assets {
             ChunkHandler.HandleList(_game, _reader, delegate (Int32 _offset) {
                 this.Instances.Add(new LRoomInstance(_game, _reader));
             });
-            Console.WriteLine("TileOffset: {0}", _reader.ReadInt32()); // TILES
+            _reader.ReadInt32(); // TILES
             this.PhysWorld = (_reader.ReadInt32() == 1 ? true : false);
             this.PhysWorldTop = _reader.ReadInt32();
             this.PhysWorldLeft = _reader.ReadInt32();
@@ -61,13 +61,9 @@ namespace Luna.Assets {
             this.PhysGravityX = _reader.ReadSingle();
             this.PhysGravityY = _reader.ReadSingle();
             this.PhysConversion = _reader.ReadSingle();
-            Console.WriteLine("LayerOffset: {0}", _reader.ReadInt32()); // LAYERS
-            Console.WriteLine("SequencesOffset: {0}", _reader.ReadInt32()); // SEQUENCES
-            //Console.WriteLine(_flagGet);
+            _reader.ReadInt32(); // LAYERS
+            _reader.ReadInt32(); // SEQUENCES
             // TODO: Parse remaining data, such as phyiscs and layer data.
-#if (DEBUG == true)
-            Console.WriteLine(this);
-#endif
         }
 
         public override string ToString() {

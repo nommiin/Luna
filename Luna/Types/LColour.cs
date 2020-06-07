@@ -17,5 +17,11 @@ namespace Luna.Types {
             this.Blue = (byte)((_colour >> 16) & 0xFF);
             this.Alpha = (byte)((_colour >> 24) & 0xFF);
         }
+
+        public static implicit operator double(LColour _val) => ((_val.Alpha << 24) & (_val.Blue << 16) & (_val.Green << 8) & _val.Red);
+
+        public override string ToString() {
+            return $"rgba({this.Red}, {this.Green}, {this.Blue}, {this.Alpha})";
+        }
     }
 }

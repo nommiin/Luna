@@ -26,6 +26,7 @@ namespace Luna.Assets {
     }
 
     class LSprite {
+        public long Index;
         public string Name;
         public Int32 Width;
         public Int32 Height;

@@ -9,7 +9,7 @@ using System.IO;
 namespace Luna.Assets {
     class LScript {
         public string Name;
-        public Int32 Index;
+        public long Index;
 
         public LScript(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using Luna.Assets;
@@ -37,7 +38,6 @@ namespace Luna {
         public static void STRG(Game _assets, BinaryReader _reader, Chunk _chunk) {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LString _stringGet = new LString(_reader, _offset);
-                Console.WriteLine("String: {0}, Offset: {1}", _stringGet.Value, _stringGet.Offset);
                 _assets.Strings.Add(_stringGet.Offset, _stringGet);
                 _assets.StringMapping.Add(_stringGet);
             });
@@ -148,7 +148,7 @@ namespace Luna {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LScript _scriptGet = new LScript(_assets, _reader);
                 _assets.Scripts.Add(_scriptGet.Name, _scriptGet);
-                _assets.ScriptMapping.Insert(_scriptGet.Index, _scriptGet);
+                _assets.ScriptMapping.Insert((Int32)_scriptGet.Index, _scriptGet);
             });
         }
 
@@ -162,6 +162,7 @@ namespace Luna {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LRoom _roomGet = new LRoom(_assets, _reader);
                 _assets.Rooms.Add(_roomGet.Name, _roomGet);
+                _roomGet.Index = _assets.RoomMapping.Count;
                 _assets.RoomMapping.Add(_roomGet);
             });
 
@@ -174,6 +175,7 @@ namespace Luna {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LSprite _spriteGet = new LSprite(_assets, _reader);
                 _assets.Sprites.Add(_spriteGet.Name, _spriteGet);
+                _spriteGet.Index = _assets.SpriteMapping.Count;
                 _assets.SpriteMapping.Add(_spriteGet);
             });
         }
@@ -182,8 +184,8 @@ namespace Luna {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LObject _objectGet = new LObject(_assets, _reader);
                 _assets.Objects.Add(_objectGet.Name, _objectGet);
+                _objectGet.Index = _assets.ObjectMapping.Count;
                 _assets.ObjectMapping.Add(_objectGet);
-                Console.WriteLine("{0} = {1}", _assets.ObjectMapping.Count -1, _objectGet.Name);
             });
         }
     }

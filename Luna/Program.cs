@@ -4,11 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
+using Luna.Runner;
 
 namespace Luna {
     class Program {
         static void Main(string[] args) {
-            IFF _wad = new IFF(@"E:\Luna\Sample\LunaParent.win", new Game());
+            // Initalize definitions
+            InstructionDefinition.Initalize();
+            FunctionDefinition.Initalize();
+
+            // Load game
+            IFF _wad = new IFF(@"E:\Luna\Sample\Luna.win", new Game());
             _wad.Parse(delegate (Game _game) {
                 _game.Initalize(false);
             });
