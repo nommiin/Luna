@@ -142,7 +142,7 @@ namespace Luna.Runner {
             this.Data = (Int16)(_instruction & 0xFFFF);
         }
 
-        public virtual void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public virtual void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             Console.WriteLine("[WARNING] - Could not perform action for unimplemented opcode: {0} in {1}", this.Opcode, _code.Name);
         }
     }
@@ -156,7 +156,7 @@ namespace Luna.Instructions {
             this.Value = new LValue(LType.Number, (double)this.Data);
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             _stack.Push(this.Value);
         }
     }
@@ -206,7 +206,7 @@ namespace Luna.Instructions {
             }
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Type) {
                 case LArgumentType.Variable: {
                     _stack.Push(_environment.Instance.Variables[this.Variable.Name]);
@@ -271,7 +271,7 @@ namespace Luna.Instructions {
             }
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             _environment.Instance.Variables[Variable.Name] = _stack.Pop();
             /*
             Console.WriteLine(Variable.Name);
@@ -282,7 +282,7 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.popz)]
     class Discard : Instruction {
         public Discard(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             _stack.Pop();
         }
     }
@@ -290,7 +290,7 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.dup)]
     class Duplicate : Instruction {
         public Duplicate(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             _stack.Push(_stack.Peek());
         }
     }
@@ -317,9 +317,9 @@ namespace Luna.Instructions {
             _reader.ReadInt32();
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             for(int i = 0; i < this.Count; i++) this.Arguments[i] = _stack.Pop();
-            this.Function(_vm, _environment, this.Arguments, this.Count, _stack);
+            this.Function(_assets, _environment, this.Arguments, this.Count, _stack);
         }
     }
 
@@ -330,7 +330,7 @@ namespace Luna.Instructions {
             this.Type = (LConditionType)((this.Data >> 8) & 0xFF);
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             LValue _compRight = _stack.Pop();
             LValue _compLeft  = _stack.Pop();
             switch (this.Type) {
@@ -352,17 +352,17 @@ namespace Luna.Instructions {
             this.Offset = (Int32)((_reader.BaseStream.Position + (this.Raw << 9 >> 7)) - 4);
         }
 
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            _vm.ProgramCounter = this.Jump;
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            _environment.ProgramCounter = this.Jump;
         }
     }
 
     [InstructionDefinition(LOpcode.bt)]
     class BranchTrue : Branch {
         public BranchTrue(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             if ((double)_stack.Pop().Value == 1) {
-                _vm.ProgramCounter = this.Jump;
+                _environment.ProgramCounter = this.Jump;
             }
         }
     }
@@ -370,9 +370,9 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.bf)]
     class BranchFalse : Branch {
         public BranchFalse(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             if ((double)_stack.Pop().Value == 0) {
-                _vm.ProgramCounter = this.Jump;
+                _environment.ProgramCounter = this.Jump;
             }
         }
     }
@@ -380,7 +380,7 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.add)]
     class Add : Instruction {
         public Add(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             LValue _valRight = _stack.Pop();
             LValue _valLeft = _stack.Pop();
             _stack.Push(_valLeft + _valRight);
@@ -390,7 +390,7 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.sub)]
     class Subtract : Instruction {
         public Subtract(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
-        public override void Perform(Interpreter _vm, Domain _environment, LCode _code, Stack<LValue> _stack) {
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             LValue _valRight = _stack.Pop();
             LValue _valLeft = _stack.Pop();
             _stack.Push(_valLeft - _valRight);

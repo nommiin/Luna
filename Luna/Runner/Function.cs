@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using Luna.Types;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
@@ -28,41 +29,57 @@ namespace Luna.Runner {
     }
 
     static class Function {
-        public delegate void Handler(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
+        public delegate void Handler(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
         public static Dictionary<string, Handler> Mapping = new Dictionary<string, Handler>();
 
         [FunctionDefinition("show_debug_message")]
-        public static void show_debug_message(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            Console.WriteLine((string)_arguments[0]);
+        public static void show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Console.WriteLine(_arguments[0].Value);
             _stack.Push(new LValue(LType.Number, (double)0));
         }
 
         [FunctionDefinition("room_goto")]
-        public static void room_goto(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void room_goto(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
 
         }
 
         [FunctionDefinition("event_inherited")]
-        public static void event_inherited(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             //
             _stack.Push(new LValue(LType.Number, (double)0));
         }
 
+        #region Instances
+        [FunctionDefinition("instance_create_depth")]
+        public static void instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            LInstance _instCreate = new LInstance(_assets.InstanceList, _assets.ObjectMapping[(int)(double)_arguments[2].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
+            if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
+            if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
+            _stack.Push(new LValue(LType.Number, _instCreate.ID));
+        }
+
+        [FunctionDefinition("instance_destroy")]
+        public static void instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            _assets.InstanceList.Remove(_environment.Instance);
+            _stack.Push(new LValue(LType.Number, (double)0));
+        }
+        #endregion
+
         #region Input
         [FunctionDefinition("keyboard_check")]
-        public static void keyboard_check(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             _stack.Push(new LValue(LType.Number, (double)(Input.KeyCheck(_arguments[0]) == true ? 1 : 0)));
         }
         #endregion
 
         #region Rendering
         [FunctionDefinition("draw_circle")]
-        public static void draw_circle(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             GL.Begin(PrimitiveType.TriangleFan);
 
-            double _x = ((double)_arguments[0].Value / (_vm.Assets.RoomWidth / 2));
-            double _y = -((double)_arguments[1].Value / (_vm.Assets.RoomHeight / 2));
-            double _r = 0.08;// (double)_arguments[2].Value;
+            double _x = ((double)_arguments[0].Value / (_assets.RoomWidth / 2));
+            double _y = -((double)_arguments[1].Value / (_assets.RoomHeight / 2));
+            double _r = (double)_arguments[2].Value / 360;// (double)_arguments[2].Value;
 
             GL.Vertex2(_x, _y);
             for(int i = 0; i < 360; i++) {
@@ -84,7 +101,7 @@ namespace Luna.Runner {
 
         #region Math
         [FunctionDefinition("max")]
-        public static void max(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = (double)_arguments[i];
             _stack.Push(new LValue(LType.Number, _val.Max()));
@@ -94,11 +111,47 @@ namespace Luna.Runner {
         }
 
         [FunctionDefinition("min")]
-        public static void min(Interpreter _vm, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static void min(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = (double)_arguments[i];
             _stack.Push(new LValue(LType.Number, _val.Min()));
         }
+
+        [FunctionDefinition("lengthdir_x")]
+        public static void lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = (double)_arguments[0].Value;
+            double _dir = (double)_arguments[1].Value;
+
+            double _Px = (_len * Math.Cos(_dir * Math.PI / 180));
+            double _o81 = Math.Round(_Px);
+            double _F6 = _Px - _o81;
+            if (Math.Abs(_F6) < 0.0001) {
+                _stack.Push(new LValue(LType.Number, _o81));
+            } else {
+                _stack.Push(new LValue(LType.Number, _Px));
+            }
+            
+        }
+
+        [FunctionDefinition("lengthdir_y")]
+        public static void lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = (double)_arguments[0].Value;
+            double _dir = (double)_arguments[1].Value;
+
+            double _Px = (_len * Math.Sin(_dir * Math.PI / 180));
+            double _o81 = Math.Round(_Px);
+            double _F6 = _Px - _o81;
+            if (Math.Abs(_F6) < 0.0001) {
+                _stack.Push(new LValue(LType.Number, _o81));
+            } else {
+                _stack.Push(new LValue(LType.Number, _Px));
+            }
+        }
+
+        [FunctionDefinition("irandom")]
+        public static void irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            _stack.Push(new LValue(LType.Number, (double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value)));
+        }
         #endregion
-    }
+        }
 }

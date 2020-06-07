@@ -85,6 +85,7 @@ namespace Luna {
         public List<LInstance> InstanceList = new List<LInstance>();
         public LInstance GlobalScope;
         public LInstance StaticScope;
+        public Random RandomGen;
 
         // Special
         public Dictionary<string, Chunk> Chunks;
@@ -97,6 +98,7 @@ namespace Luna {
             this.GlobalScope = this.Instances[(Int32)LVariableScope.Global];
             this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
             this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
+            this.RandomGen = new Random();
 
             // Window
             if (_headless == false) {
@@ -126,12 +128,15 @@ namespace Luna {
                 _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
                 _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
                 this.Instances.Add((double)_instCreate.ID, _instCreate);
-                if (_instCreate.PreCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.PreCreate);
-                if (_instCreate.Create != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.Create);
-                if (_instCreate.RoomPreCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.RoomPreCreate);
-                if (_instCreate.RoomCreate != null) this.Runner.ExecuteCode(_instCreate.Environment, _instCreate.RoomCreate);
+                if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.PreCreate);
+                if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(this, _instCreate.Create);
+                if (_instCreate.RoomPreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomPreCreate);
+                if (_instCreate.RoomCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomCreate);
             }
-            if (_room.CreationCode != null) this.Runner.ExecuteCode(new Domain(new LInstance(-100)), _room.CreationCode);
+            if (_room.CreationCode != null) {
+                Domain _roomEnvironment = new Domain(new LInstance(-100));
+                _roomEnvironment.ExecuteCode(this, _room.CreationCode);
+            }
         }
 
         public string GetString(Int32 _offset) {
@@ -144,7 +149,7 @@ namespace Luna {
 
         private void OnLoad(object sender, EventArgs e) {
             for(int i = 0; i < this.GlobalScripts.Count; i++) {
-                this.Runner.ExecuteCode(new Domain(this.GlobalScope), this.GlobalScripts[i]);
+                this.GlobalScope.Environment.ExecuteCode(this, this.GlobalScripts[i]);
             }
             LoadRoom(this.RoomOrder[0]);
         }
@@ -158,8 +163,10 @@ namespace Luna {
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
                 if (_instGet.Step != null) {
-                    this.Runner.ExecuteCode(_instGet.Environment, _instGet.Step);
+                    _instGet.Environment.ExecuteCode(this, _instGet.Step);
                 }
+                _instGet.Variables["xprevious"] = _instGet.Variables["x"];
+                _instGet.Variables["yprevious"] = _instGet.Variables["x"];
             }
         }
 
@@ -172,7 +179,7 @@ namespace Luna {
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
                 if (_instGet.Draw != null) {
-                    this.Runner.ExecuteCode(_instGet.Environment, _instGet.Draw);
+                    _instGet.Environment.ExecuteCode(this, _instGet.Draw);
                 }
             }
 

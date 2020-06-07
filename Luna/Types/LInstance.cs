@@ -29,8 +29,8 @@ namespace Luna.Types {
             this.ID = LInstance.Counter++;
             this.Environment = new Domain(this);
             this.Variables = new Dictionary<string, LValue>() {
-                ["x"] = new LValue(LType.Number, (double)0),// (double)_x),
-                ["y"] = new LValue(LType.Number, (double)0),// _y),
+                ["x"] = new LValue(LType.Number, (double)_x),
+                ["y"] = new LValue(LType.Number, (double)_y),
                 ["xprevious"] = new LValue(LType.Number, (double)_x),
                 ["yprevious"] = new LValue(LType.Number, (double)_y),
 

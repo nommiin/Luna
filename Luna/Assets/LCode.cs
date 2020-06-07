@@ -68,7 +68,9 @@ namespace Luna.Assets {
                             _instructionGet.Jump = this.BranchTable[_instructionGet.Offset] - 1;
                             Console.WriteLine("Jump: {0} -> {1}", i, this.BranchTable[_instructionGet.Offset] - 1);
                         } else {
-                            throw new Exception("Could not find proper offset for branch instruction");
+                            // TODO: seems if a jump is at the end of the code, it breaks! for now it looks like just setting the jump to the last instruction is fine
+                            _instructionGet.Jump = this.Instructions.Count;
+                            //throw new Exception("Could not find proper offset for branch instruction");
                         }
                         break;
                     }

@@ -15,7 +15,7 @@ namespace Luna {
             FunctionDefinition.Initalize();
 
             // Load game
-            IFF _wad = new IFF(@"E:\Luna\Sample\Luna.win", new Game());
+            IFF _wad = new IFF(@"E:\Luna\Sample\LunaParticles.win", new Game());
             _wad.Parse(delegate (Game _game) {
                 _game.Initalize(false);
             });
