@@ -30,12 +30,14 @@ namespace Luna {
         public Int32 I32;
         public Int64 I64;
         public string String;
+        public List<LValue> Array;
 
         public LValue(LType _type, object _val) {
             this.Number = 0;
             this.String = "";
             this.I32 = 0;
             this.I64 = 0;
+            this.Array = null;
             
             this.Type = _type;
             switch (this.Type) {
@@ -43,6 +45,7 @@ namespace Luna {
                 case LType.String: this.String = (string)_val; break;
                 case LType.Int32: this.I32 = (Int32)_val; break;
                 case LType.Int64: this.I64 = (Int64)_val; break;
+                case LType.Array: this.Array = (List<LValue>)_val; break;
             }
         }
 
@@ -53,6 +56,7 @@ namespace Luna {
                     case LType.String: return this.String;
                     case LType.Int32: return this.I32;
                     case LType.Int64: return this.I64;
+                    case LType.Array: return this.Array;
                 }
                 throw new Exception(String.Format("Could not return value for type: {0}", this.Type));
             }
@@ -62,6 +66,7 @@ namespace Luna {
         public static implicit operator string(LValue _val) => _val.String;
         public static implicit operator Int32(LValue _val) => _val.I32;
         public static implicit operator Int64(LValue _val) => _val.I64;
+        public static implicit operator List<LValue>(LValue _val) => _val.Array;
 
         public static LValue operator ==(LValue a, LValue b) {
             switch (a.Type) {

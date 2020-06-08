@@ -24,7 +24,6 @@ namespace Luna.Types {
 
         public LInstance(List<LInstance> _instances, LObject _object, double _x=0, double _y=0) {
             _instances.Add(this);
-            Console.WriteLine("{0} created at {1}, {2}", _object.Name, _x, _y);
             this.Object = _object;
             this.ID = LInstance.Counter++;
             this.Environment = new Domain(this);

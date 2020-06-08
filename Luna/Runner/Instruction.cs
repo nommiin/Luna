@@ -175,12 +175,12 @@ namespace Luna.Instructions {
                 }
 
                 case LArgumentType.Integer: {
-                    this.Value = new LValue(LType.Number, (Int32)_reader.ReadInt32());
+                    this.Value = new LValue(LType.Number, (double)_reader.ReadInt32());
                     break;
                 }
 
                 case LArgumentType.Long: {
-                    this.Value = new LValue(LType.Number, (Int64)_reader.ReadInt64());
+                    this.Value = new LValue(LType.Number, (double)_reader.ReadInt64());
                     break;
                 }
 
@@ -209,7 +209,21 @@ namespace Luna.Instructions {
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Type) {
                 case LArgumentType.Variable: {
-                    _stack.Push(_environment.Instance.Variables[this.Variable.Name]);
+                    LValue _valGet = _environment.Instance.Variables[this.Variable.Name];
+                    switch (_valGet.Type) {
+                        case LType.Array: {
+                            int _arrayIndex = (int)(double)_stack.Pop().Value;
+                            _stack.Pop();
+                            Console.WriteLine("Get {0}", _arrayIndex);
+                            _stack.Push(_valGet.Array[_arrayIndex]);
+                            break;
+                        }
+
+                        default: {
+                            _stack.Push(_valGet);
+                            break;
+                        }
+                    }
                     break;
                 }
 
@@ -251,9 +265,12 @@ namespace Luna.Instructions {
 
     [InstructionDefinition(LOpcode.pop)]
     class Pop : Instruction {
+        public LValue Value;
         public LVariable Variable;
         public LArgumentType ArgTo;
         public LArgumentType ArgFrom;
+        public bool IsArray;
+        public Int32 ArraySize;
         public Pop(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
             this.ArgTo = (LArgumentType)(this.Argument & 0xF);
             this.ArgFrom = (LArgumentType)((this.Argument >> 4) & 0xF);
@@ -262,6 +279,11 @@ namespace Luna.Instructions {
                     Int32 _varOffset = (int)((_code.Base + _reader.BaseStream.Position)) - 4;
                     this.Variable = _game.Variables[_game.VariableMapping[_varOffset]];
                     _reader.ReadInt32();
+                    if (_code.Ownership.Count > 0) {
+                        this.IsArray = _code.Ownership.Pop();
+                        this.ArraySize = 0;
+                        this.Value = new LValue(LType.Array, new List<LValue>());
+                    }
                     break;
                 }
 
@@ -272,7 +294,16 @@ namespace Luna.Instructions {
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            _environment.Instance.Variables[Variable.Name] = _stack.Pop();
+            if (this.IsArray == true) {
+                int _arrayIndex = (int)(double)_stack.Pop();
+                this.Value.Array.Insert(_arrayIndex, _stack.Pop());
+                _environment.Instance.Variables[this.Variable.Name] = this.Value;
+                //this.Value.Array
+                //this.Value.Array.Insert(_arrayIndex, _stack.Pop());
+                //this.Value.Array[]
+            } else {
+                _environment.Instance.Variables[this.Variable.Name] = _stack.Pop();
+            }
             /*
             Console.WriteLine(Variable.Name);
             */
@@ -297,21 +328,18 @@ namespace Luna.Instructions {
 
     [InstructionDefinition(new LOpcode[] { LOpcode.call, LOpcode.callv })]
     class Call : Instruction {
+        public string FunctionName;
         public Function.Handler Function;
         public LValue[] Arguments;
         public Int32 Count;
         public Call(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            string _funcName = _game.Functions[_game.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]].Name;
-            if (Runner.Function.Mapping.ContainsKey(_funcName) == true) {
-                this.Function = Runner.Function.Mapping[_funcName];
+            this.FunctionName = _game.Functions[_game.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]].Name;
+            if (Runner.Function.Mapping.ContainsKey(this.FunctionName) == true) {
+                this.Function = Runner.Function.Mapping[this.FunctionName];
             } else {
-                throw new Exception(String.Format("Could not find function mapping for \"{0}\"", _funcName));
+                throw new Exception(String.Format("Could not find function mapping for \"{0}\"", this.FunctionName));
             }
-            /*try {
-                this.Function = Luna.Runner.Function.Mapping[];
-            } catch (Exception e) {
-                throw new Exception(String.Format("Could not find instruction mapping for ));
-            }*/
+
             this.Count = this.Data;
             this.Arguments = new LValue[this.Count];
             _reader.ReadInt32();
@@ -319,7 +347,7 @@ namespace Luna.Instructions {
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             for(int i = 0; i < this.Count; i++) this.Arguments[i] = _stack.Pop();
-            this.Function(_assets, _environment, this.Arguments, this.Count, _stack);
+            _stack.Push(this.Function(_assets, _environment, this.Arguments, this.Count, _stack));
         }
     }
 
@@ -450,5 +478,16 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.shr)]
     class ShiftRight : Instruction {
         public ShiftRight(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+    }
+
+    [InstructionDefinition(LOpcode.setowner)]
+    class SetOwner : Instruction {
+        public SetOwner(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
+            _code.Ownership.Push(true);
+        }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            _stack.Pop();
+        }
     }
 }
