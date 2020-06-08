@@ -1,8 +1,11 @@
 # Luna
-A clean room implementation of the GameMaker runtime in C#
+A custom implementation of the GameMaker 2.3 runtime in C#
 
 # Features
-- Parses the GameMaker IFF file and allows you to invoke individual scripts
+- Parses the GameMaker IFF file for some assets
+- Allows for object instantiation
+- Runs an event loop and executes objects' bytecode
+- Implements input and rendering via OpenTK
 
 # Why?
 Nothing like this really exists. I don't want to make this to be some sort of super performant crazy alternative to the base GameMaker runner, instead I think it'd be cool to implement improved/new features the base Runner doesn't have. Long term I'd like to have Luna running most GM games (unlikely). Maybe I could add some sort of scripting implementation to allow for modding games at runtime. Who knows! This is mostly just a fun project for learning how stuff works. Do I know what I'm doing? Not really!
