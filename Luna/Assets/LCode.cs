@@ -38,6 +38,7 @@ namespace Luna.Assets {
             this.Reader = new BinaryReader(this.Bytecode);
             this.Instructions = new List<Instruction>();
             this.BranchTable = new Dictionary<long, Int32>();
+            this.Ownership = new Stack<bool>();
             this.Thread = new Thread(() => {
                 this.Parse(_game);
             });

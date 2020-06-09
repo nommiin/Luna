@@ -321,12 +321,9 @@ namespace Luna.Instructions {
     #region Pop Variations
     [InstructionDefinition(LOpcode.pop)]
     class Pop : Instruction {
-        public LValue Value;
         public LVariable Variable;
         public LArgumentType ArgTo;
         public LArgumentType ArgFrom;
-        public bool IsArray;
-        public Int32 ArraySize;
         public Pop(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
             this.ArgTo = (LArgumentType)(this.Argument & 0xF);
             this.ArgFrom = (LArgumentType)((this.Argument >> 4) & 0xF);
@@ -335,11 +332,6 @@ namespace Luna.Instructions {
                     Int32 _varOffset = (int)((_code.Base + _reader.BaseStream.Position)) - 4;
                     this.Variable = _game.Variables[_game.VariableMapping[_varOffset]];
                     _reader.ReadInt32();
-                    if (_code.Ownership.Count > 0) {
-                        this.IsArray = _code.Ownership.Pop();
-                        this.ArraySize = 0;
-                        this.Value = new LValue(LType.Array, new List<LValue>());
-                    }
                     break;
                 }
 
