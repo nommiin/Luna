@@ -170,7 +170,7 @@ namespace Luna {
                     _instGet.Environment.ExecuteCode(this, _instGet.Step);
                 }
                 _instGet.Variables["xprevious"] = _instGet.Variables["x"];
-                _instGet.Variables["yprevious"] = _instGet.Variables["x"];
+                _instGet.Variables["yprevious"] = _instGet.Variables["y"];
             }
         }
 
