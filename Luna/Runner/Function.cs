@@ -155,6 +155,26 @@ namespace Luna.Runner {
         #endregion
 
         #region Arrays
+        [FunctionDefinition("array_create")]
+        public static LValue array_create(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _arrayLength = (double)_arguments[0].Value;
+            LValue _valArray = new LValue(LType.Array, new LValue[(int)_arrayLength]);
+            LValue _valDefault = (_arguments.Length > 1 ? _arguments[1] : new LValue(LType.Number, (double)0));
+            for(int i = 0; i < _arrayLength; i++) {
+                _valArray.Array[i] = _valDefault;
+            }
+            return _valArray;
+        }
+
+        [FunctionDefinition("@@NewGMLArray@@")]
+        public static LValue NewGMLArray(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            LValue _valArray = new LValue(LType.Array, new LValue[_arguments.Length]);
+            for(int i = 0; i < _arguments.Length; i++) {
+                _valArray.Array[i] = _arguments[i];
+            }
+            return _valArray;
+        }
+
         [FunctionDefinition("array_length")]
         public static LValue array_length(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             if (_arguments[0].Type == LType.Array) {

@@ -87,6 +87,12 @@ namespace Luna.Assets {
                                 this.Instructions.RemoveAt(--i);   // push.i <id>
                                 this.Instructions.RemoveAt(i + 2); // pushi.e -1
                                 break;
+                            } else if (this.Instructions[j].Opcode == LOpcode.call) {
+                                Instructions.Call _instructionGet = this.Instructions[j] as Instructions.Call;
+                                if (_instructionGet.FunctionName == "@@NewGMLArray@@") {
+                                    this.Instructions.RemoveAt(i--);
+                                    break;
+                                }
                             }
                         }
                         break;
