@@ -100,21 +100,21 @@ namespace Luna.Assets {
                 }
             }
 
-            // Print out finalized bytecode
 #if (DEBUG)
-            Console.WriteLine(this.Name);
+            // Print out finalized bytecode
+            string _bytecodeOutput = this.Name + "\n";
             for (int i = 0; i < this.Instructions.Count; i++) {
-                Console.Write("{0} - {1} ", i, this.Instructions[i].Opcode);
+                _bytecodeOutput += String.Format("{0} - {1} ", i, this.Instructions[i].Opcode);
                 switch (this.Instructions[i].Opcode) {
                     case LOpcode.call: {
                         Instructions.Call _instructionGet = this.Instructions[i] as Instructions.Call;
-                        Console.Write("(Function={0})", _instructionGet.FunctionName);
+                        _bytecodeOutput += String.Format("(Function={0})", _instructionGet.FunctionName);
                         break;
                     }
 
                     case LOpcode.pop: {
                         Instructions.Pop _instructionGet = this.Instructions[i] as Instructions.Pop;
-                        Console.Write("(Variable={0})", _instructionGet.Variable.Name);
+                        _bytecodeOutput += String.Format("(Variable={0})", _instructionGet.Variable.Name);
                         break;
                     }
 
@@ -122,12 +122,12 @@ namespace Luna.Assets {
                         Instructions.Push _instructionGet = this.Instructions[i] as Instructions.Push;
                         switch (_instructionGet.Type) {
                             case LArgumentType.Variable: {
-                                Console.Write("(Variable={0})", _instructionGet.Variable.Name);
+                                _bytecodeOutput += String.Format("(Variable={0})", _instructionGet.Variable.Name);
                                 break;
                             }
 
                             default: {
-                                Console.Write("(Value={0})", _instructionGet.Value.Value);
+                                _bytecodeOutput += String.Format("(Value={0})", _instructionGet.Value.Value);
                                 break;
                             }
                         }
@@ -136,13 +136,13 @@ namespace Luna.Assets {
 
                     case LOpcode.pushi: {
                         Instructions.PushImmediate _instructionGet = this.Instructions[i] as Instructions.PushImmediate;
-                        Console.Write("(Value={0})", _instructionGet.Value.Value);
+                        _bytecodeOutput += String.Format("(Value={0})", _instructionGet.Value.Value);
                         break;
                     }
                 }
-                Console.WriteLine();
+                _bytecodeOutput += "\n";
             }
-            Console.WriteLine();
+            Console.WriteLine(_bytecodeOutput);
 #endif
         }
 

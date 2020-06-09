@@ -71,6 +71,16 @@ namespace Luna.Runner {
         public static LValue keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return new LValue(LType.Number, (double)(Input.KeyCheck(_arguments[0]) == true ? 1 : 0));
         }
+
+        [FunctionDefinition("keyboard_check_pressed")]
+        public static LValue keyboard_check_pressed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)(Input.KeyPressed(_arguments[0]) == true ? 1 : 0));
+        }
+
+        [FunctionDefinition("keyboard_check_released")]
+        public static LValue keyboard_check_released(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)(Input.KeyReleased(_arguments[0]) == true ? 1 : 0));
+        }
         #endregion
 
         #region Rendering

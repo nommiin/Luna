@@ -41,7 +41,6 @@ namespace Luna.Runner {
 
         public static bool KeyPressed(double _key) {
             Key _keyMapping = Input.InputMapping[_key];
-            Console.WriteLine("{0} was pressed", _keyMapping);
             return (InputDown.Contains(_keyMapping) == true && InputDownPrevious.Contains(_keyMapping) == false);
         }
 
