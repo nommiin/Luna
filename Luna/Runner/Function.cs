@@ -44,8 +44,8 @@ namespace Luna.Runner {
         }
         
         [FunctionDefinition("room_get_name")]
-        public static void room_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            _stack.Push(new LValue(LType.String, _assets.RoomOrder[(int) _arguments[0].Number]));
+        public static LValue room_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.String, _assets.RoomOrder[(int) _arguments[0].Number]);
         }
 
         [FunctionDefinition("event_inherited")]
@@ -72,8 +72,8 @@ namespace Luna.Runner {
 
         #region Input
         [FunctionDefinition("keyboard_check")]
-        public static void keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            _stack.Push(new LValue(LType.Number, (double)(Input.KeyCheck(_arguments[0]) ? 1 : 0)));
+        public static LValue keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)(Input.KeyCheck(_arguments[0]) ? 1 : 0));
         }
         #endregion
 
@@ -83,14 +83,14 @@ namespace Luna.Runner {
         private static int _circlePrecision = 24;
 
         [FunctionDefinition("draw_set_circle_precision")]
-        public static void draw_set_circle_precision(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        public static LValue draw_set_circle_precision(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
         {
             _circlePrecision = (int) _arguments[0].Number;
-            _stack.Push(new LValue(LType.Number, 0));
+            return new LValue(LType.Number, 0);
         }
 
         [FunctionDefinition("draw_circle")]
-        public static void draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             GL.Begin(PrimitiveType.TriangleFan);
 
             double _x = (double)_arguments[0].Value / (_assets.RoomWidth / 2);
@@ -111,30 +111,30 @@ namespace Luna.Runner {
 
 
             GL.End();
-            _stack.Push(new LValue(LType.Number, (double)0));
+            return new LValue(LType.Number, (double)0);
         }
         #endregion
 
         #region Math
         [FunctionDefinition("max")]
-        public static void max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = _arguments[i];
-            _stack.Push(new LValue(LType.Number, _val.Max()));
+            return new LValue(LType.Number, _val.Max());
             /*double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = _stack.Pop();
             _stack.Push(new LValue(LType.Number, _val.Max()));*/
         }
 
         [FunctionDefinition("min")]
-        public static void min(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue min(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = _arguments[i];
-            _stack.Push(new LValue(LType.Number, _val.Min()));
+            return new LValue(LType.Number, _val.Min());
         }
 
         [FunctionDefinition("lengthdir_x")]
-        public static void lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double _len = (double)_arguments[0].Value;
             double _dir = (double)_arguments[1].Value;
 
@@ -142,15 +142,15 @@ namespace Luna.Runner {
             double _o81 = Math.Round(_Px);
             double _F6 = _Px - _o81;
             if (Math.Abs(_F6) < 0.0001) {
-                _stack.Push(new LValue(LType.Number, _o81));
+                return new LValue(LType.Number, _o81);
             } else {
-                _stack.Push(new LValue(LType.Number, _Px));
+                return new LValue(LType.Number, _Px);
             }
             
         }
 
         [FunctionDefinition("lengthdir_y")]
-        public static void lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double _len = (double)_arguments[0].Value;
             double _dir = (double)_arguments[1].Value;
 
@@ -158,15 +158,15 @@ namespace Luna.Runner {
             double _o81 = Math.Round(_Px);
             double _F6 = _Px - _o81;
             if (Math.Abs(_F6) < 0.0001) {
-                _stack.Push(new LValue(LType.Number, _o81));
+                return new LValue(LType.Number, _o81);
             } else {
-                _stack.Push(new LValue(LType.Number, _Px));
+                return new LValue(LType.Number, _Px);
             }
         }
 
         [FunctionDefinition("irandom")]
-        public static void irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            _stack.Push(new LValue(LType.Number, (double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value)));
+        public static LValue irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value));
         }
         #endregion
         }

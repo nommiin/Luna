@@ -30,12 +30,14 @@ namespace Luna {
         public Int32 I32;
         public Int64 I64;
         public string String;
+        public List<LValue> Array;
 
         public LValue(LType _type, object _val) {
             Number = 0;
             String = "";
             I32 = 0;
             I64 = 0;
+            Array = null;
             
             Type = _type;
             switch (Type) {
@@ -43,6 +45,7 @@ namespace Luna {
                 case LType.String: String = (string)_val; break;
                 case LType.Int32: I32 = (Int32)_val; break;
                 case LType.Int64: I64 = (Int64)_val; break;
+                case LType.Array: this.Array = (List<LValue>)_val; break;
             }
         }
 
@@ -53,6 +56,7 @@ namespace Luna {
                     case LType.String: return String;
                     case LType.Int32: return I32;
                     case LType.Int64: return I64;
+                    case LType.Array: return this.Array;
                 }
                 throw new Exception(String.Format("Could not return value for type: {0}", Type));
             }
@@ -62,13 +66,12 @@ namespace Luna {
         public static implicit operator string(LValue _val) => _val.String;
         public static implicit operator Int32(LValue _val) => _val.I32;
         public static implicit operator Int64(LValue _val) => _val.I64;
+        public static implicit operator List<LValue>(LValue _val) => _val.Array;
 
         public static LValue operator ==(LValue a, LValue b) {
-            switch (a.Type)
-            {
-                //see NearlyEqual
-                case LType.Number: return new LValue(LType.Number, (double) (NearlyEqual(a.Number, b.Number) ? 1 : 0));
-                case LType.String: return new LValue(LType.String, (double) (a.String == b.String ? 1 : 0));
+            switch (a.Type) {
+                case LType.Number: return new LValue(LType.Number, (double)((double)a.Value == (double)b.Value ? 1 : 0));
+                case LType.String: return new LValue(LType.String, (double)((string)a.Value == (string)b.Value ? 1 : 0));
             }
 
             throw new Exception("Could not compare");

@@ -24,6 +24,34 @@ namespace Luna.Runner {
             for (ProgramCounter = 0; ProgramCounter < _programLength; ProgramCounter++) {
                 _code.Instructions[ProgramCounter].Perform(_assets, this, _code, Stack);
             }
+
+            Console.WriteLine("Instance Variables: {0}", this.Instance.Variables.Count);
+            int i = 0;
+            foreach(KeyValuePair<string, LValue> _var in this.Instance.Variables) {
+                string _s = "";
+                switch (_var.Value.Type) {
+                    case LType.Array: {
+                        List<LValue> _arr = _var.Value.Array;
+                        _s += "[";
+                        for(int j = 0; j < _arr.Count; j++) {
+                            _s += _arr[j].Value.ToString();
+                            if (j < _arr.Count - 1) _s += ", ";
+                        }
+                        _s += "]";
+                        break;
+                    }
+
+                    default: {
+                        _s = _var.Value.ToString();
+                        break;
+                    }
+                }
+                Console.WriteLine("{0}: {1} = {2}", i++, _var.Key, _s);
+            }
+            /*
+            for(int i = 0; i < this.Instance.Variables.Count; i++) {
+                Console.WriteLine("{0}: {1} = {2}", i, this.Instance.Variables[i].)
+            }*/
         }
     }
 }
