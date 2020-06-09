@@ -62,7 +62,7 @@ Console.WriteLine("My name is " + _myCharacterName);
 ❌ Don't:
 ```csharp
 string myCharacterName = "John";
-Console.WriteLine("My name is " + _myName);
+Console.WriteLine("My name is " + myCharacterName);
 ```
 
 # Types
