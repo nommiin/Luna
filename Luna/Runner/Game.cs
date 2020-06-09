@@ -193,7 +193,7 @@ namespace Luna {
                 LInstance _instGet = this.InstanceList[i];
                 if (_instGet.Draw != null) {
                     _instGet.Environment.ExecuteCode(this, _instGet.Draw);
-                }GL.Viewport;
+                }
             }
 
             GL.Flush();
