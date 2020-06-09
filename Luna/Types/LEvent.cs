@@ -47,16 +47,16 @@ namespace Luna.Types {
             this.LibraryID = _reader.ReadInt32();
             this.ID = _reader.ReadInt32();
             this.Type = (ActionType)_reader.ReadInt32();
-            this.UseRelative = (_reader.ReadInt32() == 1 ? true : false);
-            this.IsQuestion = (_reader.ReadInt32() == 1 ? true : false);
-            this.ApplyTo = (_reader.ReadInt32() == 1 ? true : false);
+            this.UseRelative = _reader.ReadLBoolean();
+            this.IsQuestion = _reader.ReadLBoolean();
+            this.ApplyTo = _reader.ReadLBoolean();
             this.Execution = (ActionExecution)_reader.ReadInt32();
             this.Name = _assets.GetString(_reader.ReadInt32());
             this.Code = _assets.CodeMapping[_reader.ReadInt32()];
             this.ArgumentCount = _reader.ReadInt32();
             this.Caller = _reader.ReadInt32();
-            this.IsRelative = (_reader.ReadInt32() == 1 ? true : false);
-            this.IsNot = (_reader.ReadInt32() == 1 ? true : false);
+            this.IsRelative = _reader.ReadLBoolean();
+            this.IsNot = _reader.ReadLBoolean();
 
             switch (this.Code.Name.Replace("gml_Object_" + _object.Name + "_", "")) {
                 case "PreCreate_0": _object.PreCreate = this.Code; break;

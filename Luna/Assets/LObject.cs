@@ -41,10 +41,10 @@ namespace Luna.Assets {
             if (_spriteIndex != -1) {
                 this.Sprite = _assets.SpriteMapping[_spriteIndex];
             } else this.Sprite = null;
-            this.Visible = (_reader.ReadInt32() == 1 ? true : false);
-            this.Solid = (_reader.ReadInt32() == 1 ? true : false);
+            this.Visible = _reader.ReadLBoolean();// (_reader.ReadInt32() == 1 ? true : false);
+            this.Solid = _reader.ReadLBoolean();
             this.Depth = _reader.ReadInt32();
-            this.Persistent = (_reader.ReadInt32() == 1 ? true : false);
+            this.Persistent = _reader.ReadLBoolean();
             Int32 _parentIndex = _reader.ReadInt32();
             if (_parentIndex != -100) {
                 this.Parent = _assets.ObjectMapping[_parentIndex];
@@ -53,8 +53,8 @@ namespace Luna.Assets {
             if (_maskIndex != -1) {
                 this.Mask = _assets.SpriteMapping[_maskIndex];
             } else this.Mask = this.Sprite;
-            this.PhysObject = (_reader.ReadInt32() == 1 ? true : false);
-            this.PhysSensor = (_reader.ReadInt32() == 1 ? true : false);
+            this.PhysObject = _reader.ReadLBoolean();
+            this.PhysSensor = _reader.ReadLBoolean();
             this.PhysShape = _reader.ReadInt32();
             this.PhysDensity = _reader.ReadSingle();
             this.PhysResitution = _reader.ReadSingle();
@@ -63,8 +63,8 @@ namespace Luna.Assets {
             this.PhysAngularDamping = _reader.ReadSingle();
             this.PhysVertCount = _reader.ReadInt32();
             this.PhysFriction = _reader.ReadSingle();
-            this.PhysAwake = (_reader.ReadInt32() == 1 ? true : false);
-            this.PhysKinematic = (_reader.ReadInt32() == 1 ? true : false);
+            this.PhysAwake = _reader.ReadLBoolean();
+            this.PhysKinematic = _reader.ReadLBoolean();
             _reader.BaseStream.Seek(sizeof(Single) * this.PhysVertCount, SeekOrigin.Current);
             ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _eventOffset) {
                 ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _typeOffset) {
