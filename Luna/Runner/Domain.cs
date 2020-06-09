@@ -35,9 +35,11 @@ namespace Luna.Runner {
             }
 
 #if (DEBUG)
-            Console.WriteLine("Instance Variables (Object: {0}, Count: {1})", this.Instance.Object.Name, this.Instance.Variables.Count);
-            foreach(KeyValuePair<string, LValue> _instVar in this.Instance.Variables) {
-                Console.WriteLine("{0}.{1} = {2}", this.Instance.ID, _instVar.Key, _instVar.Value.Value);
+            if (_assets.Headless == true) {
+                Console.WriteLine("Instance Variables (Object: {0}, Count: {1})", this.Instance.Object.Name, this.Instance.Variables.Count);
+                foreach (KeyValuePair<string, LValue> _instVar in this.Instance.Variables) {
+                    Console.WriteLine("{0}.{1} = {2}", this.Instance.ID, _instVar.Key, _instVar.Value.Value);
+                }
             }
 #endif
         }
