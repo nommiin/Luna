@@ -115,5 +115,20 @@ namespace Luna {
         public static LValue operator >=(LValue a, LValue b) {
             return new LValue(LType.Number, ((double)a.Value >= (double)b.Value) ? (double)1 : (double)0);
         }
+        #region Static Initializers
+        public static LValue Real(double _value)
+        {
+            return new LValue(LType.Number, _value);
+        }
+        public static LValue Text(string _value)
+        {
+            return new LValue(LType.String, _value);
+        }
+        public static LValue Values(params LValue[] _value)
+        {
+            return new LValue(LType.Array, _value);
+        }
+        #endregion
+
     }
 }
