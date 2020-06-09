@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -217,6 +217,25 @@ namespace Luna.Runner {
             }
             return new LValue(LType.Number, (double)0); // TODO: this needs to be undefined
         }
+        
+        [FunctionDefinition("room_get_viewport")]
+        public static LValue room_get_width(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _roomGet = (int)(double)_arguments[0];
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count) {
+                return LValue.Values(_arguments);
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_get_name")]
+        public static LValue room_get_height(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
+                return LValue.Text(_assets.ObjectMapping[_objGet].Name);
+            }
+            return LValue.Real(0);
+        }
+
         #endregion
     }
 }
