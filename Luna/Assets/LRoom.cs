@@ -36,9 +36,9 @@ namespace Luna.Assets {
             this.Width = _reader.ReadInt32();
             this.Height = _reader.ReadInt32();
             this.Speed = _reader.ReadInt32();
-            this.Persistent = (_reader.ReadInt32() == 1 ? true : false);
+            this.Persistent = _reader.ReadLBoolean();
             this.Colour = _reader.ReadInt32();
-            this.ShowColour = (_reader.ReadInt32() == 1 ? true : false);
+            this.ShowColour = _reader.ReadLBoolean();
             Int32 _codeIndex = _reader.ReadInt32();
             if (_codeIndex != -1) {
                 this.CreationCode = _game.CodeMapping[_codeIndex];
@@ -53,7 +53,7 @@ namespace Luna.Assets {
                 this.Instances.Add(new LRoomInstance(_game, _reader));
             });
             _reader.ReadInt32(); // TILES
-            this.PhysWorld = (_reader.ReadInt32() == 1 ? true : false);
+            this.PhysWorld = _reader.ReadLBoolean();
             this.PhysWorldTop = _reader.ReadInt32();
             this.PhysWorldLeft = _reader.ReadInt32();
             this.PhysWorldRight = _reader.ReadInt32();

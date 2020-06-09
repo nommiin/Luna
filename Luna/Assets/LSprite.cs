@@ -55,9 +55,9 @@ namespace Luna.Assets {
             this.BoundsRight = _reader.ReadInt32();
             this.BoundsBottom = _reader.ReadInt32();
             this.BoundsTop = _reader.ReadInt32();
-            this.Transparent = (_reader.ReadInt32() == 1 ? true : false);
-            this.Smooth = (_reader.ReadInt32() == 1 ? true : false);
-            this.Preload = (_reader.ReadInt32() == 1 ? true : false);
+            this.Transparent = _reader.ReadLBoolean();
+            this.Smooth = _reader.ReadLBoolean();
+            this.Preload = _reader.ReadLBoolean();
             this.BoundsType = _reader.ReadInt32();
             this.CollisionType = (CollisionType)_reader.ReadInt32();
             this.OriginX = _reader.ReadInt32();

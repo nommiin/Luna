@@ -82,7 +82,7 @@ namespace Luna {
             if (_assets.Build.Major >= 2) {
                 _reader.BaseStream.Seek(sizeof(Int64) * 5, SeekOrigin.Current);
                 _assets.GameSpeed = _reader.ReadSingle();
-                _assets.AllowStats = (_reader.ReadInt32() == 1 ? true : false);
+                _assets.AllowStats = _reader.ReadLBoolean();
                 _assets.GUID = new Guid(_reader.ReadBytes(16));
             }
         }
