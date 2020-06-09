@@ -114,7 +114,7 @@ namespace Luna.Assets {
 
                     case LOpcode.pop: {
                         Instructions.Pop _instructionGet = this.Instructions[i] as Instructions.Pop;
-                        _bytecodeOutput += String.Format("(Variable={0})", _instructionGet.Variable.Name);
+                        _bytecodeOutput += String.Format("(Variable={0}, Scope={1})", _instructionGet.Variable.Name, _instructionGet.Data);
                         break;
                     }
 

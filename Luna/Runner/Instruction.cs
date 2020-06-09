@@ -287,7 +287,29 @@ namespace Luna.Instructions {
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Type) {
                 case LArgumentType.Variable: {
-                    LValue _valGet = _environment.Instance.Variables[this.Variable.Name];
+                    Dictionary<string, LValue> _variableList = null;
+                    switch ((LVariableScope)this.Data) {
+                        case LVariableScope.Global: {
+                            _variableList = _assets.GlobalScope.Variables;
+                            break;
+                        }
+
+                        case LVariableScope.Instance: {
+                            _variableList = _environment.Instance.Variables;
+                            break;
+                        }
+
+                        case LVariableScope.Local: {
+                            _variableList = _environment.Locals;
+                            break;
+                        }
+
+                        default: {
+                            throw new Exception(String.Format("Could not push from unknown scope: {0}", this.Data));
+                        }
+                    }
+
+                    LValue _valGet = _variableList[this.Variable.Name];
                     switch (_valGet.Type) {
                         case LType.Array: {
                             if (this.Data == -1) {
