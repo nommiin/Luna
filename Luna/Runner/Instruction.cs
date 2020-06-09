@@ -354,7 +354,16 @@ namespace Luna.Instructions {
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             for(int i = 0; i < Count; i++) Arguments[i] = _stack.Pop();
-            _stack.Push(Function(_assets, _environment, Arguments, Count, _stack));
+            try//wrap function in exception handler, and exit on failure
+            {
+                _stack.Push(Function(_assets, _environment, Arguments, Count, _stack));
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Couldn't call function {0}! Reason: {1}",FunctionName,e.Message);
+                Console.Error.WriteLine(e);
+                Environment.Exit(1);
+            }
         }
     }
 

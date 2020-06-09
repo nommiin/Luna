@@ -129,6 +129,7 @@ namespace Luna {
                 _instCreate.Variables["image_index"] = new LValue(LType.Number, (double)_instGet.ImageIndex);
                 _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
                 _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
+                _instCreate.Variables["room"] = new LValue(LType.Number, (double)_room.Index);
                 Instances.Add(_instCreate.ID, _instCreate);
                 if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.PreCreate);
                 if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(this, _instCreate.Create);
@@ -164,11 +165,12 @@ namespace Luna {
             Input.OnKeyUpdate();
             for (int i = 0; i < InstanceList.Count; i++) {
                 LInstance _instGet = InstanceList[i];
+                if ((int)_instGet.Variables["room"].Number != CurrentRoom.Index) _instGet.Variables["room"] = new LValue(LType.Number,(double)CurrentRoom.Index);
                 if (_instGet.Step != null) {
                     _instGet.Environment.ExecuteCode(this, _instGet.Step);
                 }
                 _instGet.Variables["xprevious"] = _instGet.Variables["x"];
-                _instGet.Variables["yprevious"] = _instGet.Variables["x"];
+                _instGet.Variables["yprevious"] = _instGet.Variables["y"];
             }
         }
 

@@ -33,40 +33,40 @@ namespace Luna.Runner {
         public static Dictionary<string, Handler> Mapping = new Dictionary<string, Handler>();
 
         [FunctionDefinition("show_debug_message")]
-        public static void show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             Console.WriteLine(_arguments[0].Value);
-            _stack.Push(new LValue(LType.Number, (double)0));
+            return new LValue(LType.Number, (double)0);
         }
 
         [FunctionDefinition("room_goto")]
-        public static void room_goto(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-
+        public static LValue room_goto(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)0);
         }
         
         [FunctionDefinition("room_get_name")]
         public static LValue room_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return new LValue(LType.String, _assets.RoomOrder[(int) _arguments[0].Number]);
+            return new LValue(LType.String, _assets.RoomOrder[(int) _arguments[0].Number].Name);
         }
 
         [FunctionDefinition("event_inherited")]
-        public static void event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             //
-            _stack.Push(new LValue(LType.Number, (double)0));
+            return new LValue(LType.Number, (double)0);
         }
 
         #region Instances
         [FunctionDefinition("instance_create_depth")]
-        public static void instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             LInstance _instCreate = new LInstance(_assets.InstanceList, _assets.ObjectMapping[(int)(double)_arguments[2].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
             if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
             if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
-            _stack.Push(new LValue(LType.Number, _instCreate.ID));
+            return new LValue(LType.Number, _instCreate.ID);
         }
 
         [FunctionDefinition("instance_destroy")]
-        public static void instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             _assets.InstanceList.Remove(_environment.Instance);
-            _stack.Push(new LValue(LType.Number, (double)0));
+            return new LValue(LType.Number, 0);
         }
         #endregion
 

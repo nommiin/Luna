@@ -24,9 +24,10 @@ namespace Luna.Runner {
             _game.Window.KeyUp += OnKeyUp;
             _game.Window.KeyDown += OnKeyDown;
             //code to allow for key remapping, but fill default values
-            var keys = Enum.GetValues(typeof(Key)).Cast<Key>().ToDictionary(_key => (double)_key, _key => _key);
-            InputMapping = new[] {InputMapping, keys}.SelectMany(x => x).GroupBy(t => t.Key)
-                .ToDictionary(x => x.Key, y => y.First().Value);
+            Enum.GetValues(typeof(Key)).Cast<Key>().ToList().ForEach(_key =>
+            {
+                if (!InputMapping.ContainsKey((double)_key))InputMapping.Add((double) _key, _key);
+            });
         }
 
         public static void OnKeyUp(object sender, KeyboardKeyEventArgs e) {
