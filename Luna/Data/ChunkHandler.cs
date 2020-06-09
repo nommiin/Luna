@@ -44,7 +44,7 @@ namespace Luna {
         }
 
         public static void GEN8(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            _assets.DebugEnabled = ((_reader.ReadInt32() - 4352) == 0 ? true : false);
+            _assets.DebugEnabled = _reader.ReadInt32() - 4352 == 0 ? true : false;
             _assets.Name = _assets.GetString(_reader.ReadInt32());
             _assets.Configuration = _assets.GetString(_reader.ReadInt32());
             _assets.RoomMax = _reader.ReadInt32();
@@ -82,7 +82,7 @@ namespace Luna {
             if (_assets.Build.Major >= 2) {
                 _reader.BaseStream.Seek(sizeof(Int64) * 5, SeekOrigin.Current);
                 _assets.GameSpeed = _reader.ReadSingle();
-                _assets.AllowStats = (_reader.ReadInt32() == 1 ? true : false);
+                _assets.AllowStats = _reader.ReadInt32() == 1 ? true : false;
                 _assets.GUID = new Guid(_reader.ReadBytes(16));
             }
         }
@@ -103,7 +103,7 @@ namespace Luna {
                 }
                 _assets.Variables.Add(_varGet);
                 _reader.BaseStream.Seek(_varGet.Base, SeekOrigin.Begin);
-                if ((_chunk.Base + _chunk.Length) - _reader.BaseStream.Position < LVariable.Length) break;
+                if (_chunk.Base + _chunk.Length - _reader.BaseStream.Position < LVariable.Length) break;
             }
         }
 

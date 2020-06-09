@@ -86,6 +86,7 @@ namespace Luna {
         public LInstance GlobalScope;
         public LInstance StaticScope;
         public Random RandomGen;
+        public LRoom CurrentRoom;
 
         // Special
         public Dictionary<string, Chunk> Chunks;
@@ -93,32 +94,33 @@ namespace Luna {
 
         public void Initalize(bool _headless) {
             // Game
-            this.Runner = new Interpreter(this);
-            this.Instances.Add((double)LVariableScope.Global, new LInstance((double)LVariableScope.Global));
-            this.GlobalScope = this.Instances[(Int32)LVariableScope.Global];
-            this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
-            this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
-            this.RandomGen = new Random();
+            Runner = new Interpreter(this);
+            Instances.Add((double)LVariableScope.Global, new LInstance((double)LVariableScope.Global));
+            GlobalScope = Instances[(Int32)LVariableScope.Global];
+            Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
+            StaticScope = Instances[(Int32)LVariableScope.Static];
+            RandomGen = new Random();
 
             // Window
             if (_headless == false) {
-                this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
-                this.Window.Title = this.DisplayName;
-                this.Window.Load += OnLoad;
-                this.Window.Closing += OnClose;
-                this.Window.UpdateFrame += OnUpdate;
-                this.Window.RenderFrame += OnRender;
+                Window = new GameWindow(RoomWidth, RoomHeight);
+                Window.Title = DisplayName;
+                Window.Load += OnLoad;
+                Window.Closing += OnClose;
+                Window.UpdateFrame += OnUpdate;
+                Window.RenderFrame += OnRender;
                 Input.Initalize(this);
-                this.Window.Run();
+                Window.Run();
             } else {
                 OnLoad(null, null);
             }
         }
 
         public void LoadRoom(LRoom _room) {
+            CurrentRoom = _room;
             for(int i = 0; i < _room.Instances.Count; i++) {
                 LRoomInstance _instGet = _room.Instances[i];
-                LInstance _instCreate = new LInstance(this.InstanceList, _instGet.Index, _instGet.X, _instGet.Y);
+                LInstance _instCreate = new LInstance(InstanceList, _instGet.Index, _instGet.X, _instGet.Y);
                 _instCreate.RoomPreCreate = _instGet.PreCreate;
                 _instCreate.RoomCreate = _instGet.CreationCode;
                 _instCreate.Variables["image_xscale"] = new LValue(LType.Number, (double)_instGet.ScaleX);
@@ -127,7 +129,7 @@ namespace Luna {
                 _instCreate.Variables["image_index"] = new LValue(LType.Number, (double)_instGet.ImageIndex);
                 _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
                 _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
-                this.Instances.Add((double)_instCreate.ID, _instCreate);
+                Instances.Add(_instCreate.ID, _instCreate);
                 if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.PreCreate);
                 if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(this, _instCreate.Create);
                 if (_instCreate.RoomPreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomPreCreate);
@@ -141,17 +143,17 @@ namespace Luna {
 
         public string GetString(Int32 _offset) {
             if (_offset == 0) return "";
-            if (this.Strings.ContainsKey(_offset) == true) {
-                return this.Strings[_offset].Value;
+            if (Strings.ContainsKey(_offset)) {
+                return Strings[_offset].Value;
             }
             throw new Exception(String.Format("Could not find string at {0}", _offset));
         }
 
         private void OnLoad(object sender, EventArgs e) {
-            for(int i = 0; i < this.GlobalScripts.Count; i++) {
-                this.GlobalScope.Environment.ExecuteCode(this, this.GlobalScripts[i]);
+            for(int i = 0; i < GlobalScripts.Count; i++) {
+                GlobalScope.Environment.ExecuteCode(this, GlobalScripts[i]);
             }
-            LoadRoom(this.RoomOrder[0]);
+            LoadRoom(RoomOrder[0]);
         }
 
         private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -160,8 +162,8 @@ namespace Luna {
 
         private void OnUpdate(object sender, FrameEventArgs e) {
             Input.OnKeyUpdate();
-            for (int i = 0; i < this.InstanceList.Count; i++) {
-                LInstance _instGet = this.InstanceList[i];
+            for (int i = 0; i < InstanceList.Count; i++) {
+                LInstance _instGet = InstanceList[i];
                 if (_instGet.Step != null) {
                     _instGet.Environment.ExecuteCode(this, _instGet.Step);
                 }
@@ -174,10 +176,10 @@ namespace Luna {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, 0, this.RoomWidth, this.RoomHeight, 0f, 1.0f);
+            GL.Ortho(0, 0, RoomWidth, RoomHeight, 0f, 1.0f);
 
-            for (int i = 0; i < this.InstanceList.Count; i++) {
-                LInstance _instGet = this.InstanceList[i];
+            for (int i = 0; i < InstanceList.Count; i++) {
+                LInstance _instGet = InstanceList[i];
                 if (_instGet.Draw != null) {
                     _instGet.Environment.ExecuteCode(this, _instGet.Draw);
                 }

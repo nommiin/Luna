@@ -24,52 +24,53 @@ namespace Luna.Assets {
         public Thread Thread;
 
         public LCode(Game _game, BinaryReader _reader) {
-            this.Name = _game.GetString(_reader.ReadInt32());
-            this.Length = _reader.ReadInt32();
-            this.LocalCount = (short)(_reader.ReadInt16() & 0x1FFF);
-            this.ArgCount = _reader.ReadInt16();
-            this.Flags = (byte)((this.ArgCount >> 13) & 7);
-            this.ArgCount = (short)(this.ArgCount & 0x1FFF);
-            this.Offset = _reader.ReadInt32() - 4;
-            _reader.BaseStream.Seek(this.Offset, SeekOrigin.Current);
-            this.Base = _reader.BaseStream.Position;
-            this.Bytecode = new MemoryStream(_reader.ReadBytes(this.Length));
-            this.Reader = new BinaryReader(this.Bytecode);
-            this.Instructions = new List<Instruction>();
-            this.BranchTable = new Dictionary<long, Int32>();
-            this.Thread = new Thread(() => {
-                this.Parse(_game);
+            Name = _game.GetString(_reader.ReadInt32());
+            Length = _reader.ReadInt32();
+            LocalCount = (short)(_reader.ReadInt16() & 0x1FFF);
+            ArgCount = _reader.ReadInt16();
+            Flags = (byte)((ArgCount >> 13) & 7);
+            ArgCount = (short)(ArgCount & 0x1FFF);
+            Offset = _reader.ReadInt32() - 4;
+            _reader.BaseStream.Seek(Offset, SeekOrigin.Current);
+            Base = _reader.BaseStream.Position;
+            Bytecode = new MemoryStream(_reader.ReadBytes(Length));
+            Reader = new BinaryReader(Bytecode);
+            Instructions = new List<Instruction>();
+            BranchTable = new Dictionary<long, Int32>();
+            Thread = new Thread(() => {
+                Parse(_game);
             });
-            this.Thread.Start();
-            _game.Threads.Add(this.Thread);
+            Thread.Start();
+            _game.Threads.Add(Thread);
         }
 
         public void Parse(Game _game) {
-            while (this.Reader.BaseStream.Position < this.Reader.BaseStream.Length) {
-                this.BranchTable[this.Reader.BaseStream.Position] = this.Instructions.Count;
-                Int32 _instructionGet = this.Reader.ReadInt32();
+            while (Reader.BaseStream.Position < Reader.BaseStream.Length) {
+                BranchTable[Reader.BaseStream.Position] = Instructions.Count;
+                Int32 _instructionGet = Reader.ReadInt32();
                 LOpcode _opcodeGet = Instruction.GetOpcode(_instructionGet);
-                if (Instruction.Ignore.Contains(_opcodeGet) == false) {
-                    if (Instruction.Mapping.ContainsKey(_opcodeGet) == true) {
-                        this.Instructions.Add(Instruction.Mapping[_opcodeGet](_instructionGet, _game, this, this.Reader));
+                if (!Instruction.Ignore.Contains(_opcodeGet)) {
+                    if (Instruction.Mapping.ContainsKey(_opcodeGet)) {
+                        Console.WriteLine("Opcode in Code: {0} in {1}",_opcodeGet,Name);
+                        Instructions.Add(Instruction.Mapping[_opcodeGet](_instructionGet, _game, this, Reader));
                     } else {
-                        throw new Exception(String.Format("Could not find instruction mapping for {0} at {1} in {2}", _opcodeGet, this.Reader.BaseStream.Position, this.Name));
+                        throw new Exception(String.Format("Could not find instruction mapping for {0} at {1} in {2}", _opcodeGet, Reader.BaseStream.Position, Name));
                     }
                 }
             }
 
-            for(int i = 0; i < this.Instructions.Count; i++) {
-                Instructions.Branch _instructionGet = this.Instructions[i] as Instructions.Branch;
-                switch (this.Instructions[i].Opcode) {
+            for(int i = 0; i < Instructions.Count; i++) {
+                Instructions.Branch _instructionGet = Instructions[i] as Instructions.Branch;
+                switch (Instructions[i].Opcode) {
                     case LOpcode.b:
                     case LOpcode.bt:
                     case LOpcode.bf: {
-                        if (this.BranchTable.ContainsKey(_instructionGet.Offset) == true) {
-                            _instructionGet.Jump = this.BranchTable[_instructionGet.Offset] - 1;
-                            Console.WriteLine("Jump: {0} -> {1}", i, this.BranchTable[_instructionGet.Offset] - 1);
+                        if (BranchTable.ContainsKey(_instructionGet.Offset)) {
+                            _instructionGet.Jump = BranchTable[_instructionGet.Offset] - 1;
+                            Console.WriteLine("Jump: {0} -> {1}", i, BranchTable[_instructionGet.Offset] - 1);
                         } else {
                             // TODO: seems if a jump is at the end of the code, it breaks! for now it looks like just setting the jump to the last instruction is fine
-                            _instructionGet.Jump = this.Instructions.Count;
+                            _instructionGet.Jump = Instructions.Count;
                             //throw new Exception("Could not find proper offset for branch instruction");
                         }
                         break;
@@ -79,7 +80,7 @@ namespace Luna.Assets {
         }
 
         public override string ToString() {
-            return $"Code: {this.Name}, Length: {this.Length} bytes, Locals: {this.LocalCount}, Arguments: {this.ArgCount}, Offset: {this.Offset}";
+            return $"Code: {Name}, Length: {Length} bytes, Locals: {LocalCount}, Arguments: {ArgCount}, Offset: {Offset}";
         }
     }
 }

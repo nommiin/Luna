@@ -36,41 +36,41 @@ namespace Luna.Assets {
         public LCode Draw = null;
         
         public LObject(Game _assets, BinaryReader _reader) {
-            this.Name = _assets.GetString(_reader.ReadInt32());
+            Name = _assets.GetString(_reader.ReadInt32());
             Int32 _spriteIndex = _reader.ReadInt32();
             if (_spriteIndex != -1) {
-                this.Sprite = _assets.SpriteMapping[_spriteIndex];
-            } else this.Sprite = null;
-            this.Visible = (_reader.ReadInt32() == 1 ? true : false);
-            this.Solid = (_reader.ReadInt32() == 1 ? true : false);
-            this.Depth = _reader.ReadInt32();
-            this.Persistent = (_reader.ReadInt32() == 1 ? true : false);
+                Sprite = _assets.SpriteMapping[_spriteIndex];
+            } else Sprite = null;
+            Visible = _reader.ReadInt32() == 1 ? true : false;
+            Solid = _reader.ReadInt32() == 1 ? true : false;
+            Depth = _reader.ReadInt32();
+            Persistent = _reader.ReadInt32() == 1 ? true : false;
             Int32 _parentIndex = _reader.ReadInt32();
             if (_parentIndex != -100) {
-                this.Parent = _assets.ObjectMapping[_parentIndex];
-            } else this.Parent = null;
+                Parent = _assets.ObjectMapping[_parentIndex];
+            } else Parent = null;
             Int32 _maskIndex = _reader.ReadInt32();
             if (_maskIndex != -1) {
-                this.Mask = _assets.SpriteMapping[_maskIndex];
-            } else this.Mask = this.Sprite;
-            this.PhysObject = (_reader.ReadInt32() == 1 ? true : false);
-            this.PhysSensor = (_reader.ReadInt32() == 1 ? true : false);
-            this.PhysShape = _reader.ReadInt32();
-            this.PhysDensity = _reader.ReadSingle();
-            this.PhysResitution = _reader.ReadSingle();
-            this.PhysGroup = _reader.ReadInt32();
-            this.PhysLinearDamping = _reader.ReadSingle();
-            this.PhysAngularDamping = _reader.ReadSingle();
-            this.PhysVertCount = _reader.ReadInt32();
-            this.PhysFriction = _reader.ReadSingle();
-            this.PhysAwake = (_reader.ReadInt32() == 1 ? true : false);
-            this.PhysKinematic = (_reader.ReadInt32() == 1 ? true : false);
-            _reader.BaseStream.Seek(sizeof(Single) * this.PhysVertCount, SeekOrigin.Current);
+                Mask = _assets.SpriteMapping[_maskIndex];
+            } else Mask = Sprite;
+            PhysObject = _reader.ReadInt32() == 1 ? true : false;
+            PhysSensor = _reader.ReadInt32() == 1 ? true : false;
+            PhysShape = _reader.ReadInt32();
+            PhysDensity = _reader.ReadSingle();
+            PhysResitution = _reader.ReadSingle();
+            PhysGroup = _reader.ReadInt32();
+            PhysLinearDamping = _reader.ReadSingle();
+            PhysAngularDamping = _reader.ReadSingle();
+            PhysVertCount = _reader.ReadInt32();
+            PhysFriction = _reader.ReadSingle();
+            PhysAwake = _reader.ReadInt32() == 1 ? true : false;
+            PhysKinematic = _reader.ReadInt32() == 1 ? true : false;
+            _reader.BaseStream.Seek(sizeof(Single) * PhysVertCount, SeekOrigin.Current);
             ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _eventOffset) {
                 ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _typeOffset) {
                     Int32 _eventSubtype = _reader.ReadInt32();
                     ChunkHandler.HandleKVP(_assets, _reader, delegate (Int32 _actionOffset) {
-                        this.Events.Add(new LEvent(this, _assets, _reader, this, _eventSubtype));
+                        Events.Add(new LEvent(this, _assets, _reader, this, _eventSubtype));
                     });
                 });
             });

@@ -12,8 +12,8 @@ namespace Luna.Assets {
         public long Index;
 
         public LScript(Game _game, BinaryReader _reader) {
-            this.Name = _game.GetString(_reader.ReadInt32());
-            this.Index = _reader.ReadInt32();
+            Name = _game.GetString(_reader.ReadInt32());
+            Index = _reader.ReadInt32();
         }
     }
 }

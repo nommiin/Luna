@@ -13,17 +13,17 @@ namespace Luna.Types {
         public long Base;
 
         public LFunction(Game _game, BinaryReader _reader) {
-            this.Name = _game.GetString(_reader.ReadInt32());
-            this.Count = _reader.ReadInt32();
-            this.Offset = _reader.ReadInt32();
-            this.Base = _reader.BaseStream.Position;
+            Name = _game.GetString(_reader.ReadInt32());
+            Count = _reader.ReadInt32();
+            Offset = _reader.ReadInt32();
+            Base = _reader.BaseStream.Position;
 #if (DEBUG == true)
             //Console.WriteLine(this);
 #endif
         }
 
         public override string ToString() {
-            return $"Function: {this.Name}, Uses: {this.Count}, Offset: {this.Offset}";
+            return $"Function: {Name}, Uses: {Count}, Offset: {Offset}";
         }
     }
 }

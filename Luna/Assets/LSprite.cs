@@ -48,29 +48,29 @@ namespace Luna.Assets {
         // public LTexturePage[] TextureEntry;
 
         public LSprite(Game _assets, BinaryReader _reader) {
-            this.Name = _assets.GetString(_reader.ReadInt32());
-            this.Width = _reader.ReadInt32();
-            this.Height = _reader.ReadInt32();
-            this.BoundsLeft = _reader.ReadInt32();
-            this.BoundsRight = _reader.ReadInt32();
-            this.BoundsBottom = _reader.ReadInt32();
-            this.BoundsTop = _reader.ReadInt32();
-            this.Transparent = (_reader.ReadInt32() == 1 ? true : false);
-            this.Smooth = (_reader.ReadInt32() == 1 ? true : false);
-            this.Preload = (_reader.ReadInt32() == 1 ? true : false);
-            this.BoundsType = _reader.ReadInt32();
-            this.CollisionType = (CollisionType)_reader.ReadInt32();
-            this.OriginX = _reader.ReadInt32();
-            this.OriginY = _reader.ReadInt32();
+            Name = _assets.GetString(_reader.ReadInt32());
+            Width = _reader.ReadInt32();
+            Height = _reader.ReadInt32();
+            BoundsLeft = _reader.ReadInt32();
+            BoundsRight = _reader.ReadInt32();
+            BoundsBottom = _reader.ReadInt32();
+            BoundsTop = _reader.ReadInt32();
+            Transparent = _reader.ReadInt32() == 1 ? true : false;
+            Smooth = _reader.ReadInt32() == 1 ? true : false;
+            Preload = _reader.ReadInt32() == 1 ? true : false;
+            BoundsType = _reader.ReadInt32();
+            CollisionType = (CollisionType)_reader.ReadInt32();
+            OriginX = _reader.ReadInt32();
+            OriginY = _reader.ReadInt32();
             _reader.BaseStream.Seek(sizeof(Int32) * 2, SeekOrigin.Current);
-            this.SpriteType = (SpriteType)_reader.ReadInt32();
-            this.PlaybackType = (PlaybackType)_reader.ReadInt32();
-            this.PlaybackSpeed = _reader.ReadSingle();
+            SpriteType = (SpriteType)_reader.ReadInt32();
+            PlaybackType = (PlaybackType)_reader.ReadInt32();
+            PlaybackSpeed = _reader.ReadSingle();
             _reader.ReadInt32(); // TODO: Read sequence data @ position
-            switch (this.SpriteType) {
+            switch (SpriteType) {
                 case SpriteType.Bitmap: {
-                    this.FrameCount = _reader.ReadInt32();
-                    for(int i = 0; i < this.FrameCount; i++) {
+                    FrameCount = _reader.ReadInt32();
+                    for(int i = 0; i < FrameCount; i++) {
                         _reader.ReadInt32();
                         // TODO: Read texture page indices
                     }
@@ -78,7 +78,7 @@ namespace Luna.Assets {
                 }
 
                 default: {
-                    throw new Exception(String.Format("Could not read unsupported sprite type: {0}", this.SpriteType));
+                    throw new Exception(String.Format("Could not read unsupported sprite type: {0}", SpriteType));
                 }
             }
         }

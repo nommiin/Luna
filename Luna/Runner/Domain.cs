@@ -15,14 +15,14 @@ namespace Luna.Runner {
         public Int32 ProgramCounter = 0;
 
         public Domain(LInstance _inst) {
-            this.Scope = _inst.ID;
-            this.Instance = _inst;
+            Scope = _inst.ID;
+            Instance = _inst;
         }
 
         public void ExecuteCode(Game _assets, LCode _code) {
             Int32 _programLength = _code.Instructions.Count;
-            for (this.ProgramCounter = 0; this.ProgramCounter < _programLength; this.ProgramCounter++) {
-                _code.Instructions[this.ProgramCounter].Perform(_assets, this, _code, this.Stack);
+            for (ProgramCounter = 0; ProgramCounter < _programLength; ProgramCounter++) {
+                _code.Instructions[ProgramCounter].Perform(_assets, this, _code, Stack);
             }
         }
     }

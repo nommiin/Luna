@@ -85,11 +85,11 @@ namespace Luna.Runner {
     public class InstructionDefinition : Attribute {
         public LOpcode[] Opcode;
         public InstructionDefinition(LOpcode _opcode) {
-            this.Opcode = new LOpcode[] { _opcode };
+            Opcode = new LOpcode[] { _opcode };
         }
 
         public InstructionDefinition(LOpcode[] _opcode) {
-            this.Opcode = _opcode;
+            Opcode = _opcode;
         }
 
         public static void Initalize() {
@@ -113,9 +113,9 @@ namespace Luna.Runner {
         };
 
         public static LOpcode GetOpcode(Int32 _instruction) {
-            int _opcodeGet = ((_instruction >> 24) & 0xFF);
+            int _opcodeGet = (_instruction >> 24) & 0xFF;
             if (_opcodeGet == 255) {
-                int _int = (_instruction & UInt16.MaxValue);
+                int _int = _instruction & UInt16.MaxValue;
                 switch (_int) {
                     case UInt16.MaxValue - 0: return LOpcode.chkindex;
                     case UInt16.MaxValue - 1: return LOpcode.pushaf;
@@ -136,14 +136,14 @@ namespace Luna.Runner {
         public Int32 Raw;
 
         public Instruction(Int32 _instruction) {
-            this.Raw = _instruction;
-            this.Opcode = Instruction.GetOpcode(_instruction);
-            this.Argument = (byte)((_instruction >> 16) & 0xFF);
-            this.Data = (Int16)(_instruction & 0xFFFF);
+            Raw = _instruction;
+            Opcode = GetOpcode(_instruction);
+            Argument = (byte)((_instruction >> 16) & 0xFF);
+            Data = (Int16)(_instruction & 0xFFFF);
         }
 
         public virtual void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            Console.WriteLine("[WARNING] - Could not perform action for unimplemented opcode: {0} in {1}", this.Opcode, _code.Name);
+            Console.WriteLine("[WARNING] - Could not perform action for unimplemented opcode: {0} in {1}", Opcode, _code.Name);
         }
     }
 }
@@ -153,11 +153,11 @@ namespace Luna.Instructions {
     class PushImmediate : Instruction {
         public LValue Value;
         public PushImmediate(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Value = new LValue(LType.Number, (double)this.Data);
+            Value = new LValue(LType.Number, (double)Data);
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            _stack.Push(this.Value);
+            _stack.Push(Value);
         }
     }
 
@@ -167,54 +167,54 @@ namespace Luna.Instructions {
         public LVariable Variable;
         public LArgumentType Type;
         public Push(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Type = (LArgumentType)this.Argument;
-            switch (this.Type) {
+            Type = (LArgumentType)Argument;
+            switch (Type) {
                 case LArgumentType.Error: {
-                    this.Value = new LValue(LType.Number, (double)this.Data);
+                    Value = new LValue(LType.Number, (double)Data);
                     break;
                 }
 
                 case LArgumentType.Integer: {
-                    this.Value = new LValue(LType.Number, (Int32)_reader.ReadInt32());
+                    Value = new LValue(LType.Number, _reader.ReadInt32());
                     break;
                 }
 
                 case LArgumentType.Long: {
-                    this.Value = new LValue(LType.Number, (Int64)_reader.ReadInt64());
+                    Value = new LValue(LType.Number, _reader.ReadInt64());
                     break;
                 }
 
                 case LArgumentType.Double: {
-                    this.Value = new LValue(LType.Number, (double)_reader.ReadDouble());
+                    Value = new LValue(LType.Number, _reader.ReadDouble());
                     break;
                 }
 
                 case LArgumentType.String: {
-                    this.Value = new LValue(LType.String, (string)_game.StringMapping[_reader.ReadInt32()].Value);
+                    Value = new LValue(LType.String, _game.StringMapping[_reader.ReadInt32()].Value);
                     break;
                 }
 
                 case LArgumentType.Variable: {
-                    this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]];
+                    Variable = _game.Variables[_game.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position) - 4]];
                     _reader.ReadInt32();
                     break;
                 }
 
                 default: {
-                    throw new Exception(String.Format("Could not parse unimplemented push type {0}", this.Type));
+                    throw new Exception(String.Format("Could not parse unimplemented push type {0}", Type));
                 }
             }
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            switch (this.Type) {
+            switch (Type) {
                 case LArgumentType.Variable: {
-                    _stack.Push(_environment.Instance.Variables[this.Variable.Name]);
+                    _stack.Push(_environment.Instance.Variables[Variable.Name]);
                     break;
                 }
 
                 default: {
-                    _stack.Push(this.Value);
+                    _stack.Push(Value);
                     break;
                 }
             }
@@ -226,15 +226,15 @@ namespace Luna.Instructions {
         public LValue Value;
         public string Variable;
         public PushGlobal(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            switch ((LArgumentType)this.Argument) {
+            switch ((LArgumentType)Argument) {
                 case LArgumentType.Variable: {
-                    this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
+                    Variable = _game.Variables[_game.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position) - 4]].Name;
                     _reader.ReadInt32();
                     break;
                 }
 
                 default: {
-                    throw new Exception(String.Format("Could not parse unimplemented global push type: \"{0}\"", (LArgumentType)this.Argument));
+                    throw new Exception(String.Format("Could not parse unimplemented global push type: \"{0}\"", (LArgumentType)Argument));
                 }
             }
         }
@@ -243,9 +243,16 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.pushb)]
     class PushBuiltin : Instruction {
         public string Variable;
-        public PushBuiltin(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
+
+        public PushBuiltin(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction)
+        {
+            Variable = _game.Variables[_game.VariableMapping[(int)(_code.Base + _reader.BaseStream.Position) - 4]].Name;
             _reader.ReadInt32();
+        }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack)
+        {
+            _stack.Push(new LValue(LType.String,Variable));
         }
     }
 
@@ -255,18 +262,18 @@ namespace Luna.Instructions {
         public LArgumentType ArgTo;
         public LArgumentType ArgFrom;
         public Pop(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.ArgTo = (LArgumentType)(this.Argument & 0xF);
-            this.ArgFrom = (LArgumentType)((this.Argument >> 4) & 0xF);
-            switch (this.ArgTo) {
+            ArgTo = (LArgumentType)(Argument & 0xF);
+            ArgFrom = (LArgumentType)((Argument >> 4) & 0xF);
+            switch (ArgTo) {
                 case LArgumentType.Variable: {
-                    Int32 _varOffset = (int)((_code.Base + _reader.BaseStream.Position)) - 4;
-                    this.Variable = _game.Variables[_game.VariableMapping[_varOffset]];
+                    Int32 _varOffset = (int)(_code.Base + _reader.BaseStream.Position) - 4;
+                    Variable = _game.Variables[_game.VariableMapping[_varOffset]];
                     _reader.ReadInt32();
                     break;
                 }
 
                 default: {
-                    throw new Exception(String.Format("Could not pop from {0} to {1}", this.ArgTo, this.ArgFrom));
+                    throw new Exception(String.Format("Could not pop from {0} to {1}", ArgTo, ArgFrom));
                 }
             }
         }
@@ -301,9 +308,9 @@ namespace Luna.Instructions {
         public LValue[] Arguments;
         public Int32 Count;
         public Call(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            string _funcName = _game.Functions[_game.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]].Name;
-            if (Runner.Function.Mapping.ContainsKey(_funcName) == true) {
-                this.Function = Runner.Function.Mapping[_funcName];
+            string _funcName = _game.Functions[_game.FunctionMapping[(int)(_code.Base + _reader.BaseStream.Position)]].Name;
+            if (Runner.Function.Mapping.ContainsKey(_funcName)) {
+                Function = Runner.Function.Mapping[_funcName];
             } else {
                 throw new Exception(String.Format("Could not find function mapping for \"{0}\"", _funcName));
             }
@@ -312,14 +319,14 @@ namespace Luna.Instructions {
             } catch (Exception e) {
                 throw new Exception(String.Format("Could not find instruction mapping for ));
             }*/
-            this.Count = this.Data;
-            this.Arguments = new LValue[this.Count];
+            Count = Data;
+            Arguments = new LValue[Count];
             _reader.ReadInt32();
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            for(int i = 0; i < this.Count; i++) this.Arguments[i] = _stack.Pop();
-            this.Function(_assets, _environment, this.Arguments, this.Count, _stack);
+            for(int i = 0; i < Count; i++) Arguments[i] = _stack.Pop();
+            Function(_assets, _environment, Arguments, Count, _stack);
         }
     }
 
@@ -327,13 +334,13 @@ namespace Luna.Instructions {
     class Conditional : Instruction {
         public LConditionType Type;
         public Conditional(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Type = (LConditionType)((this.Data >> 8) & 0xFF);
+            Type = (LConditionType)((Data >> 8) & 0xFF);
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             LValue _compRight = _stack.Pop();
             LValue _compLeft  = _stack.Pop();
-            switch (this.Type) {
+            switch (Type) {
                 case LConditionType.Equal: _stack.Push(_compLeft == _compRight); break;
                 case LConditionType.NotEqual: _stack.Push(_compLeft != _compRight); break;
                 case LConditionType.LessThan: _stack.Push(_compLeft < _compRight); break;
@@ -349,11 +356,11 @@ namespace Luna.Instructions {
         public Int32 Offset;
         public Int32 Jump = -1;
         public Branch(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            this.Offset = (Int32)((_reader.BaseStream.Position + (this.Raw << 9 >> 7)) - 4);
+            Offset = (Int32)(_reader.BaseStream.Position + (Raw << 9 >> 7) - 4);
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            _environment.ProgramCounter = this.Jump;
+            _environment.ProgramCounter = Jump;
         }
     }
 
@@ -362,7 +369,7 @@ namespace Luna.Instructions {
         public BranchTrue(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) { }
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             if ((double)_stack.Pop().Value == 1) {
-                _environment.ProgramCounter = this.Jump;
+                _environment.ProgramCounter = Jump;
             }
         }
     }
@@ -372,7 +379,7 @@ namespace Luna.Instructions {
         public BranchFalse(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction, _game, _code, _reader) { }
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             if ((double)_stack.Pop().Value == 0) {
-                _environment.ProgramCounter = this.Jump;
+                _environment.ProgramCounter = Jump;
             }
         }
     }
