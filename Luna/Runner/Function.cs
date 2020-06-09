@@ -101,8 +101,8 @@ namespace Luna.Runner {
             double _r = (double)_arguments[2].Value / _assets.CirclePrecision;
 
             GL.Vertex2(_x, _y);
-            for(int i = 0; i < _assets.CirclePrecision; i++) {
-                GL.Vertex2(_x + (Math.Sin(i) * _r), _y + (Math.Cos(i) * _r));
+            for(int i = 0; i <= 360; i+=360/_assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(i*(Math.PI/180)) * _r), _y + (Math.Sin(i*(Math.PI/180)) * _r));
             }
 
             GL.End();
