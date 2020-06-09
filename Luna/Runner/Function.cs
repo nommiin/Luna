@@ -29,7 +29,7 @@ namespace Luna.Runner {
     }
 
     static class Function {
-        public delegate void Handler(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
+        public delegate LValue Handler(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
         public static Dictionary<string, Handler> Mapping = new Dictionary<string, Handler>();
 
         [FunctionDefinition("show_debug_message")]

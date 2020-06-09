@@ -25,9 +25,9 @@ namespace Luna.Runner {
                 _code.Instructions[ProgramCounter].Perform(_assets, this, _code, Stack);
             }
 
-            Console.WriteLine("Instance Variables: {0}", this.Instance.Variables.Count);
+            Console.WriteLine("Instance Variables: {0}", Instance.Variables.Count);
             int i = 0;
-            foreach(KeyValuePair<string, LValue> _var in this.Instance.Variables) {
+            foreach(KeyValuePair<string, LValue> _var in Instance.Variables) {
                 string _s = "";
                 switch (_var.Value.Type) {
                     case LType.Array: {
