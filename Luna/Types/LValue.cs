@@ -30,7 +30,7 @@ namespace Luna {
         public Int32 I32;
         public Int64 I64;
         public string String;
-        public List<LValue> Array;
+        public LValue[] Array;
 
         public LValue(LType _type, object _val) {
             this.Number = 0;
@@ -45,7 +45,7 @@ namespace Luna {
                 case LType.String: this.String = (string)_val; break;
                 case LType.Int32: this.I32 = (Int32)_val; break;
                 case LType.Int64: this.I64 = (Int64)_val; break;
-                case LType.Array: this.Array = (List<LValue>)_val; break;
+                case LType.Array: this.Array = (LValue[])_val; break;
             }
         }
 
@@ -66,7 +66,7 @@ namespace Luna {
         public static implicit operator string(LValue _val) => _val.String;
         public static implicit operator Int32(LValue _val) => _val.I32;
         public static implicit operator Int64(LValue _val) => _val.I64;
-        public static implicit operator List<LValue>(LValue _val) => _val.Array;
+        public static implicit operator LValue[](LValue _val) => _val.Array;
 
         public static LValue operator ==(LValue a, LValue b) {
             switch (a.Type) {
@@ -87,6 +87,8 @@ namespace Luna {
         public static LValue operator +(LValue a, LValue b) {
             if (a.Type == LType.Number && a.Type == LType.Number) {
                 return new LValue(LType.Number, (double)((double)a.Value + (double)b.Value));
+            } else if (a.Type == LType.String && b.Type == LType.String) {
+                return new LValue(LType.String, (string)((string)a.Value + (string)b.Value));
             }
             throw new Exception("Could not add 2 values");
         }

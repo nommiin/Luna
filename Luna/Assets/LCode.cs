@@ -38,7 +38,6 @@ namespace Luna.Assets {
             this.Reader = new BinaryReader(this.Bytecode);
             this.Instructions = new List<Instruction>();
             this.BranchTable = new Dictionary<long, Int32>();
-            this.Ownership = new Stack<bool>();
             this.Thread = new Thread(() => {
                 this.Parse(_game);
             });
@@ -70,45 +69,28 @@ namespace Luna.Assets {
                         Instructions.Branch _instructionBranch = this.Instructions[i] as Instructions.Branch;
                         if (this.BranchTable.ContainsKey(_instructionBranch.Offset) == true) {
                             _instructionBranch.Jump = this.BranchTable[_instructionBranch.Offset] - 1;
-                            Console.WriteLine("Jump: {0} -> {1}", i, this.BranchTable[_instructionBranch.Offset] - 1);
                         } else {
-                            // TODO: seems if a jump is at the end of the code, it breaks! for now it looks like just setting the jump to the last instruction is fine
                             _instructionBranch.Jump = this.Instructions.Count;
-                            //throw new Exception("Could not find proper offset for branch instruction");
                         }
                         break;
                     }
                 }
             }
 
-            // Clean up useless instructions
-            Stack<Instructions.Pop> _instructionRefs = new Stack<Instructions.Pop>();
+            // Check for arrays
             for(int i = 0; i < this.Instructions.Count; i++) {
                 switch (this.Instructions[i].Opcode) {
                     case LOpcode.setowner: {
-                        this.Instructions.RemoveAt(--i);
-                        this.Instructions.RemoveAt(i--);
-                        this.Instructions.RemoveAt(i + 2);
-
-                        switch (this.Instructions[i + 2].Opcode) {
-                            case LOpcode.pushi: {
-                                Instructions.Pop _instructionRef = this.Instructions[i + 3] as Instructions.Pop;
-                                _instructionRef.ArraySize = Math.Max(_instructionRef.ArraySize, (Int32)(double)(this.Instructions[i + 2] as Instructions.PushImmediate).Value.Value);
-                                _instructionRefs.Push(_instructionRef);
+                        // Find next pop instruction
+                        for(int j = i; j < this.Instructions.Count; j++) {
+                            if (this.Instructions[j].Opcode == LOpcode.pop) {
+                                this.Instructions.RemoveAt(--i);   // push.i <id>
+                                this.Instructions.RemoveAt(i + 2); // pushi.e -1
                                 break;
                             }
                         }
                         break;
                     }
-                }
-            }
-
-            // Initialize all arrays
-            while (_instructionRefs.Count > 0) {
-                Instructions.Pop _instructionGet = _instructionRefs.Pop();
-                _instructionGet.Value.Array = new List<LValue>();
-                for (int i = 0; i < _instructionGet.ArraySize; i++) {
-                    _instructionGet.Value.Array.Add(new LValue(LType.Number, (double)0));
                 }
             }
 
@@ -119,27 +101,27 @@ namespace Luna.Assets {
                 Console.Write("{0} - {1} ", i, this.Instructions[i].Opcode);
                 switch (this.Instructions[i].Opcode) {
                     case LOpcode.call: {
-                        Instructions.Call _instGet = this.Instructions[i] as Instructions.Call;
-                        Console.Write("(Function={0})", _instGet.FunctionName);
+                        Instructions.Call _instructionGet = this.Instructions[i] as Instructions.Call;
+                        Console.Write("(Function={0})", _instructionGet.FunctionName);
                         break;
                     }
 
                     case LOpcode.pop: {
-                        Instructions.Pop _instGet = this.Instructions[i] as Instructions.Pop;
-                        Console.Write("(Variable={0}, IsArray={1})", _instGet.Variable.Name, _instGet.IsArray);
+                        Instructions.Pop _instructionGet = this.Instructions[i] as Instructions.Pop;
+                        Console.Write("(Variable={0})", _instructionGet.Variable.Name);
                         break;
                     }
 
                     case LOpcode.push: {
-                        Instructions.Push _instGet = this.Instructions[i] as Instructions.Push;
-                        switch (_instGet.Type) {
+                        Instructions.Push _instructionGet = this.Instructions[i] as Instructions.Push;
+                        switch (_instructionGet.Type) {
                             case LArgumentType.Variable: {
-                                Console.Write("(Variable={0})", _instGet.Variable.Name);
+                                Console.Write("(Variable={0})", _instructionGet.Variable.Name);
                                 break;
                             }
 
                             default: {
-                                Console.Write("(Value={0})", _instGet.Value.Value);
+                                Console.Write("(Value={0})", _instructionGet.Value.Value);
                                 break;
                             }
                         }
@@ -147,8 +129,8 @@ namespace Luna.Assets {
                     }
 
                     case LOpcode.pushi: {
-                        Instructions.PushImmediate _instGet = this.Instructions[i] as Instructions.PushImmediate;
-                        Console.Write("(Value={0})", _instGet.Value.Value);
+                        Instructions.PushImmediate _instructionGet = this.Instructions[i] as Instructions.PushImmediate;
+                        Console.Write("(Value={0})", _instructionGet.Value.Value);
                         break;
                     }
                 }
