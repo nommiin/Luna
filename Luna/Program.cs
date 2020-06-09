@@ -9,8 +9,8 @@ using Luna.Runner;
 
 namespace Luna {
     class Program {
-        static void Main(string[] args) {
-            
+        static void Main(string[] args)
+        {
             // Initalize definitions
             InstructionDefinition.Initalize();
             FunctionDefinition.Initalize();
@@ -18,7 +18,7 @@ namespace Luna {
             // Load game
             IFF _wad = new IFF(String.Join(" ", args), new Game());
             _wad.Parse(delegate (Game _game) {
-                _game.Initalize(true);
+                _game.Initalize(false);
             });
             Console.ReadKey();
         }

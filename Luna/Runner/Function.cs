@@ -211,6 +211,28 @@ namespace Luna.Runner {
             }
             return new LValue(LType.Number, (double)0); // TODO: this needs to be undefined
         }
+        
+        [FunctionDefinition("room_get_viewport")]
+        public static LValue room_get_viewport(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _roomGet = (int)(double)_arguments[0];
+            int _viewGet = (int)(double)_arguments[1];
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count && _viewGet >= 0 && _viewGet < 8)
+            {
+                LRoomView _view = _assets.RoomMapping[_roomGet].Views[_viewGet];
+                return LValue.Values(_view.Enabled,_view.X,_view.Y,_view.Width,_view.Height);
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_get_name")]
+        public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
+                return LValue.Text(_assets.ObjectMapping[_objGet].Name);
+            }
+            return LValue.Real(0);
+        }
+
         #endregion
     }
 }
