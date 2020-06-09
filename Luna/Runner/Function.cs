@@ -88,11 +88,11 @@ namespace Luna.Runner {
 
             double _x = ((double)_arguments[0].Value / (_assets.RoomWidth / 2));
             double _y = -((double)_arguments[1].Value / (_assets.RoomHeight / 2));
-            double _r = (double)_arguments[2].Value / _assets.CirclePrecision;
+            double _r = (double)_arguments[2].Value/360;
 
             GL.Vertex2(_x, _y);
-            for(int i = 0; i < _assets.CirclePrecision; i++) {
-                GL.Vertex2(_x + (Math.Sin(i) * _r), _y + (Math.Cos(i) * _r));
+            for(double _i = 0; _i <= 360; _i+=360/(double)_assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(_i* (Math.PI/180)) * _r), _y + (Math.Sin(_i* (Math.PI/180)) * _r));
             }
 
             GL.End();
@@ -203,20 +203,19 @@ namespace Luna.Runner {
         }
         
         [FunctionDefinition("room_get_viewport")]
-        public static LValue room_get_width(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue room_get_viewport(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _roomGet = (int)(double)_arguments[0];
             int _viewGet = (int)(double)_arguments[1];
-            return LValue.Real(0);
-            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count)
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count && _viewGet >= 0 && _viewGet < 8)
             {
-                LRoom _room = _assets.RoomMapping[_roomGet];
-                return LValue.Values();
+                LRoomView _view = _assets.RoomMapping[_roomGet].Views[_viewGet];
+                return LValue.Values(_view.Enabled,_view.X,_view.Y,_view.Width,_view.Height);
             }
             return LValue.Real(0);
         }
 
         [FunctionDefinition("object_get_name")]
-        public static LValue room_get_height(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+        public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _objGet = (int)(double)_arguments[0];
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
                 return LValue.Text(_assets.ObjectMapping[_objGet].Name);

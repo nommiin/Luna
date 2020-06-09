@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using OpenTK.Graphics.OpenGL;
 
 namespace Luna {
     public enum LType {
@@ -124,9 +125,26 @@ namespace Luna {
         {
             return new LValue(LType.String, _value);
         }
-        public static LValue Values(params LValue[] _value)
+        public static LValue Values(params LValue[] _values)
         {
-            return new LValue(LType.Array, _value);
+            return new LValue(LType.Array, _values);
+        }
+
+        public static LValue Values(params Object[] _values)
+        {
+            LValue[] _vals = new LValue[_values.Length];
+            for (int _i=0;_i<_values.Length;_i++)
+            {
+                object _val = _values[_i];
+                if (_val is String _str) _vals[_i] = Text(_str);
+                else if (_val is IConvertible _conv)
+                {
+                    _vals[_i] = Real(_conv.ToDouble(null));
+                }
+                else _vals[_i] = Real(0);//failed to convert, change this to undefined when it's implemented
+            }
+
+            return Values(_vals);
         }
         #endregion
 

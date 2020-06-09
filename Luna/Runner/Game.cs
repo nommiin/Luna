@@ -93,7 +93,7 @@ namespace Luna {
         
         // Rendering
         public int CirclePrecision;
-        public Color4 CurrentColor;//todo: create draw_set_color and draw_set_alpha + counterparts
+        public LColour CurrentColor;//todo: create draw_set_color and draw_set_alpha + counterparts
 
         // Special
         public Dictionary<string, Chunk> Chunks;
@@ -107,8 +107,9 @@ namespace Luna {
             this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
             this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
             this.RandomGen = new Random();
-            this.CurrentColor = Color4.White;
-
+            this.CurrentColor = LColour.FromColor4(Color4.White);
+            this.CirclePrecision = 24;
+            
             // Window
             if (_headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
@@ -165,10 +166,11 @@ namespace Luna {
         }
 
         private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
-            for (int i = 0; i < Instances.Count; i++) {
-                LInstance _inst = Instances[i];
+            for (int i = 0; i < this.InstanceList.Count; i++) {
+                LInstance _inst = this.InstanceList[i];
                 if (_inst.Destroy != null) _inst.Environment.ExecuteCode(this, _inst.Destroy);
             }
+            Environment.Exit(0);
         }
 
         private void OnUpdate(object sender, FrameEventArgs e) {

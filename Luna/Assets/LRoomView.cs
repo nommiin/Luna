@@ -19,7 +19,7 @@ namespace Luna.Assets
         public int SpeedY;
         public LObject Target;
         public LRoomView(Game _assets, BinaryReader _reader){
-            Enabled = _reader.ReadBoolean();
+            Enabled = _reader.ReadInt32()==1;
             X = _reader.ReadInt32();
             Y = _reader.ReadInt32();
             Width = _reader.ReadInt32();
@@ -32,7 +32,8 @@ namespace Luna.Assets
             BorderY = _reader.ReadUInt32();
             SpeedX = _reader.ReadInt32();
             SpeedY = _reader.ReadInt32();
-            Target = _assets.ObjectMapping[_reader.ReadInt32()];
+            var _target = _reader.ReadInt32();
+            if (_target >= 0)Target = _assets.ObjectMapping[_target];
         }
     }
 }
