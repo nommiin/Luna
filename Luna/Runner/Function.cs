@@ -169,5 +169,22 @@ namespace Luna.Runner {
             return new LValue(LType.Number, (double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value));
         }
         #endregion
+
+        #region Arrays
+        [FunctionDefinition("array_length")]
+        public static LValue array_length(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            if (_arguments[0].Type == LType.Array) {
+                return new LValue(LType.Number, (double)_arguments[0].Array.Length);
+            }
+            return new LValue(LType.Number, (double)0);
         }
+        #endregion
+
+        #region Types
+        [FunctionDefinition("string")]
+        public static LValue _string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.String, _arguments[0].Value.ToString());
+        }
+        #endregion
+    }
 }
