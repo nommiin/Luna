@@ -71,6 +71,16 @@ namespace Luna.Runner {
         public static LValue keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return LValue.Real((double)(Input.KeyCheck(_arguments[0]) == true ? 1 : 0));
         }
+
+        [FunctionDefinition("keyboard_check_pressed")]
+        public static LValue keyboard_check_pressed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)(Input.KeyPressed(_arguments[0]) == true ? 1 : 0));
+        }
+
+        [FunctionDefinition("keyboard_check_released")]
+        public static LValue keyboard_check_released(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return new LValue(LType.Number, (double)(Input.KeyReleased(_arguments[0]) == true ? 1 : 0));
+        }
         #endregion
 
         #region Rendering
@@ -201,29 +211,6 @@ namespace Luna.Runner {
             }
             return new LValue(LType.Number, (double)0); // TODO: this needs to be undefined
         }
-        
-        [FunctionDefinition("room_get_viewport")]
-        public static LValue room_get_width(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            int _roomGet = (int)(double)_arguments[0];
-            int _viewGet = (int)(double)_arguments[1];
-            return LValue.Real(0);
-            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count)
-            {
-                LRoom _room = _assets.RoomMapping[_roomGet];
-                return LValue.Values();
-            }
-            return LValue.Real(0);
-        }
-
-        [FunctionDefinition("object_get_name")]
-        public static LValue room_get_height(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            int _objGet = (int)(double)_arguments[0];
-            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
-                return LValue.Text(_assets.ObjectMapping[_objGet].Name);
-            }
-            return LValue.Real(0);
-        }
-
         #endregion
     }
 }

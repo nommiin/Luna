@@ -162,25 +162,6 @@ namespace Luna.Instructions {
         }
     }
 
-    [InstructionDefinition(LOpcode.pushg)]
-    class PushGlobal : Instruction {
-        public LValue Value;
-        public string Variable;
-        public PushGlobal(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
-            switch ((LArgumentType)this.Argument) {
-                case LArgumentType.Variable: {
-                    this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
-                    _reader.ReadInt32();
-                    break;
-                }
-
-                default: {
-                    throw new Exception(String.Format("Could not parse unimplemented global push type: \"{0}\"", (LArgumentType)this.Argument));
-                }
-            }
-        }
-    }
-
     [InstructionDefinition(LOpcode.pushb)]
     class PushBuiltin : Instruction {
         public string Variable;
@@ -203,7 +184,60 @@ namespace Luna.Instructions {
         }
     }
 
-    [InstructionDefinition(new LOpcode[] { LOpcode.push, LOpcode.pushl })]
+    [InstructionDefinition(LOpcode.pushl)]
+    class PushLocal : Instruction {
+        public string Variable;
+        public PushLocal(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
+            this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
+            _reader.ReadInt32();
+        }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            switch ((LArgumentType)this.Argument) {
+                case LArgumentType.Variable: {
+                    _stack.Push(_environment.Locals[this.Variable]);
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not parse unimplemented local push type: \"{0}\"", (LArgumentType)this.Argument));
+                }
+            }
+        }
+    }
+
+    [InstructionDefinition(LOpcode.pushg)]
+    class PushGlobal : Instruction {
+        public string Variable;
+        public PushGlobal(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
+            switch ((LArgumentType)this.Argument) {
+                case LArgumentType.Variable: {
+                    this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
+                    _reader.ReadInt32();
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not parse unimplemented global push type: \"{0}\"", (LArgumentType)this.Argument));
+                }
+            }
+        }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            switch ((LArgumentType)this.Argument) {
+                case LArgumentType.Variable: {
+                    _stack.Push(_assets.GlobalScope.Variables[this.Variable]);
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not push unimplemented global type: \"{0}\"", (LArgumentType)this.Argument));
+                }
+            }
+        }
+    }
+
+    [InstructionDefinition(LOpcode.push)]
     class Push : Instruction {
         public bool IsArray;
         public LValue Value;
@@ -287,9 +321,12 @@ namespace Luna.Instructions {
     #region Pop Variations
     [InstructionDefinition(LOpcode.pop)]
     class Pop : Instruction {
+        public LValue Value;
         public LVariable Variable;
         public LArgumentType ArgTo;
         public LArgumentType ArgFrom;
+        public bool IsArray;
+        public Int32 ArraySize;
         public Pop(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
             this.ArgTo = (LArgumentType)(this.Argument & 0xF);
             this.ArgFrom = (LArgumentType)((this.Argument >> 4) & 0xF);
@@ -298,6 +335,11 @@ namespace Luna.Instructions {
                     Int32 _varOffset = (int)((_code.Base + _reader.BaseStream.Position)) - 4;
                     this.Variable = _game.Variables[_game.VariableMapping[_varOffset]];
                     _reader.ReadInt32();
+                    if (_code.Ownership.Count > 0) {
+                        this.IsArray = _code.Ownership.Pop();
+                        this.ArraySize = 0;
+                        this.Value = new LValue(LType.Array, new List<LValue>());
+                    }
                     break;
                 }
 
@@ -308,16 +350,38 @@ namespace Luna.Instructions {
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            Dictionary<string, LValue> _variableList = null;
+            switch ((LVariableScope)this.Data) {
+                case LVariableScope.Global: {
+                    _variableList = _assets.GlobalScope.Variables;
+                    break;
+                }
+
+                case LVariableScope.Instance: {
+                    _variableList = _environment.Instance.Variables;
+                    break;
+                }
+
+                case LVariableScope.Local: {
+                    _variableList = _environment.Locals;
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not pop from unknown scope: {0}", this.Data));
+                }
+            }
+
             if (_environment.ArrayNext == true) {
                 int _arrayIndex = (int)(double)_stack.Pop().Value;
-                if (_environment.Instance.Variables.ContainsKey(this.Variable.Name) == false || _environment.Instance.Variables[this.Variable.Name].Type != LType.Array) {
-                    _environment.Instance.Variables[this.Variable.Name] = new LValue(LType.Array, new LValue[_arrayIndex + 1]);
+                if (_variableList.ContainsKey(this.Variable.Name) == false || _variableList[this.Variable.Name].Type != LType.Array) {
+                    _variableList[this.Variable.Name] = new LValue(LType.Array, new LValue[_arrayIndex + 1]);
                     for(int i = 0; i <= _arrayIndex; i++) {
-                        _environment.Instance.Variables[this.Variable.Name].Array[i] = new LValue(LType.Number, (double)0);
+                        _variableList[this.Variable.Name].Array[i] = new LValue(LType.Number, (double)0);
                     }
                 }
 
-                LValue _valGet = _environment.Instance.Variables[this.Variable.Name];
+                LValue _valGet = _variableList[this.Variable.Name];
                 if (_arrayIndex > _valGet.Array.Length) {
                     LValue _valCopy = new LValue(LType.Array, new LValue[_arrayIndex + 1]);
                     for(int i = 0; i <= _arrayIndex; i++) {
@@ -327,13 +391,13 @@ namespace Luna.Instructions {
                             _valCopy.Array[i] = new LValue(LType.Number, (double)0);
                         }
                     }
-                    _environment.Instance.Variables[this.Variable.Name] = _valCopy;
+                    _variableList[this.Variable.Name] = _valCopy;
                     _valGet = _valCopy;
                 }
                 _valGet.Array[_arrayIndex] = _stack.Pop();
                 _environment.ArrayNext = false;
             } else {
-                _environment.Instance.Variables[this.Variable.Name] = _stack.Pop();
+                _variableList[this.Variable.Name] = _stack.Pop();
             }
         }
     }

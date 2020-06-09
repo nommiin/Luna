@@ -32,46 +32,46 @@ namespace Luna.Assets {
         public LRoomView[] Views = new LRoomView[8];
 
         public LRoom(Game _game, BinaryReader _reader) {
-            Name = _game.GetString(_reader.ReadInt32());
-            Caption = _game.GetString(_reader.ReadInt32());
-            Width = _reader.ReadInt32();
-            Height = _reader.ReadInt32();
-            Speed = _reader.ReadInt32();
-            Persistent = _reader.ReadInt32() == 1 ? true : false;
-            Colour = _reader.ReadInt32();
-            ShowColour = _reader.ReadInt32() == 1 ? true : false;
+            this.Name = _game.GetString(_reader.ReadInt32());
+            this.Caption = _game.GetString(_reader.ReadInt32());
+            this.Width = _reader.ReadInt32();
+            this.Height = _reader.ReadInt32();
+            this.Speed = _reader.ReadInt32();
+            this.Persistent = _reader.ReadLBoolean();
+            this.Colour = _reader.ReadInt32();
+            this.ShowColour = _reader.ReadLBoolean();
             Int32 _codeIndex = _reader.ReadInt32();
             if (_codeIndex != -1) {
-                CreationCode = _game.CodeMapping[_codeIndex];
-            } else CreationCode = null;
+                this.CreationCode = _game.CodeMapping[_codeIndex];
+            } else this.CreationCode = null;
             Int32 _flagGet = _reader.ReadInt32() & 0xF;
-            EnableViews = (_flagGet & 1) == 1 ? true : false;
-            ClearViewport = ((_flagGet >> 1) & 1) == 1 ? true : false;
-            ClearBuffer = ((_flagGet >> 2) & 1) == 1 ? true : false;
+            this.EnableViews = ((_flagGet & 1) == 1 ? true : false);
+            this.ClearViewport = (((_flagGet >> 1) & 1) == 1 ? true : false);
+            this.ClearBuffer = (((_flagGet >> 2) & 1) == 1 ? true : false);
             _reader.ReadInt32(); // Backgrounds
             int _i = 0;
             ChunkHandler.HandleList(_game, _reader, delegate(Int32 _offset) {
                 Views[_i++] = new LRoomView(_game,_reader);
             });
             ChunkHandler.HandleList(_game, _reader, delegate (Int32 _offset) {
-                Instances.Add(new LRoomInstance(_game, _reader));
+                this.Instances.Add(new LRoomInstance(_game, _reader));
             });
             _reader.ReadInt32(); // TILES
-            PhysWorld = _reader.ReadInt32() == 1 ? true : false;
-            PhysWorldTop = _reader.ReadInt32();
-            PhysWorldLeft = _reader.ReadInt32();
-            PhysWorldRight = _reader.ReadInt32();
-            PhysWorldBottom = _reader.ReadInt32();
-            PhysGravityX = _reader.ReadSingle();
-            PhysGravityY = _reader.ReadSingle();
-            PhysConversion = _reader.ReadSingle();
+            this.PhysWorld = _reader.ReadLBoolean();
+            this.PhysWorldTop = _reader.ReadInt32();
+            this.PhysWorldLeft = _reader.ReadInt32();
+            this.PhysWorldRight = _reader.ReadInt32();
+            this.PhysWorldBottom = _reader.ReadInt32();
+            this.PhysGravityX = _reader.ReadSingle();
+            this.PhysGravityY = _reader.ReadSingle();
+            this.PhysConversion = _reader.ReadSingle();
             _reader.ReadInt32(); // LAYERS
             _reader.ReadInt32(); // SEQUENCES
             // TODO: Parse remaining data, such as phyiscs and layer data.
         }
 
         public override string ToString() {
-            return $"Room: {Name}, Size: {Width}x{Height}, Creation Code: {CreationCode}";
+            return $"Room: {this.Name}, Size: {this.Width}x{this.Height}, Creation Code: {this.CreationCode}";
         }
     }
 }

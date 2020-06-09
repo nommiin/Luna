@@ -31,7 +31,7 @@ namespace Luna.Runner {
         }
 
         public static void OnKeyUp(object sender, KeyboardKeyEventArgs e) {
-            while (InputDown.Contains(e.Key)) {
+            while (InputDown.Contains(e.Key) == true) {
                 InputDown.Remove(e.Key);
             }
         }
@@ -45,20 +45,18 @@ namespace Luna.Runner {
         }
 
         public static bool KeyPressed(double _key) {
-            Key _keyMapping = InputMapping[_key];
-            Console.WriteLine("{0} was pressed", _keyMapping);
-            return InputDown.Contains(_keyMapping) && InputDownPrevious.Contains(_keyMapping) == false;
+            Key _keyMapping = Input.InputMapping[_key];
+            return (InputDown.Contains(_keyMapping) == true && InputDownPrevious.Contains(_keyMapping) == false);
         }
 
         public static bool KeyReleased(double _key) {
-            Key _keyMapping = InputMapping[_key];
-            return InputDownPrevious.Contains(_keyMapping) && InputDown.Contains(_keyMapping) == false;
+            Key _keyMapping = Input.InputMapping[_key];
+            return (InputDownPrevious.Contains(_keyMapping) == true && InputDown.Contains(_keyMapping) == false);
         }
 
-        public static bool KeyCheck(double _key)
-        {
-            Key _keyMapping = InputMapping[_key];
-            return InputDown.Contains(_keyMapping);
+        public static bool KeyCheck(double _key) {
+            Key _keyMapping = Input.InputMapping[_key];
+            return (InputDown.Contains(_keyMapping) == true);
         }
     }
 }
