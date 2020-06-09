@@ -34,7 +34,8 @@ namespace Luna.Assets {
         public LCode Create = null;
         public LCode Step = null;
         public LCode Draw = null;
-        
+        public LCode Destroy = null;
+
         public LObject(Game _assets, BinaryReader _reader) {
             Name = _assets.GetString(_reader.ReadInt32());
             Int32 _spriteIndex = _reader.ReadInt32();

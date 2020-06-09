@@ -205,8 +205,12 @@ namespace Luna.Runner {
         [FunctionDefinition("room_get_viewport")]
         public static LValue room_get_width(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _roomGet = (int)(double)_arguments[0];
-            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count) {
-                return LValue.Values(_arguments);
+            int _viewGet = (int)(double)_arguments[1];
+            return LValue.Real(0);
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count)
+            {
+                LRoom _room = _assets.RoomMapping[_roomGet];
+                return LValue.Values();
             }
             return LValue.Real(0);
         }

@@ -57,14 +57,34 @@ namespace Luna.Types {
             Caller = _reader.ReadInt32();
             IsRelative = _reader.ReadInt32() == 1 ? true : false;
             IsNot = _reader.ReadInt32() == 1 ? true : false;
-
+            //todo: use enums for setting event code objects
             switch (Code.Name.Replace("gml_Object_" + _object.Name + "_", "")) {
                 case "PreCreate_0": _object.PreCreate = Code; break;
                 case "Create_0": _object.Create = Code; break;
                 case "Step_0": _object.Step = Code; break;
                 case "Draw_0": _object.Draw = Code; break;
+                case "Destroy_0": _object.Destroy = Code; break;
+                //case "Other_(game end id goes here)": _object.Other.GameEnd = Code; break;
             }
             //this.
         }
+    }
+
+    enum Events
+    {
+        Create,
+        Destroy,
+        Alarm,
+        Step,
+        Collision,
+        Keyboard,
+        Mouse,
+        Other,
+        Draw,
+        KeyPress,
+        KeyRelease,
+        Trigger,//does this exist in 2.3? triggers were removed 
+        CleanUp,
+        PreCreate
     }
 }
