@@ -188,6 +188,19 @@ namespace Luna.Instructions {
             this.Variable = _game.Variables[_game.VariableMapping[(int)((_code.Base + _reader.BaseStream.Position)) - 4]].Name;
             _reader.ReadInt32();
         }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            switch (this.Variable) {
+                case "room": {
+                    _stack.Push(new LValue(LType.Number, (double)_assets.CurrentRoom.Index));
+                    break;
+                }
+
+                default: {
+                    throw new Exception(String.Format("Could not return built-in variable named: \"{0}\"", this.Variable));
+                }
+            }
+        }
     }
 
     [InstructionDefinition(new LOpcode[] { LOpcode.push, LOpcode.pushl })]

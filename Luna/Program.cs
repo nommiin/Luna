@@ -9,22 +9,15 @@ using Luna.Runner;
 
 namespace Luna {
     class Program {
-        static void Main(string[] args)
-        {
-            var path = String.Join(" ", args);//permits spaces without using quotes
-            if (!File.Exists(path))
-            {
-                //prevent the simplest error, but instead of doing it in the IFF class, just do it here
-                throw new FileNotFoundException("Could not find given IFF file", path);
-            }
+        static void Main(string[] args) {
             // Initalize definitions
             InstructionDefinition.Initalize();
             FunctionDefinition.Initalize();
 
-            // Load game from path in arguments
-            IFF _wad = new IFF(path, new Game());
+            // Load game
+            IFF _wad = new IFF(@"E:\Luna\Sample\LunaBuiltin.win", new Game());
             _wad.Parse(delegate (Game _game) {
-                _game.Initalize(false);
+                _game.Initalize(true);
             });
             /*
             LunaTypes
