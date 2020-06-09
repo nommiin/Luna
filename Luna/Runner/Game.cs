@@ -79,6 +79,7 @@ namespace Luna {
         public Dictionary<Int32, Int32> VariableMapping = new Dictionary<Int32, Int32>();
 
         // Runner
+        public bool Headless;
         public GameWindow Window;
         public Interpreter Runner;
         public Dictionary<double, LInstance> Instances = new Dictionary<double, LInstance>();
@@ -104,6 +105,7 @@ namespace Luna {
             this.RandomGen = new Random();
 
             // Window
+            this.Headless = _headless;
             if (_headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
                 this.Window.Title = this.DisplayName;
@@ -137,10 +139,20 @@ namespace Luna {
                 if (_instCreate.RoomPreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomPreCreate);
                 if (_instCreate.RoomCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomCreate);
             }
+
             if (_room.CreationCode != null) {
                 Domain _roomEnvironment = new Domain(new LInstance(-100));
                 _roomEnvironment.ExecuteCode(this, _room.CreationCode);
             }
+
+#if (DEBUG)
+            if (this.Headless == true) {
+                Console.WriteLine("Global Variables (Count: {0})", this.GlobalScope.Variables.Count);
+                foreach(KeyValuePair<string, LValue> _globalVar in this.GlobalScope.Variables) {
+                    Console.WriteLine("global.{0} = {1}", _globalVar.Key, _globalVar.Value.Value);
+                }
+            }
+#endif
         }
 
         public string GetString(Int32 _offset) {
