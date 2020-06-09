@@ -87,6 +87,9 @@ namespace Luna {
         public LInstance StaticScope;
         public Random RandomGen;
 
+        // Built-in Variables
+        public LRoom CurrentRoom;
+
         // Special
         public Dictionary<string, Chunk> Chunks;
         public List<System.Threading.Thread> Threads = new List<System.Threading.Thread>();
@@ -116,6 +119,7 @@ namespace Luna {
         }
 
         public void LoadRoom(LRoom _room) {
+            this.CurrentRoom = _room;
             for(int i = 0; i < _room.Instances.Count; i++) {
                 LRoomInstance _instGet = _room.Instances[i];
                 LInstance _instCreate = new LInstance(this.InstanceList, _instGet.Index, _instGet.X, _instGet.Y);

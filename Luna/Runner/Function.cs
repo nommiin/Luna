@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using Luna.Types;
+using Luna.Assets;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
@@ -188,6 +189,17 @@ namespace Luna.Runner {
         [FunctionDefinition("string")]
         public static LValue _string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return new LValue(LType.String, _arguments[0].Value.ToString());
+        }
+        #endregion
+
+        #region Assets - Room
+        [FunctionDefinition("room_get_name")]
+        public static LValue room_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _roomGet = (int)(double)_arguments[0];
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count) {
+                return new LValue(LType.String, _assets.RoomMapping[_roomGet].Name);
+            }
+            return new LValue(LType.Number, (double)0); // TODO: this needs to be undefined
         }
         #endregion
     }
