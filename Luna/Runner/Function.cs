@@ -223,7 +223,9 @@ namespace Luna.Runner {
             }
             return LValue.Real(0);
         }
-
+        #endregion
+        
+        #region Assets - Object
         [FunctionDefinition("object_get_name")]
         public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _objGet = (int)(double)_arguments[0];
