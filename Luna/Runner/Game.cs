@@ -89,6 +89,9 @@ namespace Luna {
 
         // Built-in Variables
         public LRoom CurrentRoom;
+        
+        // Rendering
+        public int CirclePrecision;
 
         // Special
         public Dictionary<string, Chunk> Chunks;
