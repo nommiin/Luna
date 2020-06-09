@@ -11,14 +11,21 @@ namespace Luna.Runner {
     class Domain {
         public double Scope = 0;
         public LInstance Instance = null;
+        public Dictionary<string, LValue> Locals;
         public Stack<LValue> Stack = new Stack<LValue>();
-        public Dictionary<string, LValue> Locals = new Dictionary<string, LValue>();
         public Int32 ProgramCounter = 0;
         public bool ArrayNext = false;
 
         public Domain(LInstance _inst) {
             this.Scope = _inst.ID;
             this.Instance = _inst;
+            this.Locals = new Dictionary<string, LValue>();
+        }
+
+        public Domain(LInstance _inst, Domain _other) {
+            this.Scope = _inst.ID;
+            this.Instance = _inst;
+            this.Locals = _other.Locals;
         }
 
         public void ExecuteCode(Game _assets, LCode _code) {
