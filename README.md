@@ -18,6 +18,6 @@ See "Long Term" header in [TODO.md](https://github.com/nommiin/Luna/blob/master/
 - Target Runtime: 23.1.1.124
 
 # Special Thanks
-- Thanks to @Shana6 for the numerous contributions 
-- Thanks to @YellowAfterlife for assistance with figuring out bytecode
-- Thanks to @DatZach for assistance in improving Luna's performance early on
+- Thanks to [@Shana6](https://github.com/Shana6) for the numerous contributions 
+- Thanks to [@YellowAfterlife](https://github.com/YellowAfterlife) for assistance with figuring out bytecode
+- Thanks to [@DatZach](https://github.com/DatZach) for assistance in improving Luna's performance early on
