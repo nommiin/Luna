@@ -81,3 +81,32 @@ var _instGlobal = _game.Instances[(double)LVariableScope.Global];
 var _instX = _instGlobal.Variables["x"];
 Console.WriteLine("Instance X position is: {0}", _instX);
 ```
+
+# Brackets
+### Brackets of all kinds should be put on the same line as the loop or conditional
+
+✔️ Do:
+```csharp
+int a = 0;
+if (a > 0) {
+    //
+}
+
+for(int i = 0; i < 100; i++) {
+    //
+}
+```
+
+❌ Don't:
+```csharp
+int a = 0;
+if (a > 0)
+{
+    //
+}
+
+for(int i = 0; i < 100; i++)
+{
+    //
+}
+```
