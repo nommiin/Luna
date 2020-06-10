@@ -367,9 +367,11 @@ namespace Luna.Instructions {
             } else {
                 double _varScope = this.Data;
                 if (this.Data == 0) {
-                    _varScope = _stack.Pop();
-                    if (_varScope == -9) {
-                        _varScope = _stack.Pop();
+                    switch ((double)_stack.Pop()) {
+                        case -9: {
+                            _varScope = _stack.Pop();
+                            break;
+                        }
                     }
                 }
                 Helper.GetVariables(_assets, _environment, _varScope)[this.Variable.Name] = _stack.Pop();
