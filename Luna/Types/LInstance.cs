@@ -20,8 +20,9 @@ namespace Luna.Types {
         public LCode Draw = null;
         public LCode Destroy = null;
 
-        public LInstance(List<LInstance> _instances, LObject _object, double _x=0, double _y=0) {
-            _instances.Add(this);
+        public LInstance(Game _assets, LObject _object, double _x=0, double _y=0) {
+            _assets.InstanceList.Add(this);
+            _assets.Instances[LInstance.Counter + 1] = this;
             this.Object = _object;
             this.ID = LInstance.Counter++;
             this.Environment = new Domain(this);

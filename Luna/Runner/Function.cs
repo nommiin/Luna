@@ -39,7 +39,8 @@ namespace Luna.Runner {
         #region Instances
         [FunctionDefinition("instance_create_depth")]
         public static LValue instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LInstance _instCreate = new LInstance(_assets.InstanceList, _assets.ObjectMapping[(int)(double)_arguments[2].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
+            LInstance _instCreate = new LInstance(_assets, _assets.ObjectMapping[(int)(double)_arguments[3].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
+            _instCreate.Variables["depth"] = _arguments[2];
             if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
             if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
             return LValue.Real(_instCreate.ID);
@@ -184,20 +185,20 @@ namespace Luna.Runner {
         #region Types
         [FunctionDefinition("string")]
         public static LValue _string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return new LValue(LType.String, _arguments[0].Value.ToString());
+            return new LValue(LType.String, _arguments[0].ToString());
         }
         #endregion
 
         #region Runner
         [FunctionDefinition("show_message")]
         public static LValue show_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            MessageBox.Show((string)_arguments[0], _assets.DisplayName, MessageBoxButtons.OK);
+            MessageBox.Show(_arguments[0].ToString(), _assets.DisplayName, MessageBoxButtons.OK);
             return LValue.Real(0);
         }
 
         [FunctionDefinition("show_debug_message")]
         public static LValue show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            Console.WriteLine(_arguments[0].Value);
+            Console.WriteLine(_arguments[0].ToString());
             return LValue.Real(0);
         }
 

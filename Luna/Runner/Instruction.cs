@@ -285,46 +285,22 @@ namespace Luna.Instructions {
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Type) {
                 case LArgumentType.Variable: {
-                    Dictionary<string, LValue> _variableList = null;
-                    switch ((LVariableScope)this.Data) {
-                        case LVariableScope.Global: {
-                            _variableList = _assets.GlobalScope.Variables;
-                            break;
-                        }
-
-                        case LVariableScope.Instance: {
-                            _variableList = _environment.Instance.Variables;
-                            break;
-                        }
-
-                        case LVariableScope.Local: {
-                            _variableList = _environment.Locals;
-                            break;
-                        }
-
-                        default: {
-                            throw new Exception(String.Format("Could not push from unknown scope: {0}", this.Data));
-                        }
-                    }
-
-                    LValue _valGet = _variableList[this.Variable.Name];
-                    switch (_valGet.Type) {
-                        case LType.Array: {
-                            if (this.Data == -1) {
-                                _stack.Push(_valGet);
-                            } else {
-                                int _arrayIndex = (int)(double)_stack.Pop().Value;
-                                _stack.Pop();
-                                _stack.Push(_valGet.Array[_arrayIndex]);
+                    if (this.Data == 0) {
+                        LValue _valPush = _stack.Pop();
+                        Dictionary<string, LValue> _variableList = Helper.GetVariables(_assets, _environment, (double)_stack.Pop().Value);
+                        LValue _varFind = _variableList[this.Variable.Name];
+                        switch (_varFind.Type) {
+                            case LType.Array: {
+                                _stack.Push(_varFind.Array[(int)(double)_valPush.Value]);
+                                break;
                             }
-                            
-                            break;
-                        }
 
-                        default: {
-                            _stack.Push(_valGet);
-                            break;
+                            default: {
+                                throw new Exception(String.Format("Could not handle push for type: {0}", _varFind.Type));
+                            }
                         }
+                    } else {
+                        _stack.Push(Helper.GetVariables(_assets, _environment, this.Data)[this.Variable.Name]);
                     }
                     break;
                 }
@@ -362,30 +338,10 @@ namespace Luna.Instructions {
         }
 
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
-            Dictionary<string, LValue> _variableList = null;
-            switch ((LVariableScope)this.Data) {
-                case LVariableScope.Global: {
-                    _variableList = _assets.GlobalScope.Variables;
-                    break;
-                }
-
-                case LVariableScope.Instance: {
-                    _variableList = _environment.Instance.Variables;
-                    break;
-                }
-
-                case LVariableScope.Local: {
-                    _variableList = _environment.Locals;
-                    break;
-                }
-
-                default: {
-                    throw new Exception(String.Format("Could not pop from unknown scope: {0}", this.Data));
-                }
-            }
-
             if (_environment.ArrayNext == true) {
                 int _arrayIndex = (int)(double)_stack.Pop().Value;
+                Dictionary<string, LValue> _variableList = Helper.GetVariables(_assets, _environment, (double)_stack.Pop().Value);
+
                 if (_variableList.ContainsKey(this.Variable.Name) == false || _variableList[this.Variable.Name].Type != LType.Array) {
                     _variableList[this.Variable.Name] = new LValue(LType.Array, new LValue[_arrayIndex + 1]);
                     for(int i = 0; i <= _arrayIndex; i++) {
@@ -409,7 +365,14 @@ namespace Luna.Instructions {
                 _valGet.Array[_arrayIndex] = _stack.Pop();
                 _environment.ArrayNext = false;
             } else {
-                _variableList[this.Variable.Name] = _stack.Pop();
+                double _varScope = this.Data;
+                if (this.Data == 0) {
+                    _varScope = _stack.Pop();
+                    if (_varScope == -9) {
+                        _varScope = _stack.Pop();
+                    }
+                }
+                Helper.GetVariables(_assets, _environment, _varScope)[this.Variable.Name] = _stack.Pop();
             }
         }
     }
@@ -600,4 +563,24 @@ namespace Luna.Instructions {
         }
     }
     #endregion
+}
+
+namespace Luna.Instructions {
+    static class Helper {
+        public static Dictionary<string, LValue> GetVariables(Game _assets, Domain _environment, double _scope) {
+            switch ((LVariableScope)_scope) {
+                case LVariableScope.Global: return _assets.GlobalScope.Variables;
+                case LVariableScope.Static: return _assets.StaticScope.Variables;
+                case LVariableScope.Instance: return _environment.Instance.Variables;
+                case LVariableScope.Local: return _environment.Locals;
+                default: {
+                    if (_assets.Instances.ContainsKey(_scope) == true) {
+                        return _assets.Instances[_scope].Variables;
+                    }
+                    break;
+                }
+            }
+            throw new Exception(String.Format("Could not return proper scope for: {0}", _scope));
+        }
+    }
 }
