@@ -90,6 +90,10 @@ Console.WriteLine("Instance X position is: {0}", _instX);
 int a = 0;
 if (a > 0) {
     //
+} else if (a  0) {
+
+} else {
+
 }
 
 for(int i = 0; i < 100; i++) {
@@ -101,6 +105,14 @@ for(int i = 0; i < 100; i++) {
 ```csharp
 int a = 0;
 if (a > 0)
+{
+    //
+}
+else if (a < 0)
+{
+    //
+}
+else 
 {
     //
 }
