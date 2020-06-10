@@ -46,6 +46,28 @@ namespace Luna {
             }
         }
 
+        public override string ToString() {
+            switch (this.Type) {
+                case LType.Number: return this.Number.ToString();
+                case LType.String: return this.String;
+                case LType.Int32: return this.I32.ToString();
+                case LType.Int64: return this.I64.ToString();
+                case LType.Undefined: return "undefined";
+                case LType.Array: {
+                    string _valReturn = "[ ";
+                    for (int i = 0; i < this.Array.Length; i++) {
+                        LValue _valGet = this.Array[i];
+                        if (_valGet.Type == LType.String) _valReturn += '"';
+                        _valReturn += _valGet.ToString();
+                        if (_valGet.Type == LType.String) _valReturn += '"';
+                        if (i < this.Array.Length - 1) _valReturn += ",";
+                    }
+                    return _valReturn + " ]";
+                }
+            }
+            throw new Exception(String.Format("Could not convert type \"{0}\" to string", this.Type));
+        }
+
         public object Value {
             get {
                 switch (this.Type) {
@@ -112,25 +134,6 @@ namespace Luna {
 
         public static LValue operator >=(LValue a, LValue b) {
             return new LValue(LType.Number, (double)(((double)a.Value >= (double)b.Value) ? 1 : 0));
-        }
-
-        public override string ToString() {
-            switch (this.Type) {
-                case LType.Number: return this.Number.ToString();
-                case LType.String: return this.String;
-                case LType.Int32: return this.I32.ToString();
-                case LType.Int64: return this.I64.ToString();
-                case LType.Undefined: return "undefined";
-                case LType.Array: {
-                    string _valReturn = "[ ";
-                    for(int i = 0; i < this.Array.Length; i++) {
-                        _valReturn += this.Array[i].ToString();
-                        if (i < this.Array.Length - 1) _valReturn += ",";
-                    }
-                    return _valReturn + " ]";
-                }
-            }
-            throw new Exception(String.Format("Could not convert type \"{0}\" to string", this.Type));
         }
 
         #region Static Initializers

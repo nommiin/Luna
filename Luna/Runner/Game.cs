@@ -111,6 +111,7 @@ namespace Luna {
             this.Headless = _headless;
             if (_headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
+                this.Window.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetEntryAssembly().Location); // meh
                 this.Window.Title = this.DisplayName;
                 this.Window.Load += OnLoad;
                 this.Window.Closing += OnClose;
@@ -127,7 +128,7 @@ namespace Luna {
             this.CurrentRoom = _room;
             for(int i = 0; i < _room.Instances.Count; i++) {
                 LRoomInstance _instGet = _room.Instances[i];
-                LInstance _instCreate = new LInstance(this.InstanceList, _instGet.Index, _instGet.X, _instGet.Y);
+                LInstance _instCreate = new LInstance(this, _instGet.Index, _instGet.X, _instGet.Y);
                 _instCreate.RoomPreCreate = _instGet.PreCreate;
                 _instCreate.RoomCreate = _instGet.CreationCode;
                 _instCreate.Variables["image_xscale"] = new LValue(LType.Number, (double)_instGet.ScaleX);
@@ -197,7 +198,7 @@ namespace Luna {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, 0, this.RoomWidth, this.RoomHeight, 0f, 1.0f);
+            GL.Ortho(0f, this.RoomWidth, this.RoomHeight, 0f, 0f, 1.0f);
 
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];

@@ -83,12 +83,11 @@ namespace Luna.Assets {
                         for(int j = i; j < this.Instructions.Count; j++) {
                             if (this.Instructions[j].Opcode == LOpcode.pop) {
                                 this.Instructions.RemoveAt(--i);   // push.i <id>
-                                this.Instructions.RemoveAt(i + 2); // pushi.e -1
                                 break;
                             } else if (this.Instructions[j].Opcode == LOpcode.call) {
                                 Instructions.Call _instructionGet = this.Instructions[j] as Instructions.Call;
                                 if (_instructionGet.FunctionName == "@@NewGMLArray@@") {
-                                    this.Instructions.RemoveAt(i--);
+                                    this.Instructions.RemoveAt(--i);
                                     break;
                                 }
                             }
@@ -102,7 +101,7 @@ namespace Luna.Assets {
             // Print out finalized bytecode
             string _bytecodeOutput = this.Name + "\n";
             for (int i = 0; i < this.Instructions.Count; i++) {
-                _bytecodeOutput += String.Format("{0} - {1} ", i, this.Instructions[i].Opcode);
+                _bytecodeOutput += String.Format("[{1}] - {0}", this.Instructions[i].Opcode, this.Instructions[i].Raw.ToString("X"));
                 switch (this.Instructions[i].Opcode) {
                     case LOpcode.call: {
                         Instructions.Call _instructionGet = this.Instructions[i] as Instructions.Call;

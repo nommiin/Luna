@@ -38,7 +38,6 @@ namespace Luna {
             _wad.Parse(delegate (Game _game) {
                 _game.Initalize(false);
             });
-            Console.ReadKey();
         }
 
         static string[] GetArguments(string[] args) {
