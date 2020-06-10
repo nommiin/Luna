@@ -139,12 +139,29 @@ namespace Luna {
                 if (_val is String _str) _vals[_i] = Text(_str);
                 else if (_val is IConvertible _conv)
                 {
-                    _vals[_i] = Real(_conv.ToDouble(null));
+                    _vals[_i] = LValue.Real(_conv.ToDouble(null));
                 }
-                else _vals[_i] = Real(0);//failed to convert, change this to undefined when it's implemented
+                else _vals[_i] = LValue.Real(0);//failed to convert, change this to undefined when it's implemented
             }
 
-            return Values(_vals);
+            return LValue.Values(_vals);
+        }
+
+        public static LValue Bool(bool _value)
+        {
+            return _value==true?True():False();
+        }
+
+        //Shorthand for Real 0
+        public static LValue False()
+        {
+            return LValue.Real(0);
+        }
+
+        //Shorthand for Real 1
+        public static LValue True()
+        {
+            return LValue.Real(1);
         }
         #endregion
 
