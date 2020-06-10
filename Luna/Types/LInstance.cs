@@ -8,8 +8,8 @@ using Luna.Runner;
 
 namespace Luna.Types {
     class LInstance {
-        public static double Counter = 100000;
         public double ID;
+        public static double Counter = 100000;
 
         public LObject Object;
         public Domain Environment;
@@ -25,10 +25,10 @@ namespace Luna.Types {
 
         public LInstance(List<LInstance> _instances, LObject _object, double _x=0, double _y=0) {
             _instances.Add(this);
-            Object = _object;
-            ID = Counter++;
-            Environment = new Domain(this);
-            Variables = new Dictionary<string, LValue>() {
+            this.Object = _object;
+            this.ID = LInstance.Counter++;
+            this.Environment = new Domain(this);
+            this.Variables = new Dictionary<string, LValue>() {
                 ["x"] = new LValue(LType.Number, _x),
                 ["y"] = new LValue(LType.Number, _y),
                 ["xprevious"] = new LValue(LType.Number, _x),
@@ -63,17 +63,17 @@ namespace Luna.Types {
                 ["bbox_bottom"] = new LValue(LType.Number, _object.Mask != null ? _y + _object.Mask.BoundsBottom : _y),
             };
 
-            PreCreate = _object.PreCreate;
-            Create = _object.Create;
-            Step = _object.Step;
-            Draw = _object.Draw;
-            Destroy = _object.Destroy;
+            this.PreCreate = _object.PreCreate;
+            this.Create = _object.Create;
+            this.Step = _object.Step;
+            this.Draw = _object.Draw;
+            this.Destroy = _object.Destroy;
         }
 
         public LInstance(double _id) {
-            ID = _id;
-            Environment = new Domain(this);
-            Variables = new Dictionary<string, LValue>();
+            this.ID = _id;
+            this.Environment = new Domain(this);
+            this.Variables = new Dictionary<string, LValue>();
         }
     }
 }

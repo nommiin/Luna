@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace Luna.Types {
@@ -11,12 +8,12 @@ namespace Luna.Types {
         public Int32 Offset;
 
         public LString(BinaryReader _reader, Int32 _offset) {
-            Value = Encoding.ASCII.GetString(_reader.ReadBytes(_reader.ReadInt32()));
-            Offset = _offset + 4;
+            this.Value = Encoding.ASCII.GetString(_reader.ReadBytes(_reader.ReadInt32()));
+            this.Offset = _offset + 4;
         }
 
         public override string ToString() {
-            return Value;
+            return this.Value;
         }
     }
 }
