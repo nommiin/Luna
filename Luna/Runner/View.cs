@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
+﻿using OpenTK;
 
 namespace Luna.Runner {
     class View {
@@ -19,7 +14,7 @@ namespace Luna.Runner {
         }
 
         public void ApplyTransform() {
-            Matrix4 _transform = Matrix4.Identity;
+
         }
     }
 
