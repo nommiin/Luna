@@ -16,3 +16,8 @@ See "Long Term" header in [TODO.md](https://github.com/nommiin/Luna/blob/master/
 # Notes
 - GameMaker is copyright of [YoYo Games Ltd.](https://www.yoyogames.com/)
 - Target Runtime: 23.1.1.124
+
+# Special Thanks
+- Thanks to @Shana6 for the numerous contributions 
+- Thanks to @YellowAfterlife for assistance with figuring out bytecode
+- Thanks to @DatZach for assistance in improving Luna's performance early on
