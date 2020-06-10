@@ -6,21 +6,22 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luna", "Luna\Luna.csproj", "{11F75A3A-1B38-4764-B752-658504C98F57}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{7C94C685-0709-4922-B951-A4D6C411ED33}"
-ProjectSection(SolutionItems) = preProject
-	Sample\Luna.win = Sample\Luna.win
-	Sample\LunaArray.win = Sample\LunaArray.win
-	Sample\LunaArray2.win = Sample\LunaArray2.win
-	Sample\LunaArrayCreate.win = Sample\LunaArrayCreate.win
-	Sample\LunaArrayLiteral.win = Sample\LunaArrayLiteral.win
-	Sample\LunaArrayMixed.win = Sample\LunaArrayMixed.win
-	Sample\LunaBuiltin.win = Sample\LunaBuiltin.win
-	Sample\LunaParent.win = Sample\LunaParent.win
-	Sample\LunaParticles.win = Sample\LunaParticles.win
-	Sample\LunaParticles2.win = Sample\LunaParticles2.win
-	Sample\LunaPlayer.win = Sample\LunaPlayer.win
-	Sample\LunaSwitch.win = Sample\LunaSwitch.win
-	Sample\LunaSwitch3.win = Sample\LunaSwitch3.win
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		Sample\Luna.win = Sample\Luna.win
+		Sample\LunaArray.win = Sample\LunaArray.win
+		Sample\LunaArray2.win = Sample\LunaArray2.win
+		Sample\LunaArrayCreate.win = Sample\LunaArrayCreate.win
+		Sample\LunaArrayLiteral.win = Sample\LunaArrayLiteral.win
+		Sample\LunaArrayLocal.win = Sample\LunaArrayLocal.win
+		Sample\LunaArrayMixed.win = Sample\LunaArrayMixed.win
+		Sample\LunaBuiltin.win = Sample\LunaBuiltin.win
+		Sample\LunaParent.win = Sample\LunaParent.win
+		Sample\LunaParticles.win = Sample\LunaParticles.win
+		Sample\LunaParticles2.win = Sample\LunaParticles2.win
+		Sample\LunaPlayer.win = Sample\LunaPlayer.win
+		Sample\LunaSwitch.win = Sample\LunaSwitch.win
+		Sample\LunaSwitch3.win = Sample\LunaSwitch3.win
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

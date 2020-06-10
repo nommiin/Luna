@@ -32,6 +32,7 @@ namespace Luna {
         public Int64 I64;
         public string String;
         public LValue[] Array;
+        public byte Undefined;
 
         public LValue(LType _type, object _val) {
             this.Number = 0;
@@ -39,6 +40,7 @@ namespace Luna {
             this.I32 = 0;
             this.I64 = 0;
             this.Array = null;
+            this.Undefined = 0;
             
             this.Type = _type;
             switch (this.Type) {
@@ -47,6 +49,7 @@ namespace Luna {
                 case LType.Int32: this.I32 = (Int32)_val; break;
                 case LType.Int64: this.I64 = (Int64)_val; break;
                 case LType.Array: this.Array = (LValue[])_val; break;
+                case LType.Undefined: this.Undefined = 0; break;
             }
         }
 
@@ -116,6 +119,26 @@ namespace Luna {
         public static LValue operator >=(LValue a, LValue b) {
             return new LValue(LType.Number, ((double)a.Value >= (double)b.Value) ? (double)1 : (double)0);
         }
+
+        public override string ToString() {
+            switch (this.Type) {
+                case LType.Number: return this.Number.ToString();
+                case LType.String: return this.String;
+                case LType.Int32: return this.I32.ToString();
+                case LType.Int64: return this.I64.ToString();
+                case LType.Undefined: return "undefined";
+                case LType.Array: {
+                    string _valReturn = "[ ";
+                    for(int i = 0; i < this.Array.Length; i++) {
+                        _valReturn += this.Array[i].ToString();
+                        if (i < this.Array.Length - 1) _valReturn += ",";
+                    }
+                    return _valReturn + " ]";
+                }
+            }
+            throw new Exception(String.Format("Could not convert type \"{0}\" to string", this.Type));
+        }
+
         #region Static Initializers
         public static LValue Real(double _value)
         {
