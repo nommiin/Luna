@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Windows.Forms;
 using Luna.Types;
 using Luna.Assets;
 using OpenTK;
@@ -32,17 +33,6 @@ namespace Luna.Runner {
     static class Function {
         public delegate LValue Handler(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
         public static Dictionary<string, Handler> Mapping = new Dictionary<string, Handler>();
-
-        [FunctionDefinition("show_debug_message")]
-        public static LValue show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            Console.WriteLine(_arguments[0].Value);
-            return new LValue(LType.Number, (double)0);
-        }
-
-        [FunctionDefinition("room_goto")]
-        public static LValue room_goto(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return new LValue(LType.Number, (double)0);
-        }
 
         [FunctionDefinition("event_inherited")]
         public static LValue event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
@@ -202,7 +192,40 @@ namespace Luna.Runner {
         }
         #endregion
 
+        #region Runner
+        [FunctionDefinition("show_message")]
+        public static LValue show_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            MessageBox.Show((string)_arguments[0], _assets.DisplayName, MessageBoxButtons.OK);
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("show_debug_message")]
+        public static LValue show_debug_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Console.WriteLine(_arguments[0].Value);
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("parameter_count")]
+        public static LValue parameter_count(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Program.Arguments.Length);
+        }
+
+        [FunctionDefinition("parameter_string")]
+        public static LValue parameter_string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _paramIndex = (int)(double)_arguments[0];
+            if (_paramIndex >= 0 && _paramIndex < Program.Arguments.Length) {
+                return LValue.Text(Program.Arguments[_paramIndex]);
+            }
+            return LValue.Text("");
+        }
+        #endregion
+
         #region Assets - Room
+        [FunctionDefinition("room_goto")]
+        public static LValue room_goto(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(0);
+        }
+
         [FunctionDefinition("room_get_name")]
         public static LValue room_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _roomGet = (int)(double)_arguments[0];
