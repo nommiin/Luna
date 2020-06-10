@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{7C94C6
 		Sample\LunaSwitch3.win = Sample\LunaSwitch3.win
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunaResearch", "LunaResearch\LunaResearch.csproj", "{794D1AEF-A77F-4AFB-864D-05A63CEA6A47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{11F75A3A-1B38-4764-B752-658504C98F57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11F75A3A-1B38-4764-B752-658504C98F57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11F75A3A-1B38-4764-B752-658504C98F57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{794D1AEF-A77F-4AFB-864D-05A63CEA6A47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{794D1AEF-A77F-4AFB-864D-05A63CEA6A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{794D1AEF-A77F-4AFB-864D-05A63CEA6A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{794D1AEF-A77F-4AFB-864D-05A63CEA6A47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

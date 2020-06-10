@@ -124,41 +124,6 @@ namespace Luna {
             }
         }
 
-        public void LoadRoom(LRoom _room) {
-            this.CurrentRoom = _room;
-            for(int i = 0; i < _room.Instances.Count; i++) {
-                LRoomInstance _instGet = _room.Instances[i];
-                LInstance _instCreate = new LInstance(this, _instGet.Index, _instGet.X, _instGet.Y);
-                _instCreate.RoomPreCreate = _instGet.PreCreate;
-                _instCreate.RoomCreate = _instGet.CreationCode;
-                _instCreate.Variables["image_xscale"] = new LValue(LType.Number, (double)_instGet.ScaleX);
-                _instCreate.Variables["image_yscale"] = new LValue(LType.Number, (double)_instGet.ScaleY);
-                _instCreate.Variables["image_speed"] = new LValue(LType.Number, (double)_instGet.ImageSpeed);
-                _instCreate.Variables["image_index"] = new LValue(LType.Number, (double)_instGet.ImageIndex);
-                _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
-                _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
-                this.Instances.Add((double)_instCreate.ID, _instCreate);
-                if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.PreCreate);
-                if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(this, _instCreate.Create);
-                if (_instCreate.RoomPreCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomPreCreate);
-                if (_instCreate.RoomCreate != null) _instCreate.Environment.ExecuteCode(this, _instCreate.RoomCreate);
-            }
-
-            if (_room.CreationCode != null) {
-                Domain _roomEnvironment = new Domain(new LInstance(-100));
-                _roomEnvironment.ExecuteCode(this, _room.CreationCode);
-            }
-
-#if (DEBUG)
-            if (this.Headless == true) {
-                Console.WriteLine("Global Variables (Count: {0})", this.GlobalScope.Variables.Count);
-                foreach(KeyValuePair<string, LValue> _globalVar in this.GlobalScope.Variables) {
-                    Console.WriteLine("global.{0} = {1}", _globalVar.Key, _globalVar.Value.Value);
-                }
-            }
-#endif
-        }
-
         public string GetString(Int32 _offset) {
             if (_offset == 0) return "";
             if (this.Strings.ContainsKey(_offset) == true) {
@@ -167,11 +132,12 @@ namespace Luna {
             throw new Exception(String.Format("Could not find string at {0}", _offset));
         }
 
+        #region OpenTK Events
         private void OnLoad(object sender, EventArgs e) {
             for(int i = 0; i < this.GlobalScripts.Count; i++) {
                 this.GlobalScope.Environment.ExecuteCode(this, this.GlobalScripts[i]);
             }
-            LoadRoom(this.RoomOrder[0]);
+            VM.LoadRoom(this, this.RoomOrder[0]);
         }
 
         private void OnClose(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -210,5 +176,6 @@ namespace Luna {
             GL.Flush();
             Window.SwapBuffers();
         }
+        #endregion
     }
 }
