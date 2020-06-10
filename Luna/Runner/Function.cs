@@ -19,6 +19,7 @@ namespace Luna.Runner {
         public static void Initalize() {
             MethodInfo[] _functionGet = typeof(Function).GetMethods(BindingFlags.Public | BindingFlags.Static);
             foreach(MethodInfo _functionHandler in _functionGet) {
+                //maybe this should use _functionHandler.Name to simplify, and keep FunctionDefinition as it is other
                 Function.Mapping.Add(_functionHandler.GetCustomAttribute<FunctionDefinition>().Name,
                     (Function.Handler)Delegate.CreateDelegate(typeof(Function.Handler), _functionHandler)
                 );
@@ -30,11 +31,15 @@ namespace Luna.Runner {
         public delegate LValue Handler(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack);
         public static Dictionary<string, Handler> Mapping = new Dictionary<string, Handler>();
 
+        #region Events
+        
         [FunctionDefinition("event_inherited")]
         public static LValue event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             //
             return LValue.Real(0);
         }
+        
+        #endregion
 
         #region Instances
         [FunctionDefinition("instance_create_depth")]
@@ -246,11 +251,184 @@ namespace Luna.Runner {
         #endregion
         
         #region Assets - Object
+
+        [FunctionDefinition("object_exists")]
+        public static LValue object_exists(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
+                return LValue.Real(1);
+            }
+            return LValue.Real(0);
+        }
+        
         [FunctionDefinition("object_get_name")]
         public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             int _objGet = (int)(double)_arguments[0];
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
                 return LValue.Text(_assets.ObjectMapping[_objGet].Name);
+            }
+            return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("object_get_mask")]
+        public static LValue object_get_mask(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                if (_obj.Mask != null) return LValue.Real(_obj.Mask.Index);
+            }
+            return LValue.Real(-1);
+        }
+        
+        [FunctionDefinition("object_get_parent")]
+        public static LValue object_get_parent(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                if (_obj.Parent != null) return LValue.Real(_obj.Parent.Index);
+            }
+            //docs say return -1 if object doesn't exist or found object doesn't have a parent
+            return LValue.Real(-1);
+        }
+        
+        [FunctionDefinition("object_get_persistent")]
+        public static LValue object_get_persistent(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                return LValue.Real(_obj.Persistent ? 1 : 0);
+            }
+            return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("object_get_physics")]
+        public static LValue object_get_physics(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                return LValue.Real(_obj.PhysObject ? 1 : 0);
+            }
+            return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("object_get_solid")]
+        public static LValue object_get_solid(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                return LValue.Real(_obj.Solid ? 1 : 0);
+            }
+            return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("object_get_sprite")]
+        public static LValue object_get_sprite(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                if (_obj.Sprite != null) return LValue.Real(_obj.Sprite.Index);
+            }
+            return LValue.Real(-1);
+        }
+        
+        [FunctionDefinition("object_get_visible")]
+        public static LValue object_get_visible(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                return LValue.Real(_obj.Visible ? 1 : 0);
+            }
+            return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("object_is_ancestor")]
+        public static LValue object_is_ancestor(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            int _objGet = (int)(double)_arguments[0];
+            int _parGet = (int)(double)_arguments[1];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count && _parGet >= 0 && _parGet < _assets.ObjectMapping.Count)
+            {
+                //define the recursive function
+                //variables go in Game but where do functions go?
+                //will move when I know that 
+                Func<LObject, LObject, bool> checkAncestry = null;
+                checkAncestry = (_childObj,_parentObj) =>
+                {
+                    if (_childObj.Parent == _parentObj) return true;
+                    bool _isAncestor = false;
+                    if (_childObj.Parent != null)
+                    {
+                        _isAncestor = checkAncestry(_parentObj, _parentObj.Parent);
+                    }
+
+                    return _isAncestor;
+                };
+                LObject _obj = _assets.ObjectMapping[_objGet];
+                LObject _par = _assets.ObjectMapping[_objGet];
+                if (_obj.Sprite != null) return LValue.Real(checkAncestry(_obj,_par) ? 1 : 0);
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_set_mask")]
+        public static LValue object_set_mask(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)_arguments[0].Number;
+            int _sprGet = (int)_arguments[1].Number;
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                if (_sprGet >= 0 && _sprGet < _assets.SpriteMapping.Count) _assets.ObjectMapping[_objGet].Mask = _assets.SpriteMapping[_sprGet];
+                else _assets.ObjectMapping[_objGet].Mask = null;
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_set_persistent")]
+        public static LValue object_set_persistent(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)_arguments[0].Number;
+            bool _persistent = _arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                _assets.ObjectMapping[_objGet].Persistent = _persistent;
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_set_solid")]
+        public static LValue object_set_solid(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)_arguments[0].Number;
+            bool _solid = _arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                _assets.ObjectMapping[_objGet].Solid = _solid;
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_set_sprite")]
+        public static LValue object_set_sprite(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)_arguments[0].Number;
+            int _sprGet = (int)_arguments[1].Number;
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                if (_sprGet >= 0 && _sprGet < _assets.SpriteMapping.Count) _assets.ObjectMapping[_objGet].Sprite = _assets.SpriteMapping[_sprGet];
+                else _assets.ObjectMapping[_objGet].Sprite = null;
+            }
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("object_set_visible")]
+        public static LValue object_set_visible(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)_arguments[0].Number;
+            bool _visible = _arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
+            {
+                _assets.ObjectMapping[_objGet].Visible = _visible;
             }
             return LValue.Real(0);
         }

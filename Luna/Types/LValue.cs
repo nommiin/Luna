@@ -87,6 +87,7 @@ namespace Luna {
         public static implicit operator Int32(LValue _val) => _val.I32;
         public static implicit operator Int64(LValue _val) => _val.I64;
         public static implicit operator LValue[](LValue _val) => _val.Array;
+        public static implicit operator bool(LValue _val) => _val.Number > 0.5 ? true : false;
 
         public static LValue operator ==(LValue a, LValue b) {
             switch (a.Type) {
