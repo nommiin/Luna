@@ -198,7 +198,7 @@ namespace Luna {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, 0, this.RoomWidth, this.RoomHeight, 0f, 1.0f);
+            GL.Ortho(0f, this.RoomWidth, this.RoomHeight, 0f, 0f, 1.0f);
 
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];

@@ -83,9 +83,9 @@ namespace Luna.Runner {
         public static LValue draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             GL.Begin(PrimitiveType.TriangleFan);
 
-            double _x = ((double)_arguments[0].Value / (_assets.RoomWidth / 2));
-            double _y = -((double)_arguments[1].Value / (_assets.RoomHeight / 2));
-            double _r = (double)_arguments[2].Value / _assets.CirclePrecision;
+            double _x = _arguments[0].Number;
+            double _y = _arguments[1].Number;
+            double _r = _arguments[2].Number;
 
             GL.Vertex2(_x, _y);
             for(int i = 0; i <= 360; i+=360/_assets.CirclePrecision) {
