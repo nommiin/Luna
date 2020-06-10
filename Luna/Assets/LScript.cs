@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Luna.Assets;
-using System.IO;
+﻿using System.IO;
 
 namespace Luna.Assets {
     class LScript {

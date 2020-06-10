@@ -13,10 +13,10 @@ namespace Luna.Types {
         public byte Alpha;
 
         public LColour(Int32 _colour) {
-            Red = (byte)(_colour & 0xFF);
-            Green = (byte)((_colour >> 8) & 0xFF);
-            Blue = (byte)((_colour >> 16) & 0xFF);
-            Alpha = (byte)((_colour >> 24) & 0xFF);
+            this.Red = (byte)(_colour & 0xFF);
+            this.Green = (byte)((_colour >> 8) & 0xFF);
+            this.Blue = (byte)((_colour >> 16) & 0xFF);
+            this.Alpha = (byte)((_colour >> 24) & 0xFF);
         }
 
         public LColour(byte _r, byte _g, byte _b, byte _a)
@@ -29,7 +29,7 @@ namespace Luna.Types {
         public static implicit operator double(LColour _val) => (_val.Alpha << 24) & (_val.Blue << 16) & (_val.Green << 8) & _val.Red;
 
         public override string ToString() {
-            return $"rgba({Red}, {Green}, {Blue}, {Alpha})";
+            return $"rgba({this.Red}, {this.Green}, {this.Blue}, {this.Alpha})";
         }
 
         public static LColour FromColor4(Color4 _color4)

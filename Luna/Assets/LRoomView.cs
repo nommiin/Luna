@@ -1,39 +1,41 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
-namespace Luna.Assets
-{
-    class LRoomView
-    {
+namespace Luna.Assets {
+    class LRoomView {
         public bool Enabled;
-        public int X;
-        public int Y;
-        public int Width;
-        public int Height;
-        public int PortX;
-        public int PortY;
-        public int PortWidth;
-        public int PortHeight;
-        public uint BorderX;
-        public uint BorderY;
-        public int SpeedX;
-        public int SpeedY;
+        public Int32 X;
+        public Int32 Y;
+        public Int32 Width;
+        public Int32 Height;
+        public Int32 PortX;
+        public Int32 PortY;
+        public Int32 PortWidth;
+        public Int32 PortHeight;
+        public Int32 BorderX;
+        public Int32 BorderY;
+        public Int32 SpeedX;
+        public Int32 SpeedY;
         public LObject Target;
-        public LRoomView(Game _assets, BinaryReader _reader){
-            Enabled = _reader.ReadInt32()==1;
-            X = _reader.ReadInt32();
-            Y = _reader.ReadInt32();
-            Width = _reader.ReadInt32();
-            Height = _reader.ReadInt32();
-            PortX = _reader.ReadInt32();
-            PortY = _reader.ReadInt32();
-            PortWidth = _reader.ReadInt32();
-            PortHeight = _reader.ReadInt32();
-            BorderX = _reader.ReadUInt32();
-            BorderY = _reader.ReadUInt32();
-            SpeedX = _reader.ReadInt32();
-            SpeedY = _reader.ReadInt32();
-            var _target = _reader.ReadInt32();
-            if (_target >= 0)Target = _assets.ObjectMapping[_target];
+
+        public LRoomView(Game _assets, BinaryReader _reader) {
+            this.Enabled = _reader.ReadLBoolean();
+            this.X = _reader.ReadInt32();
+            this.Y = _reader.ReadInt32();
+            this.Width = _reader.ReadInt32();
+            this.Height = _reader.ReadInt32();
+            this.PortX = _reader.ReadInt32();
+            this.PortY = _reader.ReadInt32();
+            this.PortWidth = _reader.ReadInt32();
+            this.PortHeight = _reader.ReadInt32();
+            this.BorderX = _reader.ReadInt32();
+            this.BorderY = _reader.ReadInt32();
+            this.SpeedX = _reader.ReadInt32();
+            this.SpeedY = _reader.ReadInt32();
+            Int32 _viewTarget = _reader.ReadInt32();
+            if (_viewTarget != -1) {
+                this.Target = _assets.ObjectMapping[_viewTarget];
+            } else this.Target = null;
         }
     }
 }

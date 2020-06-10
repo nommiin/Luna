@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 using System.Windows.Forms;
 using Luna.Types;
 using Luna.Assets;
-using OpenTK;
-using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 
 namespace Luna.Runner {

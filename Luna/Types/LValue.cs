@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime;
-using System.Runtime.InteropServices;
-using OpenTK.Graphics.OpenGL;
 
 namespace Luna {
     public enum LType {
@@ -32,7 +25,7 @@ namespace Luna {
         public Int64 I64;
         public string String;
         public LValue[] Array;
-        public byte Undefined;
+        public bool Undefined;
 
         public LValue(LType _type, object _val) {
             this.Number = 0;
@@ -40,7 +33,7 @@ namespace Luna {
             this.I32 = 0;
             this.I64 = 0;
             this.Array = null;
-            this.Undefined = 0;
+            this.Undefined = false;
             
             this.Type = _type;
             switch (this.Type) {
@@ -49,7 +42,7 @@ namespace Luna {
                 case LType.Int32: this.I32 = (Int32)_val; break;
                 case LType.Int64: this.I64 = (Int64)_val; break;
                 case LType.Array: this.Array = (LValue[])_val; break;
-                case LType.Undefined: this.Undefined = 0; break;
+                case LType.Undefined: this.Undefined = true; break;
             }
         }
 
@@ -61,6 +54,7 @@ namespace Luna {
                     case LType.Int32: return this.I32;
                     case LType.Int64: return this.I64;
                     case LType.Array: return this.Array;
+                    case LType.Undefined: return this.Undefined;
                 }
                 throw new Exception(String.Format("Could not return value for type: {0}", this.Type));
             }
@@ -105,19 +99,19 @@ namespace Luna {
         }
 
         public static LValue operator <(LValue a, LValue b) {
-            return new LValue(LType.Number, ((double)a.Value < (double)b.Value) ? (double)1 : (double)0);
+            return new LValue(LType.Number, (double)(((double)a.Value < (double)b.Value) ? 1 : 0));
         }
 
         public static LValue operator >(LValue a, LValue b) {
-            return new LValue(LType.Number, ((double)a.Value > (double)b.Value) ? (double)1 : (double)0);
+            return new LValue(LType.Number, (double)(((double)a.Value > (double)b.Value) ? 1 : 0));
         }
 
         public static LValue operator <=(LValue a, LValue b) {
-            return new LValue(LType.Number, ((double)a.Value <= (double)b.Value) ? (double)1 : (double)0);
+            return new LValue(LType.Number, (double)(((double)a.Value <= (double)b.Value) ? 1 : 0));
         }
 
         public static LValue operator >=(LValue a, LValue b) {
-            return new LValue(LType.Number, ((double)a.Value >= (double)b.Value) ? (double)1 : (double)0);
+            return new LValue(LType.Number, (double)(((double)a.Value >= (double)b.Value) ? 1 : 0));
         }
 
         public override string ToString() {
@@ -140,53 +134,29 @@ namespace Luna {
         }
 
         #region Static Initializers
-        public static LValue Real(double _value)
-        {
+        public static LValue Real(double _value) {
             return new LValue(LType.Number, _value);
         }
-        public static LValue Text(string _value)
-        {
+
+        public static LValue Text(string _value) {
             return new LValue(LType.String, _value);
         }
-        public static LValue Values(params LValue[] _values)
-        {
+
+        public static LValue Values(params LValue[] _values) {
             return new LValue(LType.Array, _values);
         }
 
-        public static LValue Values(params Object[] _values)
-        {
+        public static LValue Values(params Object[] _values) {
             LValue[] _vals = new LValue[_values.Length];
-            for (int _i=0;_i<_values.Length;_i++)
-            {
-                object _val = _values[_i];
-                if (_val is String _str) _vals[_i] = Text(_str);
-                else if (_val is IConvertible _conv)
-                {
-                    _vals[_i] = LValue.Real(_conv.ToDouble(null));
-                }
-                else _vals[_i] = LValue.Real(0);//failed to convert, change this to undefined when it's implemented
+            for (int i = 0; i < _values.Length; i++) {
+                object _val = _values[i];
+                if (_val is String _str) _vals[i] = Text(_str);
+                else if (_val is IConvertible _conv) {
+                    _vals[i] = Real(_conv.ToDouble(null));
+                } else _vals[i] = Real(0);//failed to convert, change this to undefined when it's implemented
             }
-
-            return LValue.Values(_vals);
-        }
-
-        public static LValue Bool(bool _value)
-        {
-            return _value==true?True():False();
-        }
-
-        //Shorthand for Real 0
-        public static LValue False()
-        {
-            return LValue.Real(0);
-        }
-
-        //Shorthand for Real 1
-        public static LValue True()
-        {
-            return LValue.Real(1);
+            return Values(_vals);
         }
         #endregion
-
     }
 }
