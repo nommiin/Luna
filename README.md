@@ -1,5 +1,7 @@
-# Luna
-A custom implementation of the GameMaker 2.3 runtime in C#
+![Banner](https://github.com/nommiin/Luna/raw/master/Assets/LunaBanner.png)
+<p align="center">
+  <b>A custom implementation of the GameMaker 2.3 runtime in C#</b>
+</p>
 
 # Features
 - Parses the GameMaker IFF file for some assets
