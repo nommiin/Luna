@@ -23,6 +23,11 @@ namespace Luna.Runner {
             InputDownPrevious = new List<Key>();
             _game.Window.KeyUp += OnKeyUp;
             _game.Window.KeyDown += OnKeyDown;
+            //code to allow for key remapping, but fill default values
+            Enum.GetValues(typeof(Key)).Cast<Key>().ToList().ForEach(_key =>
+            {
+                if (!InputMapping.ContainsKey((double)_key))InputMapping.Add((double) _key, _key);
+            });
         }
 
         public static void OnKeyUp(object sender, KeyboardKeyEventArgs e) {

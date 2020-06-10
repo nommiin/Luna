@@ -23,24 +23,24 @@ namespace Luna.Assets {
         public LCode PreCreate;
 
         public LRoomInstance(Game _assets, BinaryReader _reader) {
-            this.X = _reader.ReadInt32();
-            this.Y = _reader.ReadInt32();
-            this.Index = _assets.ObjectMapping[_reader.ReadInt32()];
-            this.ID = _reader.ReadInt32();
+            X = _reader.ReadInt32();
+            Y = _reader.ReadInt32();
+            Index = _assets.ObjectMapping[_reader.ReadInt32()];
+            ID = _reader.ReadInt32();
             Int32 _creationIndex = _reader.ReadInt32();
             if (_creationIndex != -1) {
-                this.CreationCode = _assets.CodeMapping[_creationIndex];
-            } else this.CreationCode = null;
-            this.ScaleX = _reader.ReadSingle();
-            this.ScaleY = _reader.ReadSingle();
-            this.ImageSpeed = _reader.ReadSingle();
-            this.ImageIndex = _reader.ReadInt32();
-            this.ImageBlend = new LColour(_reader.ReadInt32());
-            this.Rotation = _reader.ReadSingle();
+                CreationCode = _assets.CodeMapping[_creationIndex];
+            } else CreationCode = null;
+            ScaleX = _reader.ReadSingle();
+            ScaleY = _reader.ReadSingle();
+            ImageSpeed = _reader.ReadSingle();
+            ImageIndex = _reader.ReadInt32();
+            ImageBlend = new LColour(_reader.ReadInt32());
+            Rotation = _reader.ReadSingle();
             Int32 _createIndex = _reader.ReadInt32();
             if (_createIndex != -1) {
-                this.PreCreate = _assets.CodeMapping[_createIndex];
-            } else this.PreCreate = null;
+                PreCreate = _assets.CodeMapping[_createIndex];
+            } else PreCreate = null;
         }
     }
 }

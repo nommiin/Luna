@@ -47,7 +47,7 @@ namespace Luna.Runner {
         [FunctionDefinition("event_inherited")]
         public static LValue event_inherited(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             //
-            return new LValue(LType.Number, (double)0);
+            return LValue.Real(0);
         }
 
         #region Instances
@@ -56,20 +56,20 @@ namespace Luna.Runner {
             LInstance _instCreate = new LInstance(_assets.InstanceList, _assets.ObjectMapping[(int)(double)_arguments[2].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
             if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
             if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
-            return new LValue(LType.Number, _instCreate.ID);
+            return LValue.Real(_instCreate.ID);
         }
 
         [FunctionDefinition("instance_destroy")]
         public static LValue instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             _assets.InstanceList.Remove(_environment.Instance);
-            return new LValue(LType.Number, (double)0);
+            return LValue.Real(0);
         }
         #endregion
 
         #region Input
         [FunctionDefinition("keyboard_check")]
         public static LValue keyboard_check(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return new LValue(LType.Number, (double)(Input.KeyCheck(_arguments[0]) == true ? 1 : 0));
+            return LValue.Real((double)(Input.KeyCheck(_arguments[0]) == true ? 1 : 0));
         }
 
         [FunctionDefinition("keyboard_check_pressed")]
@@ -84,29 +84,29 @@ namespace Luna.Runner {
         #endregion
 
         #region Rendering
+
+        [FunctionDefinition("draw_set_circle_precision")]
+        public static LValue draw_set_circle_precision(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            _assets.CirclePrecision = (int) _arguments[0].Number;
+            return LValue.Real(0);
+        }
+        
         [FunctionDefinition("draw_circle")]
         public static LValue draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             GL.Begin(PrimitiveType.TriangleFan);
 
             double _x = ((double)_arguments[0].Value / (_assets.RoomWidth / 2));
             double _y = -((double)_arguments[1].Value / (_assets.RoomHeight / 2));
-            double _r = (double)_arguments[2].Value / 360;// (double)_arguments[2].Value;
+            double _r = (double)_arguments[2].Value / _assets.CirclePrecision;
 
             GL.Vertex2(_x, _y);
-            for(int i = 0; i < 360; i++) {
-                GL.Vertex2(_x + (Math.Sin(i) * _r), _y + (Math.Cos(i) * _r));
+            for(int i = 0; i <= 360; i+=360/_assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(i*(Math.PI/180)) * _r), _y + (Math.Sin(i*(Math.PI/180)) * _r));
             }
-
-            /*
-            GL.Vertex2(_arguments[0], _arguments[1]);
-            for(int i = 0; i <= 360; i += 360 / 16) {
-                GL.Vertex2((double)_arguments[0].Value + Math.Cos(i) * (double)_arguments[2].Value, (double)_arguments[1].Value + Math.Sin(i) * (double)_arguments[2].Value);
-            }
-            */
-
 
             GL.End();
-            return new LValue(LType.Number, (double)0);
+            return LValue.Real(0);
         }
         #endregion
 
@@ -115,7 +115,7 @@ namespace Luna.Runner {
         public static LValue max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = (double)_arguments[i];
-            return new LValue(LType.Number, _val.Max());
+            return LValue.Real(_val.Max());
             /*double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = _stack.Pop();
             _stack.Push(new LValue(LType.Number, _val.Max()));*/
@@ -125,7 +125,7 @@ namespace Luna.Runner {
         public static LValue min(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
             for (int i = 0; i < _count; i++) _val[i] = (double)_arguments[i];
-            return new LValue(LType.Number, _val.Min());
+            return LValue.Real(_val.Min());
         }
 
         [FunctionDefinition("lengthdir_x")]
@@ -137,9 +137,9 @@ namespace Luna.Runner {
             double _o81 = Math.Round(_Px);
             double _F6 = _Px - _o81;
             if (Math.Abs(_F6) < 0.0001) {
-                return new LValue(LType.Number, _o81);
+                return LValue.Real(_o81);
             } else {
-                return new LValue(LType.Number, _Px);
+                return LValue.Real(_Px);
             }
             
         }
@@ -161,7 +161,7 @@ namespace Luna.Runner {
 
         [FunctionDefinition("irandom")]
         public static LValue irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return new LValue(LType.Number, (double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value));
+            return LValue.Real((double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value));
         }
         #endregion
 
@@ -211,6 +211,30 @@ namespace Luna.Runner {
             }
             return new LValue(LType.Number, (double)0); // TODO: this needs to be undefined
         }
+        
+        [FunctionDefinition("room_get_viewport")]
+        public static LValue room_get_viewport(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _roomGet = (int)(double)_arguments[0];
+            int _viewGet = (int)(double)_arguments[1];
+            if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count && _viewGet >= 0 && _viewGet < 8)
+            {
+                LRoomView _view = _assets.RoomMapping[_roomGet].Views[_viewGet];
+                return LValue.Values(_view.Enabled,_view.X,_view.Y,_view.Width,_view.Height);
+            }
+            return LValue.Real(0);
+        }
+        #endregion
+        
+        #region Assets - Object
+        [FunctionDefinition("object_get_name")]
+        public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int _objGet = (int)(double)_arguments[0];
+            if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
+                return LValue.Text(_assets.ObjectMapping[_objGet].Name);
+            }
+            return LValue.Real(0);
+        }
+
         #endregion
     }
 }

@@ -29,6 +29,7 @@ namespace Luna.Assets {
         public Single PhysGravityY;
         public Single PhysConversion;
         public List<LRoomInstance> Instances = new List<LRoomInstance>();
+        public LRoomView[] Views = new LRoomView[8];
 
         public LRoom(Game _game, BinaryReader _reader) {
             this.Name = _game.GetString(_reader.ReadInt32());
@@ -48,7 +49,10 @@ namespace Luna.Assets {
             this.ClearViewport = (((_flagGet >> 1) & 1) == 1 ? true : false);
             this.ClearBuffer = (((_flagGet >> 2) & 1) == 1 ? true : false);
             _reader.ReadInt32(); // Backgrounds
-            _reader.ReadInt32(); // Views
+            int _i = 0;
+            ChunkHandler.HandleList(_game, _reader, delegate(Int32 _offset) {
+                Views[_i++] = new LRoomView(_game,_reader);
+            });
             ChunkHandler.HandleList(_game, _reader, delegate (Int32 _offset) {
                 this.Instances.Add(new LRoomInstance(_game, _reader));
             });

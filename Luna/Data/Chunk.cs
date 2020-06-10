@@ -26,9 +26,9 @@ namespace Luna {
         public long Base;
 
         public Chunk(BinaryReader _reader) {
-            this.Name = ASCIIEncoding.ASCII.GetString(_reader.ReadBytes(4));
-            this.Length = _reader.ReadInt32();
-            this.Base = _reader.BaseStream.Position;
+            Name = Encoding.ASCII.GetString(_reader.ReadBytes(4));
+            Length = _reader.ReadInt32();
+            Base = _reader.BaseStream.Position;
 #if (DEBUG == true)
             Console.WriteLine(this);
 #endif
@@ -37,7 +37,7 @@ namespace Luna {
         public void Dispose() { }
 
         public override string ToString() {
-            return $"Chunk: {this.Name}, Length: {this.Length} bytes";
+            return $"Chunk: {Name}, Length: {Length} bytes";
         }
     }
 }

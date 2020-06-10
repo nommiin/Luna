@@ -11,7 +11,7 @@ namespace Luna.Runner {
         public Game Assets;
 
         public Interpreter(Game _assets) {
-            this.Assets = _assets;
+            Assets = _assets;
         }
     }
 }

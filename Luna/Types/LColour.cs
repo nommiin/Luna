@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics;
 
 namespace Luna.Types {
     class LColour {
@@ -12,16 +13,28 @@ namespace Luna.Types {
         public byte Alpha;
 
         public LColour(Int32 _colour) {
-            this.Red = (byte)(_colour & 0xFF);
-            this.Green = (byte)((_colour >> 8) & 0xFF);
-            this.Blue = (byte)((_colour >> 16) & 0xFF);
-            this.Alpha = (byte)((_colour >> 24) & 0xFF);
+            Red = (byte)(_colour & 0xFF);
+            Green = (byte)((_colour >> 8) & 0xFF);
+            Blue = (byte)((_colour >> 16) & 0xFF);
+            Alpha = (byte)((_colour >> 24) & 0xFF);
         }
 
-        public static implicit operator double(LColour _val) => ((_val.Alpha << 24) & (_val.Blue << 16) & (_val.Green << 8) & _val.Red);
+        public LColour(byte _r, byte _g, byte _b, byte _a)
+        {
+            //is this ever gonna get used?
+            //stubbing, implement when needed
+            throw new NotImplementedException("LColour's RGBA constructor is not implemented.");
+        }
+
+        public static implicit operator double(LColour _val) => (_val.Alpha << 24) & (_val.Blue << 16) & (_val.Green << 8) & _val.Red;
 
         public override string ToString() {
-            return $"rgba({this.Red}, {this.Green}, {this.Blue}, {this.Alpha})";
+            return $"rgba({Red}, {Green}, {Blue}, {Alpha})";
+        }
+
+        public static LColour FromColor4(Color4 _color4)
+        {
+            return new LColour(_color4.ToArgb());
         }
     }
 }

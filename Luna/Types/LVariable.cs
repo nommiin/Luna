@@ -24,21 +24,21 @@ namespace Luna.Types {
         public long Base;
 
         public LVariable(Game _game, BinaryReader _reader) {
-            this.Name = _game.GetString(_reader.ReadInt32());
-            this.Scope = (LVariableScope)_reader.ReadInt32();
-            this.String = _reader.ReadInt32();
-            this.Count = _reader.ReadInt32();
-            this.Offset = _reader.ReadInt32();
-            this.Base = _reader.BaseStream.Position;
+            Name = _game.GetString(_reader.ReadInt32());
+            Scope = (LVariableScope)_reader.ReadInt32();
+            String = _reader.ReadInt32();
+            Count = _reader.ReadInt32();
+            Offset = _reader.ReadInt32();
+            Base = _reader.BaseStream.Position;
         }
 
         public LVariable(string _name, LVariableScope _type) {
-            this.Name = _name;
-            this.Scope = _type;
+            Name = _name;
+            Scope = _type;
         }
 
         public override string ToString() {
-            return $"Variable: {this.Name}, Type: {this.Scope}, String: {this.String}, Count: {this.Count}, Offset: {this.Offset}";
+            return $"Variable: {Name}, Type: {Scope}, String: {String}, Count: {Count}, Offset: {Offset}";
         }
     }
 }

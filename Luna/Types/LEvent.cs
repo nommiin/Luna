@@ -63,8 +63,27 @@ namespace Luna.Types {
                 case "Create_0": _object.Create = this.Code; break;
                 case "Step_0": _object.Step = this.Code; break;
                 case "Draw_0": _object.Draw = this.Code; break;
+                case "Destroy_0": _object.Destroy = Code; break;
             }
             //this.
         }
+    }
+
+    enum Events
+    {
+        Create,
+        Destroy,
+        Alarm,
+        Step,
+        Collision,
+        Keyboard,
+        Mouse,
+        Other,
+        Draw,
+        KeyPress,
+        KeyRelease,
+        Trigger,//does this exist in 2.3? triggers were removed 
+        CleanUp,
+        PreCreate
     }
 }
