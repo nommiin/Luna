@@ -32,6 +32,8 @@ namespace Luna {
 
             // Check existence
             if (File.Exists(Program.GameLocation) == false) {
+                // NOTE: Runner.exe will display a file selection dialogue if no -game argument is provided
+                //       but I don't really think we need to replicate the same behaviour.
                 MessageBox.Show("Could not find specified game file: \"" + Program.GameLocation + "\"", "An error has occured", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
