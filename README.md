@@ -21,3 +21,4 @@ See "Long Term" header in [TODO.md](https://github.com/nommiin/Luna/blob/master/
 - Thanks to [@Shana6](https://github.com/Shana6) for the numerous contributions 
 - Thanks to [@YellowAfterlife](https://github.com/YellowAfterlife) for assistance with figuring out bytecode
 - Thanks to [@DatZach](https://github.com/DatZach) for assistance in improving Luna's performance early on
+- Thanks to [@i_am_thirteen](https://twitter.com/i_am_thirteen) for designing Luna's logo
