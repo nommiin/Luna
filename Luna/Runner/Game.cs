@@ -152,9 +152,9 @@ namespace Luna {
             Input.OnKeyUpdate();
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
-                if (_instGet.Step != null) {
-                    _instGet.Environment.ExecuteCode(this, _instGet.Step);
-                }
+                if (_instGet.BeginStep != null) _instGet.Environment.ExecuteCode(this, _instGet.BeginStep);
+                if (_instGet.Step != null) _instGet.Environment.ExecuteCode(this, _instGet.Step);
+                if (_instGet.EndStep != null) _instGet.Environment.ExecuteCode(this, _instGet.EndStep);
                 _instGet.Variables["xprevious"] = _instGet.Variables["x"];
                 _instGet.Variables["yprevious"] = _instGet.Variables["y"];
             }
@@ -168,9 +168,7 @@ namespace Luna {
 
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
-                if (_instGet.Draw != null) {
-                    _instGet.Environment.ExecuteCode(this, _instGet.Draw);
-                }
+                if (_instGet.Draw != null) _instGet.Environment.ExecuteCode(this, _instGet.Draw);
             }
 
             GL.Flush();

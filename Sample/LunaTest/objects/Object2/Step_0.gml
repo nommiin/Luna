@@ -1,3 +1,1 @@
-/// @description Insert description here
-// You can write your code in this editor
-show_debug_message(test);
+image_blend = (Object1.y / room_height) * c_white;

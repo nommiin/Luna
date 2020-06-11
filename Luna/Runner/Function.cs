@@ -87,6 +87,7 @@ namespace Luna.Runner {
         [FunctionDefinition("draw_circle")]
         public static LValue draw_circle(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             GL.Begin(PrimitiveType.TriangleFan);
+            GL.Color4((OpenTK.Graphics.Color4)_assets.CurrentColor);
 
             double _x = _arguments[0].Number;
             double _y = _arguments[1].Number;
@@ -98,6 +99,12 @@ namespace Luna.Runner {
             }
 
             GL.End();
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("draw_set_colour")]
+        public static LValue draw_set_colour(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            _assets.CurrentColor = new LColour((int)_arguments[0].Number);
             return LValue.Real(0);
         }
         #endregion

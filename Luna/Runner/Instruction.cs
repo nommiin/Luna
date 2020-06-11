@@ -171,7 +171,16 @@ namespace Luna.Instructions {
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Variable) {
                 case "room": {
-                    _stack.Push(new LValue(LType.Number, (double)_assets.CurrentRoom.Index));
+                    _stack.Push(LValue.Real((double)_assets.CurrentRoom.Index));
+                    break;
+                }
+
+                case "room_width": {
+                    _stack.Push(LValue.Real((double)_assets.CurrentRoom.Width));
+                    break;
+                }
+                case "room_height": {
+                    _stack.Push(LValue.Real((double)_assets.CurrentRoom.Height));
                     break;
                 }
 
@@ -285,7 +294,7 @@ namespace Luna.Instructions {
         public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
             switch (this.Type) {
                 case LArgumentType.Variable: {
-                    if (this.Data == 0) {
+                    if (this.Data == 0 && _stack.Count > 0) {
                         LValue _valPush = _stack.Pop();
                         Dictionary<string, LValue> _variableList = Helper.GetVariables(_assets, _environment, (double)_stack.Pop().Value);
                         LValue _varFind = _variableList[this.Variable.Name];
@@ -487,11 +496,21 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.mul)]
     class Multiply : Instruction {
         public Multiply(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            LValue _valRight = _stack.Pop();
+            LValue _valLeft = _stack.Pop();
+            _stack.Push(_valLeft * _valRight);
+        }
     }
 
     [InstructionDefinition(LOpcode.div)]
     class Divide : Instruction {
         public Divide(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            LValue _valRight = _stack.Pop();
+            LValue _valLeft = _stack.Pop();
+            _stack.Push(_valLeft / _valRight);
+        }
     }
 
     [InstructionDefinition(LOpcode.rem)]
@@ -576,8 +595,17 @@ namespace Luna.Instructions {
                 case LVariableScope.Instance: return _environment.Instance.Variables;
                 case LVariableScope.Local: return _environment.Locals;
                 default: {
-                    if (_assets.Instances.ContainsKey(_scope) == true) {
-                        return _assets.Instances[_scope].Variables;
+                    if (_scope < LInstance.IDStart) {
+                        for(int i = 0; i < _assets.InstanceList.Count; i++) {
+                            LInstance _instGet = _assets.InstanceList[i];
+                            if (_instGet.Object.Index == _scope) {
+                                return _instGet.Variables;
+                            }
+                        }
+                    } else {
+                        if (_assets.Instances.ContainsKey(_scope) == true) {
+                            return _assets.Instances[_scope].Variables;
+                        }
                     }
                     break;
                 }

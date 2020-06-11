@@ -27,13 +27,13 @@ namespace Luna.Types {
         }
 
         public static implicit operator double(LColour _val) => (_val.Alpha << 24) & (_val.Blue << 16) & (_val.Green << 8) & _val.Red;
+        public static implicit operator Color4(LColour _val) => new Color4(_val.Red, _val.Green, _val.Blue, _val.Alpha);
 
         public override string ToString() {
             return $"rgba({this.Red}, {this.Green}, {this.Blue}, {this.Alpha})";
         }
 
-        public static LColour FromColor4(Color4 _color4)
-        {
+        public static LColour FromColor4(Color4 _color4) {
             return new LColour(_color4.ToArgb());
         }
     }

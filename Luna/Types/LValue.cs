@@ -89,53 +89,83 @@ namespace Luna {
         public static implicit operator LValue[](LValue _val) => _val.Array;
         public static implicit operator bool(LValue _val) => _val.Number > 0.5 ? true : false;
 
-        public static LValue operator ==(LValue a, LValue b) {
-            switch (a.Type) {
-                case LType.Number: return new LValue(LType.Number, (double)((double)a.Value == (double)b.Value ? 1 : 0));
-                case LType.String: return new LValue(LType.String, (double)((string)a.Value == (string)b.Value ? 1 : 0));
-            }
-            throw new Exception("Could not compare");
-        }
-
-        public static LValue operator !=(LValue a, LValue b) {
-            switch (a.Type) {
-                case LType.Number: return new LValue(LType.Number, (double)((double)a.Value != (double)b.Value ? 1 : 0));
-                case LType.String: return new LValue(LType.String, (double)((string)a.Value != (string)b.Value ? 1 : 0));
-            }
-            throw new Exception("Could not compare");
-        }
-
+        #region Math
         public static LValue operator +(LValue a, LValue b) {
             if (a.Type == LType.Number && a.Type == LType.Number) {
-                return new LValue(LType.Number, (double)((double)a.Value + (double)b.Value));
+                return LValue.Real(a.Number + b.Number);
             } else if (a.Type == LType.String && b.Type == LType.String) {
-                return new LValue(LType.String, (string)((string)a.Value + (string)b.Value));
+                return LValue.Text(a.String + b.String);
             }
-            throw new Exception("Could not add 2 values");
+            throw new Exception(String.Format("Could not add {0} (Type: {2}) to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator -(LValue a, LValue b) {
             if (a.Type == LType.Number && b.Type == LType.Number) {
-                return new LValue(LType.Number, ((double)a.Value - (double)b.Value));
+                return LValue.Real(a.Number - b.Number);
             }
-            throw new Exception("Could not subtract 2 values");
+            throw new Exception(String.Format("Could not subtract {0} (Type: {2}) from {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
+        }
+
+        public static LValue operator *(LValue a, LValue b) {
+            if (a.Type == LType.Number && b.Type == LType.Number) {
+                return LValue.Real(a.Number * b.Number);
+            }
+            throw new Exception(String.Format("Could not divide {0} (Type: {2}) by {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
+        }
+
+        public static LValue operator /(LValue a, LValue b) {
+            if (a.Type == LType.Number && b.Type == LType.Number) {
+                return LValue.Real(a.Number / b.Number);
+            }
+            throw new Exception(String.Format("Could not divide {0} (Type: {2}) by {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
+        }
+        #endregion
+
+        #region Conditionals
+        public static LValue operator ==(LValue a, LValue b) {
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number == b.Number ? 1 : 0);
+                case LType.String: return LValue.Real(a.String == b.String ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
+        }
+
+        public static LValue operator !=(LValue a, LValue b) {
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number != b.Number ? 1 : 0);
+                case LType.String: return LValue.Real(a.String != b.String ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is not equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator <(LValue a, LValue b) {
-            return new LValue(LType.Number, (double)(((double)a.Value < (double)b.Value) ? 1 : 0));
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number < b.Number ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is less than {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator >(LValue a, LValue b) {
-            return new LValue(LType.Number, (double)(((double)a.Value > (double)b.Value) ? 1 : 0));
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number > b.Number ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is greater than {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator <=(LValue a, LValue b) {
-            return new LValue(LType.Number, (double)(((double)a.Value <= (double)b.Value) ? 1 : 0));
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number <= b.Number ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is less than or equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator >=(LValue a, LValue b) {
-            return new LValue(LType.Number, (double)(((double)a.Value >= (double)b.Value) ? 1 : 0));
+            switch (a.Type) {
+                case LType.Number: return LValue.Real(a.Number >= b.Number ? 1 : 0);
+            }
+            throw new Exception(String.Format("Could not check if {0} (Type: {2}) is greater than or equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
+        #endregion
 
         #region Static Initializers
         public static LValue Real(double _value) {
