@@ -94,8 +94,8 @@ namespace Luna.Runner {
             double _r = _arguments[2].Number;
 
             GL.Vertex2(_x, _y);
-            for(int i = 0; i <= 360; i+=360/_assets.CirclePrecision) {
-                GL.Vertex2(_x + (Math.Cos(i*(Math.PI/180)) * _r), _y + (Math.Sin(i*(Math.PI/180)) * _r));
+            for(int _i = 0; _i <= 360; _i+=360/_assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(_i*(Math.PI/180)) * _r), _y + (Math.Sin(_i*(Math.PI/180)) * _r));
             }
 
             GL.End();
@@ -110,6 +110,38 @@ namespace Luna.Runner {
         #endregion
 
         #region Math
+        
+        #region Miscellaneous 
+
+        [FunctionDefinition("abs")]
+        public static LValue abs(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Abs(_arguments[0].Number));
+        }
+
+        [FunctionDefinition("frac")]
+        public static LValue frac(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(_arguments[0].Number-Math.Truncate(_arguments[0].Number));
+        }
+        [FunctionDefinition("sign")]
+        public static LValue sign(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Sign(_arguments[0]));
+        }
+
+        [FunctionDefinition("clamp")]
+        public static LValue clamp(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            if (_arguments[0].Number > _arguments[2].Number) return _arguments[2];
+            if (_arguments[0].Number < _arguments[1].Number) return _arguments[1];
+            return _arguments[0];
+        }
+        [FunctionDefinition("lerp")]
+        public static LValue lerp(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Sign(_arguments[0]));
+        }
+        
+        #endregion
+        
+        #region Analysis
+        
         [FunctionDefinition("max")]
         public static LValue max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
@@ -127,66 +159,69 @@ namespace Luna.Runner {
             return LValue.Real(_val.Min());
         }
 
-        [FunctionDefinition("lengthdir_x")]
-        public static LValue lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            double _len = _arguments[0].Number;
-            double _dir = _arguments[1].Number;
-
-            return LValue.Real(_len * Math.Cos(_dir * Math.PI / 180));
-        }
-
-        [FunctionDefinition("lengthdir_y")]
-        public static LValue lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            double _len = _arguments[0].Number;
-            double _dir = _arguments[1].Number;
-
-            return LValue.Real(_len * Math.Sin(_dir * Math.PI / 180));
+        [FunctionDefinition("mean")]
+        public static LValue mean(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            if (_count == 1) return _arguments[0]; //this handles the edge case of absolute complete stupidity, and provides a micro/millisecond performance boost
+            double d = 0;
+            foreach (LValue arg in _arguments) {
+                d += arg.Number;
+            }
+            return LValue.Real(d/_count);
         }
         
+        #endregion
+        
         #region Random
-        //todo: create a class for randomization, then do randomize, random_get_seed, random_set_seed
+
+        [FunctionDefinition("random_set_seed")]
+        public static LValue random_set_seed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            WellGenerator.Seed = (uint) _arguments[0].Number;
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("random_get_seed")]
+        public static LValue random_get_seed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            return LValue.Real(WellGenerator.Seed);
+        }
+
+        [FunctionDefinition("randomize")]
+        public static LValue randomize(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            WellGenerator.Seed = (uint) DateTime.Now.Ticks;//yes long is larger do i care no i don't 
+            return LValue.Real(0);
+        }
+
         [FunctionDefinition("choose")]
         public static LValue choose(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            if (_arguments.Length == 0) return new LValue(LType.Undefined,null);
-            var choice = _assets.RandomGen.Next(_arguments.Length);
+            if (_count == 0) return LValue.Undef();
+            var choice = WellGenerator.ENext(_count);
             return _arguments[choice];
         }
         
         [FunctionDefinition("random_range")]
         public static LValue random_range(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(_assets.RandomGen.Next((int) _arguments[0].Number,(int) _arguments[1].Number));
+            return LValue.Real(WellGenerator.ENext((int) _arguments[0].Number,(int) _arguments[1].Number));
         }
-        
-        [FunctionDefinition("irandom")]
-        public static LValue irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(_assets.RandomGen.Next(0, (int)_arguments[0].Number+1));
-        }
-        
+
         [FunctionDefinition("random")]
         public static LValue random(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(_assets.RandomGen.Next((int)_arguments[0].Number));
+            return LValue.Real(WellGenerator.ENext((int)_arguments[0].Number));
         }
-        
+
+        [FunctionDefinition("irandom")]
+        public static LValue irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(WellGenerator.INext((int)_arguments[0].Number));
+        }
+
         [FunctionDefinition("irandom_range")]
         public static LValue irandom_range(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(_assets.RandomGen.Next((int) _arguments[0].Number,(int) _arguments[1].Number+1));
+            return LValue.Real(WellGenerator.INext((int) _arguments[0].Number,(int) _arguments[1].Number));
         }
         
         #endregion
-
-        [FunctionDefinition("abs")]
-        public static LValue abs(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(Math.Abs(_arguments[0].Number));
-        }
-
-        [FunctionDefinition("frac")]
-        public static LValue frac(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(_arguments[0].Number-Math.Truncate(_arguments[0].Number));
-        }
-        [FunctionDefinition("sign")]
-        public static LValue sign(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(Math.Sign(_arguments[0]));
-        }
         
         #region Rounding
 
@@ -222,9 +257,46 @@ namespace Luna.Runner {
         public static LValue sqr(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
             return LValue.Real(Math.Pow(_arguments[0],2));
         }
+        
+        [FunctionDefinition("logn")]
+        public static LValue logn(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0], _arguments[1]));
+        }
+
+        [FunctionDefinition("log2")]
+        public static LValue log2(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0], 2));
+        }
+
+        [FunctionDefinition("log10")]
+        public static LValue log10(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log10(_arguments[0]));
+        }
+
+        [FunctionDefinition("ln")]
+        public static LValue ln(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0],Math.E));
+        }
+        
         #endregion
 
         #region Trig Ratios
+
+        [FunctionDefinition("lengthdir_x")]
+        public static LValue lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = _arguments[0].Number;
+            double _dir = _arguments[1].Number;
+
+            return LValue.Real(_len * Math.Cos(_dir * Math.PI / 180));
+        }
+
+        [FunctionDefinition("lengthdir_y")]
+        public static LValue lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = _arguments[0].Number;
+            double _dir = _arguments[1].Number;
+
+            return LValue.Real(_len * Math.Sin(_dir * Math.PI / 180));
+        }
         
         [FunctionDefinition("sin")]
         public static LValue sin(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
@@ -304,7 +376,7 @@ namespace Luna.Runner {
         public static LValue array_create(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double _arrayLength = _arguments[0].Number;
             LValue _valArray = new LValue(LType.Array, new LValue[(int)_arrayLength]);
-            LValue _valDefault = (_arguments.Length > 1 ? _arguments[1] : new LValue(LType.Number, (double)0));
+            LValue _valDefault = (_count > 1 ? _arguments[1] : new LValue(LType.Number, (double)0));
             for(int i = 0; i < _arrayLength; i++) {
                 _valArray.Array[i] = _valDefault;
             }
@@ -313,8 +385,8 @@ namespace Luna.Runner {
 
         [FunctionDefinition("@@NewGMLArray@@")]
         public static LValue NewGMLArray(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LValue _valArray = new LValue(LType.Array, new LValue[_arguments.Length]);
-            for(int i = 0; i < _arguments.Length; i++) {
+            LValue _valArray = new LValue(LType.Array, new LValue[_count]);
+            for(int i = 0; i < _count; i++) {
                 _valArray.Array[i] = _arguments[i];
             }
             return _valArray;
@@ -330,10 +402,25 @@ namespace Luna.Runner {
         #endregion
 
         #region Types
+        
         [FunctionDefinition("string")]
         public static LValue _string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return new LValue(LType.String, _arguments[0].ToString());
         }
+
+        [FunctionDefinition("int64")]
+        public static LValue int64(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            switch (_arguments[0].Type)
+            {
+                case LType.Int64: return _arguments[0];
+                //there's no shorthand for int64 simply because gamemaker barely uses it itself and there's little reason to bother with it
+                case LType.String: return new LValue(LType.Int64,Int64.Parse(_arguments[0]));
+                case LType.Int32: return new LValue(LType.Int64,_arguments[0].I32);
+                case LType.Number: return new LValue(LType.Int64,_arguments[0].Number);
+            }
+            return new LValue(LType.Int64, 0);
+        }
+        
         #endregion
 
         #region Runner
