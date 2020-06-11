@@ -35,4 +35,41 @@ namespace Luna {
             }
         }
     }
+
+    /// <summary>
+    /// Implementation/transplant of the Well512a RNG algorithm in C#
+    /// </summary>
+    /// <remarks>
+    /// Original C code at http://www.iro.umontreal.ca/~panneton/well/WELL512a.c
+    /// </remarks>
+    static class WellGenerator
+    {
+        private static readonly int W = 32;
+        private static readonly int R = 16;
+        private static readonly int P = 0;
+        private static readonly int M1 = 13;
+        private static readonly int M2 = 9;
+        private static readonly int M3 = 5;
+        private static readonly double FACT = 2.32830643653869628906e-10;
+        
+        private static int state_i = 0;
+        private static List<uint> State = Enumerable.Repeat(0u,R).ToList();
+        private static uint z0, z1, z2;
+
+        private static uint Mat0Pos(int t, uint v) => v ^ v >> t;
+        private static uint Mat0Neg(int t, uint v) => v ^ v << -t;
+        private static uint Mat3Neg(int t, uint v) => v << -t;
+        private static uint Mat4Neg(int t, uint b, uint v) => v ^ v << -t & b;
+
+        public static double Next()
+        {
+            z0 = State[(state_i + 15) & 15];
+            z1 = Mat0Neg(-16,State[state_i]) ^ Mat0Neg(-15, State[(state_i + M1) & 15]);
+            z2 = Mat0Pos(11, State[(state_i + M2) & 15]);
+            uint newV1 = State[state_i] = z1 ^ z2;
+            State[(state_i + 15) & 15] = Mat0Neg(-2,z0) ^ Mat0Neg(-18,z1) ^ Mat3Neg(-28,z2) ^ Mat4Neg(-5,0xda442d24U, newV1) ; 
+            state_i = (state_i + 15) & 15;
+            return ((double) State[state_i]) * FACT;
+        }
+    }
 }
