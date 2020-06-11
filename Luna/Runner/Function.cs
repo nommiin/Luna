@@ -390,7 +390,7 @@ namespace Luna.Runner {
             return LValue.Real(Math.Atan(_arguments[0])*(180/Math.PI));
         }
 
-        [FunctionDefinition("darctan")]
+        [FunctionDefinition("darctan2")]
         public static LValue darctan2(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
             return LValue.Real(Math.Atan2(_arguments[0],_arguments[1])*(180/Math.PI));
         }
