@@ -69,6 +69,7 @@
     <Compile Include="Data\IFF.cs" />
     <Compile Include="Runner\Input.cs" />
     <Compile Include="Runner\Instruction.cs" />
+    <Compile Include="Runner\Internals.cs" />
     <Compile Include="Runner\Interpreter.cs" />
     <Compile Include="Runner\View.cs" />
     <Compile Include="Types\LColour.cs" />
