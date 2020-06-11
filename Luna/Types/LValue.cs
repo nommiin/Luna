@@ -168,17 +168,11 @@ namespace Luna {
         #endregion
 
         #region Static Initializers
-        public static LValue Real(double _value) {
-            return new LValue(LType.Number, _value);
-        }
+        public static LValue Real(double _value) => new LValue(LType.Number, _value);
 
-        public static LValue Text(string _value) {
-            return new LValue(LType.String, _value);
-        }
+        public static LValue Text(string _value) => new LValue(LType.String, _value);
 
-        public static LValue Values(params LValue[] _values) {
-            return new LValue(LType.Array, _values);
-        }
+        public static LValue Values(params LValue[] _values) => new LValue(LType.Array, _values);
 
         public static LValue Values(params Object[] _values) {
             LValue[] _vals = new LValue[_values.Length];
@@ -191,6 +185,26 @@ namespace Luna {
             }
             return Values(_vals);
         }
+
+        public static LValue Undef() => new LValue(LType.Undefined, null);
+
+        public static LValue Bool(bool _value)
+        {
+            return _value==true?True():False();
+        }
+
+        //Shorthand for Real 0
+        public static LValue False()
+        {
+            return LValue.Real(0);
+        }
+
+        //Shorthand for Real 1
+        public static LValue True()
+        {
+            return LValue.Real(1);
+        }
+
         #endregion
     }
 }

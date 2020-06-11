@@ -35,4 +35,81 @@ namespace Luna {
             }
         }
     }
+
+    /// <summary>
+    /// Implementation/transplant of the Well512a RNG algorithm in C#
+    /// </summary>
+    /// <remarks>
+    /// Original C code at http://www.iro.umontreal.ca/~panneton/well/WELL512a.c
+    /// </remarks>
+    static class WellGenerator
+    {
+        private static readonly int W = 32;
+        private static readonly int R = 16;
+        private static readonly int P = 0;
+        private static readonly int M1 = 13;
+        private static readonly int M2 = 9;
+        private static readonly int M3 = 5;
+        private static readonly double FACT = 2.32830643653869628906e-10;
+        
+        private static int state_i;
+        private static List<uint> State = Enumerable.Repeat(0u,R).ToList();
+        private static uint seed;//should never be 0 ever, that's why i set it to a funny number
+
+        public static uint Seed
+        {
+            get => seed;
+            set
+            {
+                seed = value;
+                State = Enumerable.Repeat(value,R).ToList();
+            }
+        }
+
+        static WellGenerator()
+        {
+            Seed = 8008132;//i know, total comedian aren't i
+        }
+
+        private static uint z0, z1, z2;
+
+        private static uint Mat0Pos(int t, uint v) => v ^ v >> t;
+        private static uint Mat0Neg(int t, uint v) => v ^ v << -t;
+        private static uint Mat3Neg(int t, uint v) => v << -t;
+        private static uint Mat4Neg(int t, uint b, uint v) => v ^ v << -t & b;
+        public static double Next()
+        {
+            z0 = State[(state_i + 15) & 15];
+            z1 = Mat0Neg(-16,State[state_i]) ^ Mat0Neg(-15, State[(state_i + M1) & 15]);
+            z2 = Mat0Pos(11, State[(state_i + M2) & 15]);
+            uint newV1 = State[state_i] = z1 ^ z2;
+            State[(state_i + 15) & 15] = Mat0Neg(-2,z0) ^ Mat0Neg(-18,z1) ^ Mat3Neg(-28,z2) ^ Mat4Neg(-5,0xda442d24U, newV1) ; 
+            state_i = (state_i + 15) & 15;
+            return State[state_i] * FACT;
+        }
+
+        public static int ENext(int min, int max)
+        {
+            min = (int) Math.Ceiling((double) min);
+            max = (int) Math.Floor((double) max);
+            return (int) (Math.Floor(Next()*(max - min))+min);
+        }
+
+        public static int ENext(int max)
+        {
+            return ENext(0,max);
+        }
+
+        public static int INext(int min, int max)
+        {
+            min = (int) Math.Ceiling((double) min);
+            max = (int) Math.Floor((double) max);
+            return (int) (Math.Floor(Next()*(max - min+1))+min);
+        }
+
+        public static int INext(int max)
+        {
+            return INext(0, max);
+        }
+    }
 }
