@@ -122,6 +122,7 @@ namespace Luna.Runner {
         public static LValue frac(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return LValue.Real(_arguments[0].Number-Math.Truncate(_arguments[0].Number));
         }
+        
         [FunctionDefinition("sign")]
         public static LValue sign(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return LValue.Real(Math.Sign(_arguments[0]));
@@ -133,11 +134,24 @@ namespace Luna.Runner {
             if (_arguments[0].Number < _arguments[1].Number) return _arguments[1];
             return _arguments[0];
         }
+        
         [FunctionDefinition("lerp")]
         public static LValue lerp(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real(Math.Sign(_arguments[0]));
+            return LValue.Real((_arguments[1].Number-_arguments[0].Number)*_arguments[2].Number);
         }
         
+        [FunctionDefinition("math_get_epsilon")]
+        public static LValue math_get_epsilon(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            //pretty sure this is what gamemaker uses for it, but it's a guess from the docs so it's probably wrong cough
+            return LValue.Real(0.000001);
+        }
+        
+        [FunctionDefinition("math_set_epsilon")]
+        public static LValue math_set_epsilon(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            //stub for when someone decides to implement proper double comparison
+            return LValue.Real(0);
+        }
+
         #endregion
         
         #region Analysis
@@ -168,6 +182,19 @@ namespace Luna.Runner {
                 d += arg.Number;
             }
             return LValue.Real(d/_count);
+        }
+
+        [FunctionDefinition("median")]
+        public static LValue median(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            if (_count == 1) return _arguments[0]; //this still handles the edge case of absolute complete stupidity, and provides a micro/millisecond performance boost
+            if (_count % 2 == 0)
+            {
+                double lower = _arguments[_count / 2 - 1].Number;
+                double higher = _arguments[_count / 2].Number;
+                return LValue.Real((lower+higher)/2);
+            }
+            return _arguments[_count/2];
         }
         
         #endregion
