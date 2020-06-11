@@ -29,7 +29,9 @@ namespace Luna.Assets {
         public List<LEvent> Events = new List<LEvent>();
         public LCode PreCreate = null;
         public LCode Create = null;
+        public LCode BeginStep = null;
         public LCode Step = null;
+        public LCode EndStep = null;
         public LCode Draw = null;
         public LCode Destroy = null;
 

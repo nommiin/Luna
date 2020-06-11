@@ -1,4 +1,1 @@
-var a;
-a[10] = "Hey!";
-show_debug_message(a[10]);
-show_debug_message(a);
+instance_create_depth(room_width / 1.5, room_height / 2, 0, Object2);

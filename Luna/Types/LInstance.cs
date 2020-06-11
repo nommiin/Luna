@@ -6,7 +6,8 @@ using Luna.Runner;
 namespace Luna.Types {
     class LInstance {
         public double ID;
-        public static double Counter = 100000;
+        public static double IDStart = 100000;
+        public static double IDCount = LInstance.IDStart;
 
         public LObject Object;
         public Domain Environment;
@@ -16,15 +17,17 @@ namespace Luna.Types {
         public LCode RoomCreate = null;
         public LCode PreCreate = null;
         public LCode Create = null;
+        public LCode BeginStep = null;
         public LCode Step = null;
+        public LCode EndStep = null;
         public LCode Draw = null;
         public LCode Destroy = null;
 
         public LInstance(Game _assets, LObject _object, double _x=0, double _y=0) {
             _assets.InstanceList.Add(this);
-            _assets.Instances[LInstance.Counter + 1] = this;
+            _assets.Instances[LInstance.IDCount + 1] = this;
             this.Object = _object;
-            this.ID = LInstance.Counter++;
+            this.ID = LInstance.IDCount++;
             this.Environment = new Domain(this);
             this.Variables = new Dictionary<string, LValue>() {
                 ["x"] = new LValue(LType.Number, _x),
@@ -63,7 +66,9 @@ namespace Luna.Types {
 
             this.PreCreate = _object.PreCreate;
             this.Create = _object.Create;
+            this.BeginStep = _object.BeginStep;
             this.Step = _object.Step;
+            this.EndStep = _object.EndStep;
             this.Draw = _object.Draw;
             this.Destroy = _object.Destroy;
         }

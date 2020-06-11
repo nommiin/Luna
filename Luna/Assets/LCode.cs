@@ -131,6 +131,12 @@ namespace Luna.Assets {
                         break;
                     }
 
+                    case LOpcode.pushb: {
+                        Instructions.PushBuiltin _instructionGet = this.Instructions[i] as Instructions.PushBuiltin;
+                        _bytecodeOutput += String.Format("(Variable={0})", _instructionGet.Variable);
+                        break;
+                    }
+
                     case LOpcode.pushi: {
                         Instructions.PushImmediate _instructionGet = this.Instructions[i] as Instructions.PushImmediate;
                         _bytecodeOutput += String.Format("(Value={0})", _instructionGet.Value.Value);

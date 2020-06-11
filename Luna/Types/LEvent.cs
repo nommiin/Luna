@@ -74,7 +74,9 @@ namespace Luna.Types {
             switch (this.Code.Name.Replace("gml_Object_" + _object.Name + "_", "")) {
                 case "PreCreate_0": _object.PreCreate = this.Code; break;
                 case "Create_0": _object.Create = this.Code; break;
+                case "Step_1": _object.BeginStep = this.Code; break;
                 case "Step_0": _object.Step = this.Code; break;
+                case "Step_2": _object.EndStep = this.Code; break;
                 case "Draw_0": _object.Draw = this.Code; break;
                 case "Destroy_0": _object.Destroy = this.Code; break;
             }
