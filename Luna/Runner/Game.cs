@@ -83,11 +83,10 @@ namespace Luna {
         public List<LInstance> InstanceList = new List<LInstance>();
         public LInstance GlobalScope;
         public LInstance StaticScope;
-        public Random RandomGen;
 
         // Built-in Variables
         public LRoom CurrentRoom;
-        
+
         // Rendering
         public int CirclePrecision;
         public LColour CurrentColor;//todo: create draw_set_color and draw_set_alpha + counterparts
@@ -103,7 +102,6 @@ namespace Luna {
             this.GlobalScope = this.Instances[(Int32)LVariableScope.Global];
             this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
             this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
-            this.RandomGen = new Random();
             this.CurrentColor = LColour.FromColor4(Color4.White);
             this.CirclePrecision = 24;
             
@@ -111,7 +109,7 @@ namespace Luna {
             this.Headless = _headless;
             if (_headless == false) {
                 this.Window = new GameWindow(this.RoomWidth, this.RoomHeight);
-                this.Window.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetEntryAssembly().Location); // meh
+                this.Window.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetEntryAssembly().Location); // meh (big meh -sanae)
                 this.Window.Title = this.DisplayName;
                 this.Window.Load += OnLoad;
                 this.Window.Closing += OnClose;

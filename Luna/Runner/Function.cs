@@ -44,7 +44,7 @@ namespace Luna.Runner {
         #region Instances
         [FunctionDefinition("instance_create_depth")]
         public static LValue instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LInstance _instCreate = new LInstance(_assets, _assets.ObjectMapping[(int)(double)_arguments[3].Value], (double)_arguments[0].Value, (double)_arguments[1].Value);
+            LInstance _instCreate = new LInstance(_assets, _assets.ObjectMapping[(int)_arguments[3].Number], _arguments[0].Number, _arguments[1].Number);
             _instCreate.Variables["depth"] = _arguments[2];
             if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
             if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
@@ -94,8 +94,8 @@ namespace Luna.Runner {
             double _r = _arguments[2].Number;
 
             GL.Vertex2(_x, _y);
-            for(int i = 0; i <= 360; i+=360/_assets.CirclePrecision) {
-                GL.Vertex2(_x + (Math.Cos(i*(Math.PI/180)) * _r), _y + (Math.Sin(i*(Math.PI/180)) * _r));
+            for(int _i = 0; _i <= 360; _i+=360/_assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(_i*(Math.PI/180)) * _r), _y + (Math.Sin(_i*(Math.PI/180)) * _r));
             }
 
             GL.End();
@@ -110,6 +110,52 @@ namespace Luna.Runner {
         #endregion
 
         #region Math
+        
+        #region Miscellaneous 
+
+        [FunctionDefinition("abs")]
+        public static LValue abs(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Abs(_arguments[0].Number));
+        }
+
+        [FunctionDefinition("frac")]
+        public static LValue frac(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(_arguments[0].Number-Math.Truncate(_arguments[0].Number));
+        }
+        
+        [FunctionDefinition("sign")]
+        public static LValue sign(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Sign(_arguments[0]));
+        }
+
+        [FunctionDefinition("clamp")]
+        public static LValue clamp(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            if (_arguments[0].Number > _arguments[2].Number) return _arguments[2];
+            if (_arguments[0].Number < _arguments[1].Number) return _arguments[1];
+            return _arguments[0];
+        }
+        
+        [FunctionDefinition("lerp")]
+        public static LValue lerp(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real((_arguments[1].Number-_arguments[0].Number)*_arguments[2].Number);
+        }
+        
+        [FunctionDefinition("math_get_epsilon")]
+        public static LValue math_get_epsilon(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            //pretty sure this is what gamemaker uses for it, but it's a guess from the docs so it's probably wrong cough
+            return LValue.Real(0.000001);
+        }
+        
+        [FunctionDefinition("math_set_epsilon")]
+        public static LValue math_set_epsilon(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            //stub for when someone decides to implement proper double comparison
+            return LValue.Real(0);
+        }
+
+        #endregion
+        
+        #region Analysis
+        
         [FunctionDefinition("max")]
         public static LValue max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             double[] _val = new double[_count];
@@ -127,49 +173,237 @@ namespace Luna.Runner {
             return LValue.Real(_val.Min());
         }
 
-        [FunctionDefinition("lengthdir_x")]
-        public static LValue lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            double _len = (double)_arguments[0].Value;
-            double _dir = (double)_arguments[1].Value;
-
-            double _Px = (_len * Math.Cos(_dir * Math.PI / 180));
-            double _o81 = Math.Round(_Px);
-            double _F6 = _Px - _o81;
-            if (Math.Abs(_F6) < 0.0001) {
-                return LValue.Real(_o81);
-            } else {
-                return LValue.Real(_Px);
+        [FunctionDefinition("mean")]
+        public static LValue mean(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            if (_count == 1) return _arguments[0]; //this handles the edge case of absolute complete stupidity, and provides a micro/millisecond performance boost
+            double d = 0;
+            foreach (LValue arg in _arguments) {
+                d += arg.Number;
             }
-            
+            return LValue.Real(d/_count);
         }
 
-        [FunctionDefinition("lengthdir_y")]
-        public static LValue lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            double _len = (double)_arguments[0].Value;
-            double _dir = (double)_arguments[1].Value;
-
-            double _Px = (_len * Math.Sin(_dir * Math.PI / 180));
-            double _o81 = Math.Round(_Px);
-            double _F6 = _Px - _o81;
-            if (Math.Abs(_F6) < 0.0001) {
-                return new LValue(LType.Number, _o81);
-            } else {
-                return new LValue(LType.Number, _Px);
+        [FunctionDefinition("median")]
+        public static LValue median(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            if (_count == 1) return _arguments[0]; //this still handles the edge case of absolute complete stupidity, and provides a micro/millisecond performance boost
+            if (_count % 2 == 0)
+            {
+                double lower = _arguments[_count / 2 - 1].Number;
+                double higher = _arguments[_count / 2].Number;
+                return LValue.Real((lower+higher)/2);
             }
+            return _arguments[_count/2];
+        }
+        
+        #endregion
+        
+        #region Random
+
+        [FunctionDefinition("random_set_seed")]
+        public static LValue random_set_seed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            WellGenerator.Seed = (uint) _arguments[0].Number;
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("random_get_seed")]
+        public static LValue random_get_seed(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            return LValue.Real(WellGenerator.Seed);
+        }
+
+        [FunctionDefinition("randomize")]
+        public static LValue randomize(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack)
+        {
+            WellGenerator.Seed = (uint) DateTime.Now.Ticks;//yes long is larger do i care no i don't 
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("choose")]
+        public static LValue choose(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            if (_count == 0) return LValue.Undef();
+            var choice = WellGenerator.ENext(_count);
+            return _arguments[choice];
+        }
+        
+        [FunctionDefinition("random_range")]
+        public static LValue random_range(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(WellGenerator.ENext((int) _arguments[0].Number,(int) _arguments[1].Number));
+        }
+
+        [FunctionDefinition("random")]
+        public static LValue random(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(WellGenerator.ENext((int)_arguments[0].Number));
         }
 
         [FunctionDefinition("irandom")]
         public static LValue irandom(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            return LValue.Real((double)_assets.RandomGen.Next(0, (int)(double)_arguments[0].Value));
+            return LValue.Real(WellGenerator.INext((int)_arguments[0].Number));
         }
+
+        [FunctionDefinition("irandom_range")]
+        public static LValue irandom_range(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(WellGenerator.INext((int) _arguments[0].Number,(int) _arguments[1].Number));
+        }
+        
+        #endregion
+        
+        #region Rounding
+
+        [FunctionDefinition("round")]
+        public static LValue round(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Round(_arguments[0].Number));
+        }
+
+        [FunctionDefinition("floor")]
+        public static LValue floor(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Round(_arguments[0].Number));
+        }
+
+        [FunctionDefinition("ceil")]
+        public static LValue ceil(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(Math.Round(_arguments[0].Number));
+        }
+        
+        #endregion
+        
+        #region Exponents
+        [FunctionDefinition("power")]
+        public static LValue power(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Pow(_arguments[0], _arguments[1]));
+        }
+
+        [FunctionDefinition("sqrt")]
+        public static LValue sqrt(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Sqrt(_arguments[0]));
+        }
+
+        [FunctionDefinition("sqr")]
+        public static LValue sqr(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Pow(_arguments[0],2));
+        }
+        
+        [FunctionDefinition("logn")]
+        public static LValue logn(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0], _arguments[1]));
+        }
+
+        [FunctionDefinition("log2")]
+        public static LValue log2(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0], 2));
+        }
+
+        [FunctionDefinition("log10")]
+        public static LValue log10(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log10(_arguments[0]));
+        }
+
+        [FunctionDefinition("ln")]
+        public static LValue ln(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Log(_arguments[0],Math.E));
+        }
+        
+        #endregion
+
+        #region Trig Ratios
+
+        [FunctionDefinition("lengthdir_x")]
+        public static LValue lengthdir_x(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = _arguments[0].Number;
+            double _dir = _arguments[1].Number;
+
+            return LValue.Real(_len * Math.Cos(_dir * Math.PI / 180));
+        }
+
+        [FunctionDefinition("lengthdir_y")]
+        public static LValue lengthdir_y(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _len = _arguments[0].Number;
+            double _dir = _arguments[1].Number;
+
+            return LValue.Real(_len * Math.Sin(_dir * Math.PI / 180));
+        }
+        
+        [FunctionDefinition("sin")]
+        public static LValue sin(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Sin(_arguments[0]));
+        }
+
+        [FunctionDefinition("cos")]
+        public static LValue cos(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Cos(_arguments[0]));
+        }
+
+        [FunctionDefinition("tan")]
+        public static LValue tan(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Tan(_arguments[0]));
+        }
+
+        [FunctionDefinition("dsin")]
+        public static LValue dsin(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Sin(_arguments[0] * (Math.PI / 180)));
+        }
+
+        [FunctionDefinition("dcos")]
+        public static LValue dcos(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Cos(_arguments[0] * (Math.PI / 180)));
+        }
+
+        [FunctionDefinition("dtan")]
+        public static LValue dtan(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Tan(_arguments[0] * (Math.PI / 180)));
+        }
+
+        [FunctionDefinition("arcsin")]
+        public static LValue arcsin(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Asin(_arguments[0]));
+        }
+
+        [FunctionDefinition("arccos")]
+        public static LValue arccos(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Acos(_arguments[0]));
+        }
+
+        [FunctionDefinition("arctan")]
+        public static LValue arctan(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Atan(_arguments[0]));
+        }
+
+        [FunctionDefinition("arctan2")]
+        public static LValue arctan2(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Atan2(_arguments[0],_arguments[1]));
+        }
+
+        [FunctionDefinition("darcsin")]
+        public static LValue darcsin(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Sin(_arguments[0])*(180/Math.PI));
+        }
+
+        [FunctionDefinition("darccos")]
+        public static LValue darccos(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Acos(_arguments[0])*(180/Math.PI));
+        }
+
+        [FunctionDefinition("darctan")]
+        public static LValue darctan(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Atan(_arguments[0])*(180/Math.PI));
+        }
+
+        [FunctionDefinition("darctan2")]
+        public static LValue darctan2(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
+            return LValue.Real(Math.Atan2(_arguments[0],_arguments[1])*(180/Math.PI));
+        }
+        #endregion
+
         #endregion
 
         #region Arrays
         [FunctionDefinition("array_create")]
         public static LValue array_create(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            double _arrayLength = (double)_arguments[0].Value;
+            double _arrayLength = _arguments[0].Number;
             LValue _valArray = new LValue(LType.Array, new LValue[(int)_arrayLength]);
-            LValue _valDefault = (_arguments.Length > 1 ? _arguments[1] : new LValue(LType.Number, (double)0));
+            LValue _valDefault = (_count > 1 ? _arguments[1] : new LValue(LType.Number, (double)0));
             for(int i = 0; i < _arrayLength; i++) {
                 _valArray.Array[i] = _valDefault;
             }
@@ -178,8 +412,8 @@ namespace Luna.Runner {
 
         [FunctionDefinition("@@NewGMLArray@@")]
         public static LValue NewGMLArray(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LValue _valArray = new LValue(LType.Array, new LValue[_arguments.Length]);
-            for(int i = 0; i < _arguments.Length; i++) {
+            LValue _valArray = new LValue(LType.Array, new LValue[_count]);
+            for(int i = 0; i < _count; i++) {
                 _valArray.Array[i] = _arguments[i];
             }
             return _valArray;
@@ -195,10 +429,25 @@ namespace Luna.Runner {
         #endregion
 
         #region Types
+        
         [FunctionDefinition("string")]
         public static LValue _string(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return new LValue(LType.String, _arguments[0].ToString());
         }
+
+        [FunctionDefinition("int64")]
+        public static LValue int64(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            switch (_arguments[0].Type)
+            {
+                case LType.Int64: return _arguments[0];
+                //there's no shorthand for int64 simply because gamemaker barely uses it itself and there's little reason to bother with it
+                case LType.String: return new LValue(LType.Int64,Int64.Parse(_arguments[0]));
+                case LType.Int32: return new LValue(LType.Int64,_arguments[0].I32);
+                case LType.Number: return new LValue(LType.Int64,_arguments[0].Number);
+            }
+            return new LValue(LType.Int64, 0);
+        }
+        
         #endregion
 
         #region Runner
@@ -246,8 +495,8 @@ namespace Luna.Runner {
         
         [FunctionDefinition("room_get_viewport")]
         public static LValue room_get_viewport(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            int _roomGet = (int)(double)_arguments[0];
-            int _viewGet = (int)(double)_arguments[1];
+            int _roomGet = (int)_arguments[0].Number;
+            int _viewGet = (int)_arguments[1].Number;
             if (_roomGet >= 0 && _roomGet < _assets.RoomMapping.Count && _viewGet >= 0 && _viewGet < 8)
             {
                 LRoomView _view = _assets.RoomMapping[_roomGet].Views[_viewGet];
@@ -261,7 +510,7 @@ namespace Luna.Runner {
 
         [FunctionDefinition("object_exists")]
         public static LValue object_exists(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
                 return LValue.Real(1);
             }
@@ -270,7 +519,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_name")]
         public static LValue object_get_name(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count) {
                 return LValue.Text(_assets.ObjectMapping[_objGet].Name);
             }
@@ -290,7 +539,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_parent")]
         public static LValue object_get_parent(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -302,7 +551,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_persistent")]
         public static LValue object_get_persistent(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -313,7 +562,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_physics")]
         public static LValue object_get_physics(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -324,7 +573,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_solid")]
         public static LValue object_get_solid(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -335,7 +584,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_sprite")]
         public static LValue object_get_sprite(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -346,7 +595,7 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_get_visible")]
         public static LValue object_get_visible(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
+            int _objGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count)
             {
                 LObject _obj = _assets.ObjectMapping[_objGet];
@@ -357,8 +606,8 @@ namespace Luna.Runner {
         
         [FunctionDefinition("object_is_ancestor")]
         public static LValue object_is_ancestor(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack){
-            int _objGet = (int)(double)_arguments[0];
-            int _parGet = (int)(double)_arguments[1];
+            int _objGet = (int)_arguments[0].Number;
+            int _parGet = (int)_arguments[0].Number;
             if (_objGet >= 0 && _objGet < _assets.ObjectMapping.Count && _parGet >= 0 && _parGet < _assets.ObjectMapping.Count)
             {
                 //define the recursive function
