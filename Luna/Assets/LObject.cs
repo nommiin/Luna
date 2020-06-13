@@ -34,6 +34,7 @@ namespace Luna.Assets {
         public LCode EndStep = null;
         public LCode Draw = null;
         public LCode Destroy = null;
+        public LCode CleanUp = null;
 
         public LObject(Game _assets, BinaryReader _reader) {
             this.Name = _assets.GetString(_reader.ReadInt32());

@@ -79,8 +79,8 @@ namespace Luna {
         public bool Headless;
         public GameWindow Window;
         public Interpreter Runner;
-        public Dictionary<double, LInstance> Instances = new Dictionary<double, LInstance>();
         public List<LInstance> InstanceList = new List<LInstance>();
+        public Dictionary<double, LInstance> InstanceMapping = new Dictionary<double, LInstance>();
         public LInstance GlobalScope;
         public LInstance StaticScope;
 
@@ -98,10 +98,8 @@ namespace Luna {
         public void Initalize(bool _headless) {
             // Game
             this.Runner = new Interpreter(this);
-            this.Instances.Add((double)LVariableScope.Global, new LInstance((double)LVariableScope.Global));
-            this.GlobalScope = this.Instances[(Int32)LVariableScope.Global];
-            this.Instances.Add((double)LVariableScope.Static, new LInstance((double)LVariableScope.Static));
-            this.StaticScope = this.Instances[(Int32)LVariableScope.Static];
+            this.GlobalScope = new LInstance(this, (double)LVariableScope.Global);
+            this.StaticScope = new LInstance(this, (double)LVariableScope.Static);
             this.CurrentColor = LColour.FromColor4(Color4.White);
             this.CirclePrecision = 24;
             

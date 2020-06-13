@@ -11,26 +11,31 @@ namespace Luna {
     static class VM {
         public static void LoadRoom(Game _assets, LRoom _room) {
             _assets.CurrentRoom = _room;
+            LInstance[] _roomInstances = new LInstance[_room.Instances.Count];
             for (int i = 0; i < _room.Instances.Count; i++) {
                 LRoomInstance _instGet = _room.Instances[i];
-                LInstance _instCreate = new LInstance(_assets, _instGet.Index, _instGet.X, _instGet.Y);
+                LInstance _instCreate = new LInstance(_assets, _instGet.Index, true, _instGet.X, _instGet.Y);
+                _instCreate.Variables["image_xscale"] = LValue.Real(_instGet.ScaleX);
+                _instCreate.Variables["image_yscale"] = LValue.Real(_instGet.ScaleY);
+                _instCreate.Variables["image_speed"] = LValue.Real(_instGet.ImageSpeed);
+                _instCreate.Variables["image_index"] = LValue.Real(_instGet.ImageIndex);
+                _instCreate.Variables["image_blend"] = LValue.Real(_instGet.ImageBlend);
+                _instCreate.Variables["image_angle"] = LValue.Real(_instGet.Rotation);
                 _instCreate.RoomPreCreate = _instGet.PreCreate;
                 _instCreate.RoomCreate = _instGet.CreationCode;
-                _instCreate.Variables["image_xscale"] = new LValue(LType.Number, (double)_instGet.ScaleX);
-                _instCreate.Variables["image_yscale"] = new LValue(LType.Number, (double)_instGet.ScaleY);
-                _instCreate.Variables["image_speed"] = new LValue(LType.Number, (double)_instGet.ImageSpeed);
-                _instCreate.Variables["image_index"] = new LValue(LType.Number, (double)_instGet.ImageIndex);
-                _instCreate.Variables["image_blend"] = new LValue(LType.Number, (double)_instGet.ImageBlend);
-                _instCreate.Variables["image_angle"] = new LValue(LType.Number, (double)_instGet.Rotation);
-                _assets.Instances.Add((double)_instCreate.ID, _instCreate); // TODO: this is probably unneeded
-                if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
-                if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
-                if (_instCreate.RoomPreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.RoomPreCreate);
-                if (_instCreate.RoomCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.RoomCreate);
+                _roomInstances[i] = _instCreate;
+            }
+
+            for(int i = 0; i < _roomInstances.Length; i++) {
+                LInstance _instGet = _roomInstances[i];
+                if (_instGet.PreCreate != null) _instGet.Environment.ExecuteCode(_assets, _instGet.PreCreate);
+                if (_instGet.RoomPreCreate != null) _instGet.Environment.ExecuteCode(_assets, _instGet.RoomPreCreate);
+                if (_instGet.Create != null) _instGet.Environment.ExecuteCode(_assets, _instGet.Create);
+                if (_instGet.RoomCreate != null) _instGet.Environment.ExecuteCode(_assets, _instGet.RoomCreate);
             }
 
             if (_room.CreationCode != null) {
-                Domain _roomEnvironment = new Domain(new LInstance(-100));
+                Domain _roomEnvironment = new LInstance(_assets, -100, false).Environment;
                 _roomEnvironment.ExecuteCode(_assets, _room.CreationCode);
             }
         }

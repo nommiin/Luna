@@ -22,10 +22,9 @@ namespace Luna.Types {
         public LCode EndStep = null;
         public LCode Draw = null;
         public LCode Destroy = null;
+        public LCode CleanUp = null;
 
-        public LInstance(Game _assets, LObject _object, double _x=0, double _y=0) {
-            _assets.InstanceList.Add(this);
-            _assets.Instances[LInstance.IDCount + 1] = this;
+        public LInstance(Game _assets, LObject _object, bool _include=false, double _x=0, double _y=0) {
             this.Object = _object;
             this.ID = LInstance.IDCount++;
             this.Environment = new Domain(this);
@@ -64,6 +63,11 @@ namespace Luna.Types {
                 ["bbox_bottom"] = new LValue(LType.Number, _object.Mask != null ? _y + _object.Mask.BoundsBottom : _y),
             };
 
+            if (_include == true) {
+                _assets.InstanceList.Add(this);
+                _assets.InstanceMapping[this.ID] = this;
+            }
+
             this.PreCreate = _object.PreCreate;
             this.Create = _object.Create;
             this.BeginStep = _object.BeginStep;
@@ -71,12 +75,30 @@ namespace Luna.Types {
             this.EndStep = _object.EndStep;
             this.Draw = _object.Draw;
             this.Destroy = _object.Destroy;
+            this.CleanUp = _object.CleanUp;
         }
 
-        public LInstance(double _id) {
+        public LInstance(Game _assets, double _id, bool _include=true) {
             this.ID = _id;
             this.Environment = new Domain(this);
             this.Variables = new Dictionary<string, LValue>();
+            if (_include == true) {
+                _assets.InstanceMapping[_id] = this;
+            }
+        }
+
+        public static LInstance Find(Game _assets, double _id) {
+            if (_id >= 0 && _id < LInstance.IDStart) {
+                for(int i = 0; i < _assets.InstanceList.Count; i++) {
+                    LInstance _instGet = _assets.InstanceList[i];
+                    if (_instGet.Object.Index == _id) return _instGet;
+                }
+            } else {
+                if (_assets.InstanceMapping.ContainsKey(_id) == true) {
+                    return _assets.InstanceMapping[_id];
+                }
+            }
+            return null;
         }
     }
 }

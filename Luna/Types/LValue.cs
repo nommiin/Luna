@@ -165,6 +165,13 @@ namespace Luna {
             }
             throw new Exception(String.Format("Could not check if {0} (Type: {2}) is greater than or equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
+
+        public static bool GetBool(LValue a) {
+            if (a.Type == LType.Number) {
+                if (a.Number >= 0.5) return true;
+            }
+            return false;
+        }
         #endregion
 
         #region Static Initializers

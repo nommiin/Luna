@@ -590,27 +590,14 @@ namespace Luna.Instructions {
     static class Helper {
         public static Dictionary<string, LValue> GetVariables(Game _assets, Domain _environment, double _scope) {
             switch ((LVariableScope)_scope) {
-                case LVariableScope.Global: return _assets.GlobalScope.Variables;
-                case LVariableScope.Static: return _assets.StaticScope.Variables;
                 case LVariableScope.Instance: return _environment.Instance.Variables;
                 case LVariableScope.Local: return _environment.Locals;
                 default: {
-                    if (_scope < LInstance.IDStart) {
-                        for(int i = 0; i < _assets.InstanceList.Count; i++) {
-                            LInstance _instGet = _assets.InstanceList[i];
-                            if (_instGet.Object.Index == _scope) {
-                                return _instGet.Variables;
-                            }
-                        }
-                    } else {
-                        if (_assets.Instances.ContainsKey(_scope) == true) {
-                            return _assets.Instances[_scope].Variables;
-                        }
-                    }
-                    break;
+                    LInstance _instGet = LInstance.Find(_assets, _scope);
+                    if (_instGet != null) return _instGet.Variables;
+                    throw new Exception(String.Format("Could not find object or instance with the index: {0}", _scope));
                 }
             }
-            throw new Exception(String.Format("Could not return proper scope for: {0}", _scope));
         }
     }
 }

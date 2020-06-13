@@ -44,7 +44,7 @@ namespace Luna.Runner {
         #region Instances
         [FunctionDefinition("instance_create_depth")]
         public static LValue instance_create_depth(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LInstance _instCreate = new LInstance(_assets, _assets.ObjectMapping[(int)_arguments[3].Number], _arguments[0].Number, _arguments[1].Number);
+            LInstance _instCreate = new LInstance(_assets, _assets.ObjectMapping[(int)_arguments[3].Number], true, _arguments[0].Number, _arguments[1].Number);
             _instCreate.Variables["depth"] = _arguments[2];
             if (_instCreate.PreCreate != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.PreCreate);
             if (_instCreate.Create != null) _instCreate.Environment.ExecuteCode(_assets, _instCreate.Create);
@@ -53,7 +53,19 @@ namespace Luna.Runner {
 
         [FunctionDefinition("instance_destroy")]
         public static LValue instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            _assets.InstanceList.Remove(_environment.Instance);
+            LInstance _instGet = _environment.Instance;
+            if (_count > 0) {
+                _instGet = LInstance.Find(_assets, _arguments[0].Number);
+            }
+
+            if (_instGet != null) {
+                if (_count < 2 || LValue.GetBool(_arguments[1]) == true) {
+                    if (_instGet.Destroy != null) _instGet.Environment.ExecuteCode(_assets, _instGet.Destroy);
+                }
+                if (_instGet.CleanUp != null) _instGet.Environment.ExecuteCode(_assets, _instGet.CleanUp);
+                _assets.InstanceList.Remove(_instGet);
+                _assets.InstanceMapping.Remove(_instGet.ID);
+            }
             return LValue.Real(0);
         }
         #endregion

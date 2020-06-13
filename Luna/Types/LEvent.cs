@@ -79,6 +79,7 @@ namespace Luna.Types {
                 case "Step_2": _object.EndStep = this.Code; break;
                 case "Draw_0": _object.Draw = this.Code; break;
                 case "Destroy_0": _object.Destroy = this.Code; break;
+                case "CleanUp_0": _object.CleanUp = this.Code; break;
             }
         }
     }
