@@ -53,18 +53,25 @@ namespace Luna.Runner {
 
         [FunctionDefinition("instance_destroy")]
         public static LValue instance_destroy(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            LInstance _instGet = _environment.Instance;
+            bool _instDestroy = (_count < 2 || LValue.GetBool(_arguments[1]) == true);
             if (_count > 0) {
-                _instGet = LInstance.Find(_assets, _arguments[0].Number);
-            }
-
-            if (_instGet != null) {
-                if (_count < 2 || LValue.GetBool(_arguments[1]) == true) {
-                    if (_instGet.Destroy != null) _instGet.Environment.ExecuteCode(_assets, _instGet.Destroy);
+                double _instIndex = _arguments[1].Number;
+                if (_instIndex < LInstance.IDStart) {
+                    LInstance _instGet = LInstance.Find(_assets, _instIndex, false);
+                    while (_instGet != null) {
+                        _instGet.Remove(_assets, _instDestroy);
+                        _instGet = LInstance.Find(_assets, _instIndex, false);
+                    }
+                } else {
+                    LInstance _instGet = LInstance.Find(_assets, _instIndex, false);
+                    if (_instGet != null) {
+                        _instGet.Remove(_assets, _instDestroy);
+                    }
                 }
-                if (_instGet.CleanUp != null) _instGet.Environment.ExecuteCode(_assets, _instGet.CleanUp);
-                _assets.InstanceList.Remove(_instGet);
-                _assets.InstanceMapping.Remove(_instGet.ID);
+            } else {
+                if (_environment.Instance.ID >= LInstance.IDStart) {
+                    _environment.Instance.Remove(_assets, _instDestroy);
+                }
             }
             return LValue.Real(0);
         }

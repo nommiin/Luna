@@ -87,13 +87,22 @@ namespace Luna.Types {
             }
         }
 
-        public static LInstance Find(Game _assets, double _id) {
+        public void Remove(Game _assets, bool _destroy) {
+            if (_destroy == true) {
+                if (this.Destroy != null) this.Environment.ExecuteCode(_assets, this.Destroy);
+            }
+            if (this.CleanUp != null) this.Environment.ExecuteCode(_assets, this.CleanUp);
+            _assets.InstanceList.Remove(this);
+            _assets.InstanceMapping.Remove(this.ID);
+        }
+
+        public static LInstance Find(Game _assets, double _id, bool _internal=true) {
             if (_id >= 0 && _id < LInstance.IDStart) {
                 for(int i = 0; i < _assets.InstanceList.Count; i++) {
                     LInstance _instGet = _assets.InstanceList[i];
                     if (_instGet.Object.Index == _id) return _instGet;
                 }
-            } else {
+            } else if (_internal == true || _id >= 0) {
                 if (_assets.InstanceMapping.ContainsKey(_id) == true) {
                     return _assets.InstanceMapping[_id];
                 }
