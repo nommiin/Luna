@@ -56,10 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\LCode.cs" />
+    <Compile Include="Assets\LEmbTexture.cs" />
     <Compile Include="Assets\LObject.cs" />
     <Compile Include="Assets\LRoomInstance.cs" />
     <Compile Include="Assets\LSprite.cs" />
     <Compile Include="Assets\LRoomView.cs" />
+    <Compile Include="Assets\LTexturePage.cs" />
     <Compile Include="Data\ChunkHandler.cs" />
     <Compile Include="Assets\LRoom.cs" />
     <Compile Include="Data\Chunk.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using Luna.Assets;
 using Luna.Types;
@@ -164,6 +165,15 @@ namespace Luna {
             for(Int32 i = 0; i < _assets.RoomIndices.Count; i++) {
                 _assets.RoomOrder.Insert(i, _assets.RoomMapping[_assets.RoomIndices[i]]);
             }
+        }
+
+        public static void TXTR(Game _assets, BinaryReader _reader, Chunk _chunk)
+        {
+            HandleList(_assets, _reader, delegate(int _offset){
+                LEmbTexture _tex = new LEmbTexture(_assets, _reader);
+                _tex.Texture.Save(_offset+".png");
+            });
+            Environment.Exit(0);
         }
 
         public static void SPRT(Game _assets, BinaryReader _reader, Chunk _chunk) {

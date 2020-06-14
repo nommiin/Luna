@@ -64,11 +64,9 @@ namespace Luna.Assets {
             _reader.ReadInt32(); // TODO: Read sequence data @ position
             switch (this.SpriteType) {
                 case SpriteType.Bitmap: {
-                    this.FrameCount = _reader.ReadInt32();
-                    for(int i = 0; i < this.FrameCount; i++) {
-                        _reader.ReadInt32();
-                        // TODO: Read texture page indices
-                    }
+                    ChunkHandler.HandleList(_assets, _reader, delegate(int _offset) {
+                        
+                    });
                     break;
                 }
 

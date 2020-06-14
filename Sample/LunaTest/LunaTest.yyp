@@ -1,6 +1,8 @@
 {
   "resources": [
+    {"id":{"name":"LunaBanner","path":"sprites/LunaBanner/LunaBanner.yy",},"order":5,},
     {"id":{"name":"Object1","path":"objects/Object1/Object1.yy",},"order":2,},
+    {"id":{"name":"LunaIcon","path":"sprites/LunaIcon/LunaIcon.yy",},"order":4,},
     {"id":{"name":"Object2","path":"objects/Object2/Object2.yy",},"order":3,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":1,},
   ],
