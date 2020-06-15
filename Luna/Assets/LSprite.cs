@@ -65,7 +65,7 @@ namespace Luna.Assets {
             switch (this.SpriteType) {
                 case SpriteType.Bitmap: {
                     ChunkHandler.HandleList(_assets, _reader, delegate(int _offset) {
-                        
+                        //todo for sanae to cry
                     });
                     break;
                 }

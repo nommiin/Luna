@@ -193,5 +193,14 @@ namespace Luna {
                 _assets.ObjectMapping.Add(_objectGet);
             });
         }
+
+        public static void SEQN(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets, _reader, delegate(int _offset) {
+                LSequence _seqGet = new LSequence(_assets, _reader);
+                _assets.Sequences.Add(_seqGet.Name,_seqGet);
+                _seqGet.Index = _assets.SequenceMapping.Count;
+                _assets.SequenceMapping.Add(_seqGet);
+            });
+        }
     }
 }

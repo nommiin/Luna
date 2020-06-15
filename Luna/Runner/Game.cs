@@ -57,6 +57,7 @@ namespace Luna {
         public Dictionary<string, LSprite> Sprites = new Dictionary<string, LSprite>();
         public Dictionary<string, LObject> Objects = new Dictionary<string, LObject>();
         public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
+        public Dictionary<string, LSequence> Sequences = new Dictionary<string, LSequence>();
         public List<LTexturePage> TexturePages = new List<LTexturePage>();
 
         public List<LString> StringMapping = new List<LString>();
@@ -65,6 +66,7 @@ namespace Luna {
         public List<LSprite> SpriteMapping = new List<LSprite>();
         public List<LObject> ObjectMapping = new List<LObject>();
         public List<LRoom> RoomMapping = new List<LRoom>();
+        public List<LSequence> SequenceMapping = new List<LSequence>();
 
         // Code
         public Int32 LocalVariables = 0;

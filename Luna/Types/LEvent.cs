@@ -32,7 +32,7 @@ namespace Luna.Types {
         Draw,
         KeyPress,
         KeyRelease,
-        Trigger,//does this exist in 2.3? triggers were removed 
+        Trigger,//does this exist in 2.3? triggers were removed, were they not?
         CleanUp,
         PreCreate
     }

@@ -14,6 +14,7 @@ namespace Luna {
             { "CODE", ChunkHandler.CODE },
             { "SCPT", ChunkHandler.SCPT },
             { "GLOB", ChunkHandler.GLOB },
+            { "SEQN", ChunkHandler.SEQN },
             { "TXTR", ChunkHandler.TXTR },
             { "SPRT", ChunkHandler.SPRT },
             { "OBJT", ChunkHandler.OBJT },
