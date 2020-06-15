@@ -375,7 +375,7 @@ namespace Luna.Instructions {
                 _environment.ArrayNext = false;
             } else {
                 double _varScope = this.Data;
-                if (this.Data == 0) {
+                if (this.Data == 0 && _stack.Count > 1) {
                     switch ((double)_stack.Pop()) {
                         case -9: {
                             _varScope = _stack.Pop();
@@ -383,7 +383,19 @@ namespace Luna.Instructions {
                         }
                     }
                 }
-                Helper.GetVariables(_assets, _environment, _varScope)[this.Variable.Name] = _stack.Pop();
+
+                if (_varScope >= 0 && _varScope < LInstance.IDStart) {
+                    LValue _valSet = _stack.Pop();
+                    List<LInstance> _instList = LInstance.FindList(_assets, _varScope, true);
+                    if (_instList != null) {
+                        foreach (LInstance _instGet in _instList) {
+                            _instGet.Variables[this.Variable.Name] = _valSet;
+                        }
+                    }
+                } else {
+                    Helper.GetVariables(_assets, _environment, _varScope)[this.Variable.Name] = _stack.Pop();
+                }
+
             }
         }
     }
@@ -560,6 +572,62 @@ namespace Luna.Instructions {
     #endregion
 
     #region Virtual Machine
+    [InstructionDefinition(LOpcode.pushenv)]
+    class PushEnvironment : Instruction {
+        public Int32 Offset;
+        public Int32 Jump = -1;
+        public PushEnvironment(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
+            this.Offset = (Int32)((_reader.BaseStream.Position + (this.Raw << 9 >> 7)) - 4);
+        }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            double _instScope = _stack.Pop().Number;
+            switch (_instScope) {
+                case -9: {
+                    _instScope = _stack.Pop().Number;
+                    break;
+                }
+            }
+
+            /*
+                NOTE:
+                The code here isn't great, I don't really want to do code execution this way.
+                I think that the code should be ran in the current scope, and we'll just have a stack
+                that holds each instance scope in it. This does work, but doesn't really follow the
+                pattern set by Runner.exe and will likely lead to issues down the line.
+                - Nommiin
+            */
+            if (_instScope >= 0 && _instScope < LInstance.IDStart) {
+                List<LInstance> _instList = LInstance.FindList(_assets, _instScope, true);
+                if (_instList != null) {
+                    foreach (LInstance _instGet in _instList) {
+                        _instGet.Environment.Locals = _environment.Locals;
+                        _instGet.Environment.ExecuteCode(_assets, _code, new Tuple<int, int>(_environment.ProgramCounter + 1, this.Jump));
+                    }
+                }
+            } else {
+                LInstance _instGet = _assets.InstanceMapping[_instScope];
+                if (_instGet != null) {
+                    _instGet.Environment.Locals = _environment.Locals;
+                    _instGet.Environment.ExecuteCode(_assets, _code, new Tuple<int, int>(_environment.ProgramCounter + 1, this.Jump));
+                }
+            }
+            _environment.ProgramCounter = this.Jump;
+        }
+    }
+
+    [InstructionDefinition(LOpcode.popenv)]
+    class PopEnvironment : Instruction {
+        public Int32 Offset;
+        public Int32 Jump = -1;
+        public PopEnvironment(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
+            this.Offset = (Int32)((_reader.BaseStream.Position + (this.Raw << 9 >> 7)) - 4);
+        }
+
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            //
+        }
+    }
+
     [InstructionDefinition(LOpcode.popz)]
     class Discard : Instruction {
         public Discard(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }

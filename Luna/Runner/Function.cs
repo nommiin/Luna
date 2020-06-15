@@ -438,6 +438,19 @@ namespace Luna.Runner {
             return _valArray;
         }
 
+        [FunctionDefinition("array_get")]
+        public static LValue array_get(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            if (_arguments[0].Type == LType.Array) {
+                LValue[] _arrayGet = _arguments[0].Array;
+                int _arrayIndex = (int)_arguments[1].Number;
+                if (_arrayIndex >= 0 && _arrayIndex < _arrayGet.Length) {
+                    return _arrayGet[_arrayIndex];
+                }
+                throw new Exception(String.Format("Could retrieve value from out-of-range array index: {0} (Length: {1})", _arrayIndex, _arrayGet.Length));
+            }
+            throw new Exception("Could not retrieve value from non-array value");
+        }
+
         [FunctionDefinition("array_length")]
         public static LValue array_length(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             if (_arguments[0].Type == LType.Array) {

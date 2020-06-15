@@ -58,7 +58,7 @@ namespace Luna.Assets {
                 }
             }
 
-            // Map out branching
+            // Map out branching & environments
             for(int i = 0; i < this.Instructions.Count; i++) {
                 switch (this.Instructions[i].Opcode) {
                     case LOpcode.b:
@@ -69,6 +69,25 @@ namespace Luna.Assets {
                             _instructionBranch.Jump = this.BranchTable[_instructionBranch.Offset] - 1;
                         } else {
                             _instructionBranch.Jump = this.Instructions.Count;
+                        }
+                        break;
+                    }
+
+                    case LOpcode.pushenv: {
+                        Instructions.PushEnvironment _instructionEnv = this.Instructions[i] as Instructions.PushEnvironment;
+                        if (this.BranchTable.ContainsKey(_instructionEnv.Offset) == true) {
+                            _instructionEnv.Jump = this.BranchTable[_instructionEnv.Offset];
+                        } else {
+                            _instructionEnv.Jump = this.Instructions.Count;
+                        }
+                        break;
+                    }
+                    case LOpcode.popenv: {
+                        Instructions.PopEnvironment _instructionEnv = this.Instructions[i] as Instructions.PopEnvironment;
+                        if (this.BranchTable.ContainsKey(_instructionEnv.Offset) == true) {
+                            _instructionEnv.Jump = this.BranchTable[_instructionEnv.Offset];
+                        } else {
+                            _instructionEnv.Jump = this.Instructions.Count;
                         }
                         break;
                     }

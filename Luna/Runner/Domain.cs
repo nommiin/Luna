@@ -9,6 +9,7 @@ using Luna.Types;
 
 namespace Luna.Runner {
     class Domain {
+        public LCode Current;
         public double Scope = 0;
         public LInstance Instance = null;
         public Dictionary<string, LValue> Locals;
@@ -28,9 +29,10 @@ namespace Luna.Runner {
             this.Locals = _other.Locals;
         }
 
-        public void ExecuteCode(Game _assets, LCode _code) {
-            Int32 _programLength = _code.Instructions.Count;
-            for (this.ProgramCounter = 0; this.ProgramCounter < _programLength; this.ProgramCounter++) {
+        public void ExecuteCode(Game _assets, LCode _code, Tuple<int, int> _range=null) {
+            this.Current = _code;
+            if (_range == null) _range = new Tuple<int, int>(0, this.Current.Instructions.Count);
+            for (this.ProgramCounter = _range.Item1; this.ProgramCounter < _range.Item2; this.ProgramCounter++) {
                 _code.Instructions[this.ProgramCounter].Perform(_assets, this, _code, this.Stack);
             }
 
