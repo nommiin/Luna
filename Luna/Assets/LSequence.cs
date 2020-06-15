@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Luna.Types;
 
@@ -26,13 +27,20 @@ namespace Luna.Assets
 			XOrigin = _reader.ReadInt32();
 			YOrigin = _reader.ReadInt32();
 			Volume = _reader.ReadSingle();
-			ChunkHandler.HandleKVP(_assets, _reader, delegate(int _offset) {
+			ChunkHandler.HandleZeus(_assets, _reader, delegate {
 				LTrack _track = new LTrack(_assets, _reader);
 				Tracks.Add(_track);
 			});
-			ChunkHandler.HandleKVP(_assets, _reader, delegate(int _offset) {
+			ChunkHandler.HandleZeus(_assets, _reader, delegate {
 				LSeqEvent _evt = new LSeqEvent(_assets, _reader);
 				Events.Add(_evt.Key,_evt);
+			});
+			ChunkHandler.HandleZeus(_assets,_reader, delegate {
+				_reader.ReadSingle();
+				_reader.ReadSingle();
+				_reader.ReadInt32();
+				_reader.ReadInt32();
+				_reader.ReadInt32();
 			});
 		}
 	}

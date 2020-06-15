@@ -18,7 +18,7 @@ namespace Luna {
         }
 
         public delegate void ChunkList(Int32 _offset);
-        public static void HandleList(Game _asset, BinaryReader _reader, ChunkList _handler) {
+        public static void HandleList(Game _assets, BinaryReader _reader, ChunkList _handler) {
             Int32 _listOffset = _reader.ReadInt32(), _listBase = (Int32)_reader.BaseStream.Position;
             _reader.BaseStream.Seek(_listOffset, SeekOrigin.Begin);
             Int32 _itemCount = _reader.ReadInt32();
@@ -29,6 +29,15 @@ namespace Luna {
                 _reader.BaseStream.Seek(_itemBase, SeekOrigin.Begin);
             }
             _reader.BaseStream.Seek(_listBase, SeekOrigin.Begin);
+        }
+        
+        //gonna have to be serious got no idea if this works
+        public delegate void ChunkZeus();
+        public static void HandleZeus(Game _assets, BinaryReader _reader, ChunkZeus _handler) {
+            int _count = _reader.ReadInt32();
+            for (int i = 0; i < _count; i++) {
+                _handler();
+            }
         }
 
         public static void STRG(Game _assets, BinaryReader _reader, Chunk _chunk) {

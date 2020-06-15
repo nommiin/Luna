@@ -14,7 +14,7 @@ namespace Luna {
             { "CODE", ChunkHandler.CODE },
             { "SCPT", ChunkHandler.SCPT },
             { "GLOB", ChunkHandler.GLOB },
-            { "SEQN", ChunkHandler.SEQN },
+            //{ "SEQN", ChunkHandler.SEQN }, todo: implement this, but implement sprite drawing first
             { "TXTR", ChunkHandler.TXTR },
             { "SPRT", ChunkHandler.SPRT },
             { "OBJT", ChunkHandler.OBJT },
