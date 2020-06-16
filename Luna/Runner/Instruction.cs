@@ -402,18 +402,31 @@ namespace Luna.Instructions {
     #endregion
 
     #region Functions
+    public enum CallType {
+        Function,
+        Method
+    }
+
     [InstructionDefinition(new LOpcode[] { LOpcode.call, LOpcode.callv })]
     class Call : Instruction {
+        public CallType Type;
         public string FunctionName;
-        public Function.Handler Function;
+        public Function.Handler Function;   // functions
+        public LCode Code;                  // Method
         public LValue[] Arguments;
         public Int32 Count;
         public Call(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) {
             this.FunctionName = _game.Functions[_game.FunctionMapping[(int)((_code.Base + _reader.BaseStream.Position))]].Name;
             if (Runner.Function.Mapping.ContainsKey(this.FunctionName) == true) {
                 this.Function = Runner.Function.Mapping[this.FunctionName];
+                this.Type = CallType.Function;
             } else {
-                throw new Exception(String.Format("Could not find function mapping for \"{0}\"", this.FunctionName));
+                if (_game.Code.ContainsKey(this.FunctionName) == true) {
+                    this.Code = _game.Code[this.FunctionName];
+                    this.Type = CallType.Method;
+                } else {
+                    throw new Exception(String.Format("Could not find function or script named \"{0}\"", this.FunctionName));
+                }
             }
 
             this.Count = this.Data;
@@ -651,6 +664,24 @@ namespace Luna.Instructions {
             _environment.ArrayNext = true;
         }
     }
+
+    [InstructionDefinition(LOpcode.setstatic)]
+    class SetStatic : Instruction {
+        public SetStatic(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            Console.WriteLine("Stack Size: {0}", _stack.Count);
+            throw new Exception("");
+        }
+    }
+
+    [InstructionDefinition(LOpcode.exit)]
+    class Exit : Instruction {
+        public Exit(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            
+        }
+    }
+
     #endregion
 }
 

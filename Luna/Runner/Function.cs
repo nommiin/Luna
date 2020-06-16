@@ -126,10 +126,28 @@ namespace Luna.Runner {
             _assets.CurrentColor = new LColour((int)_arguments[0].Number);
             return LValue.Real(0);
         }
+
+        [FunctionDefinition("draw_sprite")]
+        public static LValue draw_sprite(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            GL.Begin(PrimitiveType.TriangleFan);
+            GL.Color4((OpenTK.Graphics.Color4)_assets.CurrentColor);
+
+            double _x = _arguments[2].Number;
+            double _y = _arguments[3].Number;
+            double _r = 32;// _arguments[2].Number;
+
+            GL.Vertex2(_x, _y);
+            for (int _i = 0; _i <= 360; _i += 360 / _assets.CirclePrecision) {
+                GL.Vertex2(_x + (Math.Cos(_i * (Math.PI / 180)) * _r), _y + (Math.Sin(_i * (Math.PI / 180)) * _r));
+            }
+
+            GL.End();
+            return LValue.Real(0);
+        }
         #endregion
 
         #region Math
-        
+
         #region Miscellaneous 
 
         [FunctionDefinition("abs")]
@@ -483,6 +501,13 @@ namespace Luna.Runner {
         #endregion
 
         #region Runner
+        [FunctionDefinition("method")]
+        public static LValue method(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            throw new Exception("Count: " + _count.ToString());
+            //MessageBox.Show(_arguments[0].ToString(), _assets.DisplayName, MessageBoxButtons.OK);
+            return LValue.Real(0);
+        }
+
         [FunctionDefinition("show_message")]
         public static LValue show_message(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             MessageBox.Show(_arguments[0].ToString(), _assets.DisplayName, MessageBoxButtons.OK);

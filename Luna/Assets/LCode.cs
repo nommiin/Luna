@@ -122,6 +122,12 @@ namespace Luna.Assets {
             for (int i = 0; i < this.Instructions.Count; i++) {
                 _bytecodeOutput += String.Format("[{1}] - {0}", this.Instructions[i].Opcode, this.Instructions[i].Raw.ToString("X"));
                 switch (this.Instructions[i].Opcode) {
+                    case LOpcode.b: {
+                        Instructions.Branch _instructionGet = this.Instructions[i] as Instructions.Branch;
+                        _bytecodeOutput += String.Format("(Goto={0}:{1})", this.Instructions[_instructionGet.Jump].Opcode, _instructionGet.Jump);
+                        break;
+                    }
+
                     case LOpcode.call: {
                         Instructions.Call _instructionGet = this.Instructions[i] as Instructions.Call;
                         _bytecodeOutput += String.Format("(Function={0})", _instructionGet.FunctionName);
@@ -165,6 +171,13 @@ namespace Luna.Assets {
                 _bytecodeOutput += "\n";
             }
             Console.WriteLine(_bytecodeOutput);
+
+            // Print out decompiled bytecode
+            try {
+                Console.WriteLine("{0}:\n---\n{1}\n---", this.Name, Runner.Debug.Decompiler.Decompile(this.Instructions));
+            } catch (Exception e) {
+                Console.WriteLine("Failed to decompile {0}", this.Name);
+            }
 #endif
         }
 
