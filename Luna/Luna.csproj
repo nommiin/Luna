@@ -66,7 +66,7 @@
     <Compile Include="Data\ChunkHandler.cs" />
     <Compile Include="Assets\LRoom.cs" />
     <Compile Include="Data\Chunk.cs" />
-    <Compile Include="Runner\Debug\Decompiler.cs" />
+    <Compile Include="Runner\Decompiler.cs" />
     <Compile Include="Runner\Domain.cs" />
     <Compile Include="Runner\Function.cs" />
     <Compile Include="Runner\Game.cs" />
