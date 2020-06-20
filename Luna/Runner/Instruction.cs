@@ -184,6 +184,16 @@ namespace Luna.Instructions {
                     break;
                 }
 
+                case "undefined": {
+                    _stack.Push(LValue.Undef());
+                    break;
+                }
+
+                case "current_time": {
+                    _stack.Push(LValue.Real(VM.Timer.ElapsedMilliseconds));
+                    break;
+                }
+
                 default: {
                     throw new Exception(String.Format("Could not return built-in variable named: \"{0}\"", this.Variable));
                 }

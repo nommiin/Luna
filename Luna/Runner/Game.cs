@@ -118,6 +118,7 @@ namespace Luna {
                 this.Window.RenderFrame += OnRender;
                 Input.Initalize(this);
                 this.Window.Run();
+                VM.Timer.Start();
             } else {
                 OnLoad(null, null);
             }
