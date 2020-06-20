@@ -9,6 +9,14 @@ using Luna.Runner;
 
 namespace Luna.Runner.Debug {
     static class Decompiler {
+        /*
+            NOTE:
+            This is a simple ad-hoc decompiler intended strictly for debugging purposes.
+            Any pull requests or commits that attempt to turn this into a decompiler for
+            the creating a GameMaker project are strictly prohibited and will be immediately
+            declined.
+        */
+        
         public static string Decompile(List<Instruction> _instructionList) {
             string _decomOutput = "";
             Stack<dynamic> _decomStack = new Stack<dynamic>();
