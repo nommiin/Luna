@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Luna.Assets;
 using Luna.Runner;
@@ -9,7 +10,7 @@ namespace Luna.Types {
         public static double IDStart = 100000;
         public static double IDCount = LInstance.IDStart;
 
-        public LObject Object;
+        public LObject Object = null;
         public Domain Environment;
         public Dictionary<string, LValue> Variables;
 
@@ -66,6 +67,10 @@ namespace Luna.Types {
             if (_include == true) {
                 _assets.InstanceList.Add(this);
                 _assets.InstanceMapping[this.ID] = this;
+                if (_assets.ObjectInstances.ContainsKey(this.Object.Index) == false) {
+                    _assets.ObjectInstances[this.Object.Index] = new List<LInstance>();
+                }
+                _assets.ObjectInstances[this.Object.Index].Add(this);
             }
 
             this.PreCreate = _object.PreCreate;
@@ -94,20 +99,31 @@ namespace Luna.Types {
             if (this.CleanUp != null) this.Environment.ExecuteCode(_assets, this.CleanUp);
             _assets.InstanceList.Remove(this);
             _assets.InstanceMapping.Remove(this.ID);
+            if (this.Object != null) _assets.ObjectInstances[this.Object.Index].Remove(this);
         }
 
         public static LInstance Find(Game _assets, double _id, bool _internal=true) {
             if (_id >= 0 && _id < LInstance.IDStart) {
-                for(int i = 0; i < _assets.InstanceList.Count; i++) {
-                    LInstance _instGet = _assets.InstanceList[i];
-                    if (_instGet.Object.Index == _id) return _instGet;
+                if (_assets.ObjectInstances.ContainsKey(_id) == true) {
+                    return _assets.ObjectInstances[_id][0];
                 }
+                return null;
             } else if (_internal == true || _id >= 0) {
                 if (_assets.InstanceMapping.ContainsKey(_id) == true) {
                     return _assets.InstanceMapping[_id];
                 }
             }
             return null;
+        }
+
+        public static List<LInstance> FindList(Game _assets, double _id, bool _internal=true) {
+            if (_id >= 0 && _id < LInstance.IDStart) {
+                if (_assets.ObjectInstances.ContainsKey(_id) == true) {
+                    return _assets.ObjectInstances[_id];
+                }
+                return null;
+            }
+            throw new Exception("Unable to retireve instance list for an instance ID");
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
+using System.Text;
 using Luna.Assets;
 using Luna.Types;
 
@@ -90,6 +92,41 @@ namespace Luna {
                 _assets.AllowStats = _reader.ReadLBoolean();
                 _assets.GUID = new Guid(_reader.ReadBytes(16));
             }
+        }
+
+        public static void TXTR(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            // Collect textures
+            List<LTexture> _textureList = new List<LTexture>();
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
+                _textureList.Add(new LTexture(_reader));
+            });
+
+            // Get sizes
+            for(int i = 0; i < _textureList.Count; i++) {
+                if (i < _textureList.Count - 1) {
+                    _textureList[i].Length = _textureList[i + 1].Offset - _textureList[i].Offset;
+                } else {
+                    _textureList[i].Length = (int)((_chunk.Base + _chunk.Length) - _textureList[i].Offset);
+                }
+            }
+
+            // PNG Data @ (LTexture.Offset + LTexture.Length)
+
+            /*
+            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
+                Console.WriteLine("Offset: {0}", _offset);
+                Int32 _textureScale = _reader.ReadInt32();
+                Int32 _textureMipmaps = _reader.ReadInt32();
+                Int32 _textureOffset = _reader.ReadInt32();
+                long _streamBase = _reader.BaseStream.Position;
+
+                _reader.BaseStream.Seek(_streamBase, SeekOrigin.Begin);
+                //Console.WriteLine(ASCIIEncoding.ASCII.GetString(_reader.ReadBytes(8)));
+            });*/
+            //for(int i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+            //    Console.WriteLine("Int32: {0}", _reader.ReadInt32());
+            //}
+            //Console.WriteLine("FirstInt32: {0}", _reader.ReadInt32());
         }
 
         public static void VARI(Game _assets, BinaryReader _reader, Chunk _chunk) {

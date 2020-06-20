@@ -5,7 +5,7 @@ using Luna.Types;
 
 namespace Luna.Assets {
     class LObject {
-        public long Index;
+        public double Index;
         public string Name;
         public LSprite Sprite;
         public bool Visible;

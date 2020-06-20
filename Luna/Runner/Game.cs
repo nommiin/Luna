@@ -84,6 +84,7 @@ namespace Luna {
         public Interpreter Runner;
         public List<LInstance> InstanceList = new List<LInstance>();
         public Dictionary<double, LInstance> InstanceMapping = new Dictionary<double, LInstance>();
+        public Dictionary<double, List<LInstance>> ObjectInstances = new Dictionary<double, List<LInstance>>();
         public LInstance GlobalScope;
         public LInstance StaticScope;
 

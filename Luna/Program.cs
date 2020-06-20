@@ -5,6 +5,7 @@ using Luna.Runner;
 
 namespace Luna {
     class Program {
+        public static IFF GameData = null;
         public static string[] Arguments;
         public static string GameLocation = null;
 
@@ -34,8 +35,8 @@ namespace Luna {
             }
 
             // Load game
-            IFF _wad = new IFF(Program.GameLocation, new Game());
-            _wad.Parse(delegate (Game _game) {
+            Program.GameData = new IFF(Program.GameLocation, new Game());
+            Program.GameData.Parse(delegate (Game _game) {
                 _game.Initalize(false);
             });
         }
