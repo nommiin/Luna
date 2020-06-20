@@ -213,15 +213,6 @@ namespace Luna {
             }
         }
 
-        public static void TXTR(Game _assets, BinaryReader _reader, Chunk _chunk)
-        {
-            HandleList(_assets, _reader, delegate(int _offset){
-                LEmbTexture _tex = new LEmbTexture(_assets, _reader);
-                _tex.Texture.Save(_offset+".png");
-            });
-            Environment.Exit(0);
-        }
-
         public static void SPRT(Game _assets, BinaryReader _reader, Chunk _chunk) {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LSprite _spriteGet = new LSprite(_assets, _reader);
@@ -237,15 +228,6 @@ namespace Luna {
                 _assets.Objects.Add(_objectGet.Name, _objectGet);
                 _objectGet.Index = _assets.ObjectMapping.Count;
                 _assets.ObjectMapping.Add(_objectGet);
-            });
-        }
-
-        public static void SEQN(Game _assets, BinaryReader _reader, Chunk _chunk) {
-            HandleKVP(_assets, _reader, delegate(int _offset) {
-                LSequence _seqGet = new LSequence(_assets, _reader);
-                _assets.Sequences.Add(_seqGet.Name,_seqGet);
-                _seqGet.Index = _assets.SequenceMapping.Count;
-                _assets.SequenceMapping.Add(_seqGet);
             });
         }
     }

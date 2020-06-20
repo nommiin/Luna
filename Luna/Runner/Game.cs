@@ -58,7 +58,6 @@ namespace Luna {
         public Dictionary<string, LObject> Objects = new Dictionary<string, LObject>();
         public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
         public Dictionary<string, LSequence> Sequences = new Dictionary<string, LSequence>();
-        public List<LTexturePage> TexturePages = new List<LTexturePage>();
 
         public List<LString> StringMapping = new List<LString>();
         public List<LCode> CodeMapping = new List<LCode>();
