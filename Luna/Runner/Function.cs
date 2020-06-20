@@ -747,5 +747,65 @@ namespace Luna.Runner {
         }
 
         #endregion
+
+        #region Data Structures - Maps
+        [FunctionDefinition("ds_map_create")]
+        public static LValue ds_map_create(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            double _mapIndex = VM.Maps.Count;
+            VM.Maps.Add(new Dictionary<LValue, LValue>());
+            return LValue.Real(_mapIndex);
+        }
+
+        [FunctionDefinition("ds_map_set")]
+        public static LValue ds_map_set(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            _mapFind[_arguments[1]] = _arguments[2];
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("ds_map_find_value")]
+        public static LValue ds_map_find_value(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            if (_mapFind.ContainsKey(_arguments[1]) == true) {
+                return _mapFind[_arguments[1]];
+            }
+            return LValue.Undef();
+        }
+
+        [FunctionDefinition("ds_map_size")]
+        public static LValue ds_map_size(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            return LValue.Real(_mapFind.Count);
+        }
+
+        [FunctionDefinition("ds_map_clear")]
+        public static LValue ds_map_clear(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            _mapFind.Clear();
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("ds_map_find_first")]
+        public static LValue ds_map_find_first(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            return _mapFind.First().Key;
+        }
+
+        [FunctionDefinition("ds_map_find_next")]
+        public static LValue ds_map_find_next(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
+            int _keyInd = 0;
+            foreach(KeyValuePair<LValue, LValue> _mapKey in _mapFind) {
+                if (_keyInd == 0) {
+                    if (_mapKey.Key == _arguments[1]) {
+                        _keyInd++;
+                    }
+                } else if (_keyInd == 1) {
+                    return _mapKey.Key;
+                }
+            }
+            return LValue.Undef();
+        }
+        #endregion
     }
 }

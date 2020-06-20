@@ -176,7 +176,7 @@ namespace Luna.Assets {
             try {
                 Console.WriteLine("{0}:\n---\n{1}\n---", this.Name, Runner.Debug.Decompiler.Decompile(this.Instructions));
             } catch (Exception e) {
-                Console.WriteLine("Failed to decompile {0}", this.Name);
+                Console.WriteLine("Failed to decompile {0}: {1}", this.Name, e.Message);
             }
 #endif
         }

@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Luna.Runner;
 using Luna.Types;
 using Luna.Assets;
 
 namespace Luna {
     static class VM {
+        public static Stopwatch Timer = new Stopwatch();
+        public static List<List<LValue>> Lists = new List<List<LValue>>();
+        public static List<Dictionary<LValue, LValue>> Maps = new List<Dictionary<LValue, LValue>>();
+
         public static void LoadRoom(Game _assets, LRoom _room) {
             _assets.CurrentRoom = _room;
             LInstance[] _roomInstances = new LInstance[_room.Instances.Count];
