@@ -9,6 +9,7 @@ namespace Luna {
         public static Dictionary<string, Handler> Handlers = new Dictionary<string, Handler>() {
             { "STRG", ChunkHandler.STRG },
             { "GEN8", ChunkHandler.GEN8 },
+            { "OPTN", ChunkHandler.OPTN },
             { "TXTR", ChunkHandler.TXTR },
             { "VARI", ChunkHandler.VARI },
             { "FUNC", ChunkHandler.FUNC },

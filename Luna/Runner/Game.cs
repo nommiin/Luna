@@ -50,6 +50,52 @@ namespace Luna {
         public bool AllowStats;
         public Guid GUID;
 
+        // OPTN
+        public Platform PlatformOptions = new Platform();
+        public class Platform {
+            public bool Fullscreen;
+            public bool Interpolate;
+            public bool NewAudioEngine;
+            public bool HideBorder;
+            public bool ShowCursor;
+            public bool Resizable;
+            public bool StayOnTop;
+            public bool ResolutionChange;
+            public bool HasButtons;
+            public bool FullscreenKey;
+            public bool HelpKey;
+            public bool QuitKey;
+            public bool SaveKey;
+            public bool ScreenshotKey;
+            public bool CloseEscape;
+            public bool Freeze;
+            public bool ShowProgress;
+            public bool LoadTransparent;
+            public bool ScaleProgress;
+            public bool DisplayErrors;
+            public bool WriteErrors;
+            public bool AbortErrors;
+            public bool VariableErrors;
+            public bool CreationOrder;
+            public bool UseFrontTouch;
+            public bool UseRearTouch;
+            public bool FastCollision;
+            public bool FastCollisionCompat;
+            public bool DisableSandbox;
+            public Int32 Scale;
+            public Int32 WindowColour;
+            public Int32 ColourDepth;
+            public Int32 Resolution;
+            public Int32 RefreshRate;
+            public Int32 SyncVertex;
+            public Int32 Priority;
+            public LTexture BackgroundImage;
+            public LTexture FrontImage;
+            public LTexture LoadImage;
+            public Int32 LoadAlpha;
+        }
+        public Dictionary<string, string> Constants = new Dictionary<string, string>();
+
         // Assets
         public Dictionary<long, LString> Strings = new Dictionary<long, LString>();
         public Dictionary<string, LCode> Code = new Dictionary<string, LCode>();
@@ -101,7 +147,7 @@ namespace Luna {
             this.Runner = new Interpreter(this);
             this.GlobalScope = new LInstance(this, (double)LVariableScope.Global);
             this.StaticScope = new LInstance(this, (double)LVariableScope.Static);
-            this.CurrentColor = LColour.FromColor4(Color4.White);
+            this.CurrentColor = new LColour(UInt32.Parse(this.Constants["@@DrawColour"]));
             this.CirclePrecision = 24;
             
             // Window

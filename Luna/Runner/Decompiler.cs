@@ -7,8 +7,8 @@ using Luna.Assets;
 using Luna.Types;
 using Luna.Runner;
 
-namespace Luna.Runner.Debug {
-    static class Decompiler {
+namespace Luna.Runner {
+    class Decompiler {
         /*
             NOTE:
             This is a simple ad-hoc decompiler intended strictly for debugging purposes.
@@ -16,93 +16,63 @@ namespace Luna.Runner.Debug {
             the creating a GameMaker project are strictly prohibited and will be immediately
             declined.
         */
-        
-        public static string Decompile(List<Instruction> _instructionList) {
-            string _decomOutput = "";
-            Stack<dynamic> _decomStack = new Stack<dynamic>();
-            foreach(Instruction _instructionGet in _instructionList) {
+
+        public string Output = "";
+        public Decompiler(LCode _code, List<Instruction> _instructionList) {
+            Stack<dynamic> _programStack = new Stack<dynamic>();
+
+            for(int i = 0; i < _instructionList.Count; i++) {
+                Instruction _instructionGet = _instructionList[i];
                 switch (_instructionGet.Opcode) {
-                    case LOpcode.b:
-                    case LOpcode.bt:
-                    case LOpcode.bf: {
-                        Instructions.Branch _instructionBranch = _instructionGet as Instructions.Branch;
-                        _decomOutput += "// branch->" + _instructionBranch.Jump + "\n";
+                    case LOpcode.push: {
+                        _programStack.Push((_instructionGet as Instructions.Push).Value.ToString());
                         break;
                     }
 
                     case LOpcode.pushi: {
-                        Instructions.PushImmediate _instructionPushImmediate = _instructionGet as Instructions.PushImmediate;
-                        _decomStack.Push(_instructionPushImmediate.Value.ToString());
+                        _programStack.Push((_instructionGet as Instructions.PushImmediate).Value.ToString());
                         break;
                     }
 
-                    case LOpcode.push: {
-                        Instructions.Push _instructionPush = _instructionGet as Instructions.Push;
-                        switch (_instructionPush.Type) {
-                            case LArgumentType.Variable: {
-                                _decomStack.Push(_instructionPush.Variable.Name);
-                                break;
-                            }
-
-                            case LArgumentType.String: {
-                                _decomStack.Push("\"" + _instructionPush.Value.String + "\"");
-                                break;
-                            }
-
-                            default: {
-                                _decomStack.Push(_instructionPush.Value.Number.ToString());
-                                break;
-                            }
-                        }
+                    case LOpcode.pushb: {
+                        _programStack.Push((_instructionGet as Instructions.PushBuiltin).Variable);
                         break;
                     }
 
                     case LOpcode.pop: {
                         Instructions.Pop _instructionPop = _instructionGet as Instructions.Pop;
-                        switch (_instructionPop.Variable.Scope) {
-                            case LVariableScope.Global: {
-                                _decomOutput += "global.";
-                                break;
-                            }
-
-                            case LVariableScope.Instance: {
-                                _decomOutput += "self.";
-                                break;
-                            }
-
-                            case LVariableScope.Local: {
-                                _decomOutput += "local.";
-                                break;
-                            }
-
-                            case LVariableScope.Static: {
-                                _decomOutput += "static.";
+                        switch ((LVariableScope)_instructionPop.Data) {
+                            case LVariableScope.Global: this.Output += "global."; break;
+                            case LVariableScope.Instance: this.Output += "self."; break;
+                            case LVariableScope.Local: this.Output += "var "; break;
+                            case LVariableScope.Static: this.Output += "static "; break;
+                            default: {
+                                this.Output += $"({_instructionPop.Data}).";
                                 break;
                             }
                         }
-                        _decomOutput += _instructionPop.Variable.Name + " = ";
-                        _decomOutput += _decomStack.Pop().ToString() + ";\n";
+                        this.Output += $"{_instructionPop.Variable.Name} = {_programStack.Pop()};\n";
+                        break;
+                    }
+
+                    case LOpcode.popz: {
+                        _programStack.Pop();
                         break;
                     }
 
                     case LOpcode.call: {
                         Instructions.Call _instructionCall = _instructionGet as Instructions.Call;
-                        _decomOutput += _instructionCall.FunctionName + "(";
-                        for(int i = 0; i < _instructionCall.Count; i++) {
-                            _decomOutput += _decomStack.Pop().ToString();
-                            if (i < _instructionCall.Count - 1) _decomOutput += ", ";
+                        this.Output += $"{_instructionCall.FunctionName}(";
+                        for(int j = 0; j < _instructionCall.Count; j++) {
+                            this.Output += _programStack.Pop();
+                            if (j < _instructionCall.Count - 1) this.Output += ", ";
                         }
-                        _decomOutput += ");\n";
-                        break;
-                    }
-
-                    case LOpcode.exit: {
-                        _decomOutput += "exit;\n";
+                        this.Output += ");\n";
+                        _programStack.Push(0);
                         break;
                     }
                 }
             }
-            return _decomOutput;
         }
     }
 }

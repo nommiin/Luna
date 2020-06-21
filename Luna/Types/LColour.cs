@@ -19,6 +19,13 @@ namespace Luna.Types {
             this.Alpha = (byte)((_colour >> 24) & 0xFF);
         }
 
+        public LColour(UInt32 _colour) {
+            this.Red = (byte)(_colour & 0xFF);
+            this.Green = (byte)((_colour >> 8) & 0xFF);
+            this.Blue = (byte)((_colour >> 16) & 0xFF);
+            this.Alpha = (byte)((_colour >> 24) & 0xFF);
+        }
+
         public LColour(byte _r, byte _g, byte _b, byte _a)
         {
             //is this ever gonna get used?

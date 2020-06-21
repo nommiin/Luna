@@ -117,8 +117,8 @@ namespace Luna.Assets {
             }
 
 #if (DEBUG)
-            // Print out finalized bytecode
-            string _bytecodeOutput = this.Name + "\n";
+            // Parse and format finalized bytecode
+            string _bytecodeOutput = this.Name + " Bytecode:\n";
             for (int i = 0; i < this.Instructions.Count; i++) {
                 _bytecodeOutput += String.Format("[{1}] - {0}", this.Instructions[i].Opcode, this.Instructions[i].Raw.ToString("X"));
                 switch (this.Instructions[i].Opcode) {
@@ -170,14 +170,13 @@ namespace Luna.Assets {
                 }
                 _bytecodeOutput += "\n";
             }
+
+            // Decompile the bytecode
+            try {
+                _bytecodeOutput += "---\n" + this.Name + " Code:\n" + (new Runner.Decompiler(this, this.Instructions)).Output;
+            } catch (Exception _e) { /* Do Nothing */ };
             Console.WriteLine(_bytecodeOutput);
 
-            // Print out decompiled bytecode
-            try {
-                Console.WriteLine("{0}:\n---\n{1}\n---", this.Name, Runner.Debug.Decompiler.Decompile(this.Instructions));
-            } catch (Exception e) {
-                Console.WriteLine("Failed to decompile {0}: {1}", this.Name, e.Message);
-            }
 #endif
         }
 

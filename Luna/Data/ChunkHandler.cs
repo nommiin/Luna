@@ -84,6 +84,66 @@ namespace Luna {
             }
         }
 
+        public static void OPTN(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            _reader.BaseStream.Seek(sizeof(Int32) * 2, SeekOrigin.Current); // int.MinValue & 2
+            long _optionFlags = _reader.ReadInt64();
+            int _optionIndex = 0;
+            _assets.PlatformOptions.Fullscreen = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.Interpolate = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.NewAudioEngine = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.HideBorder = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.ShowCursor = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.Resizable = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.StayOnTop = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.ResolutionChange = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.HasButtons = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.FullscreenKey = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.HelpKey = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.QuitKey = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.SaveKey = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.ScreenshotKey = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.CloseEscape = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.Freeze = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.ShowProgress = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.LoadTransparent = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.ScaleProgress = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.DisplayErrors = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.WriteErrors = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.AbortErrors = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.VariableErrors = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.CreationOrder = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.UseFrontTouch = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.UseRearTouch = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.FastCollision = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.FastCollisionCompat = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.DisableSandbox = ((_optionFlags >> _optionIndex++) & 1) == 1 ? true : false;
+            _assets.PlatformOptions.Scale = _reader.ReadInt32();
+            _assets.PlatformOptions.WindowColour = _reader.ReadInt32();
+            _assets.PlatformOptions.ColourDepth = _reader.ReadInt32();
+            _assets.PlatformOptions.Resolution = _reader.ReadInt32();
+            _assets.PlatformOptions.RefreshRate = _reader.ReadInt32();
+            _assets.PlatformOptions.SyncVertex = _reader.ReadInt32();
+            _assets.PlatformOptions.Priority = _reader.ReadInt32();
+            Int32 _backgroundIndex = _reader.ReadInt32();
+            if (_backgroundIndex != 0) {
+                // TexturePage Entry
+            } else _assets.PlatformOptions.BackgroundImage = null;
+            Int32 _frontIndex = _reader.ReadInt32();
+            if (_frontIndex != 0) {
+                // TexturePage Entry
+            } else _assets.PlatformOptions.FrontImage = null;
+            Int32 _loadIndex = _reader.ReadInt32();
+            if (_loadIndex != 0) {
+                // TexturePage Entry
+            } else _assets.PlatformOptions.LoadImage = null;
+            _assets.PlatformOptions.LoadAlpha = _reader.ReadInt32();
+            for(int i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
+                string _constantKey = _assets.GetString(_reader.ReadInt32());
+                string _constantValue = _assets.GetString(_reader.ReadInt32());
+                _assets.Constants[_constantKey] = _constantValue;
+            }
+        } 
+
         public static void TXTR(Game _assets, BinaryReader _reader, Chunk _chunk) {
             // Collect textures
             List<LTexture> _textureList = new List<LTexture>();
@@ -180,7 +240,6 @@ namespace Luna {
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 LScript _scriptGet = new LScript(_assets, _reader);
                 _assets.Scripts.Add(_scriptGet.Name, _scriptGet);
-                _assets.ScriptMapping.Insert((Int32)_scriptGet.Index, _scriptGet);
             });
         }
 
