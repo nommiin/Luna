@@ -10,6 +10,7 @@ namespace Luna {
             { "STRG", ChunkHandler.STRG },
             { "GEN8", ChunkHandler.GEN8 },
             { "TXTR", ChunkHandler.TXTR },
+            { "TPAG", ChunkHandler.TPAG },
             { "VARI", ChunkHandler.VARI },
             { "FUNC", ChunkHandler.FUNC },
             { "CODE", ChunkHandler.CODE },

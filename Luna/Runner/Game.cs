@@ -66,6 +66,8 @@ namespace Luna {
         public List<LObject> ObjectMapping = new List<LObject>();
         public List<LRoom> RoomMapping = new List<LRoom>();
         public List<LSequence> SequenceMapping = new List<LSequence>();
+        public List<LTexturePageEntry> TextureEntries = new List<LTexturePageEntry>(); 
+        public List<LTexture> TexturePages = new List<LTexture>(); 
 
         // Code
         public Int32 LocalVariables = 0;
@@ -134,6 +136,10 @@ namespace Luna {
 
         #region OpenTK Events
         private void OnLoad(object sender, EventArgs e) {
+            //keep this until todo: on-demand sprite texture generation is being worked on
+            for (int i = 0; i < this.TextureEntries.Count; i++) {
+                this.TextureEntries[i].PrepareGlTexture();
+            }
             for(int i = 0; i < this.GlobalScripts.Count; i++) {
                 this.GlobalScope.Environment.ExecuteCode(this, this.GlobalScripts[i]);
             }

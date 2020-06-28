@@ -1,1 +1,2 @@
-instance_create_depth(room_width / 1.5, room_height / 2, 0, Object2);
+x = room_width/2;
+y = room_height/2;

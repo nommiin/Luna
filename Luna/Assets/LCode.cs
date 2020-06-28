@@ -116,7 +116,7 @@ namespace Luna.Assets {
                 }
             }
 
-#if (DEBUG)
+#if (!DEBUG)
             // Print out finalized bytecode
             string _bytecodeOutput = this.Name + "\n";
             for (int i = 0; i < this.Instructions.Count; i++) {

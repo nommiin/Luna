@@ -64,6 +64,7 @@
     <Compile Include="Assets\LSequence.cs" />
     <Compile Include="Assets\LSprite.cs" />
     <Compile Include="Assets\LRoomView.cs" />
+    <Compile Include="Assets\LTextureEntry.cs" />
     <Compile Include="Assets\LTracks.cs" />
     <Compile Include="Data\ChunkHandler.cs" />
     <Compile Include="Assets\LRoom.cs" />

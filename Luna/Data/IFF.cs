@@ -34,6 +34,7 @@ namespace Luna {
                     if (_chunkGet != null) {
                         Reader.BaseStream.Seek(_chunkGet.Base, SeekOrigin.Begin);
                         _handlerGet.Value(Assets, Reader, _chunkGet);
+                        if (Reader.BaseStream.Position > _chunkGet.Base+_chunkGet.Length) throw new IOException("Reading outside of chunk!");
                     }
                 }
             }

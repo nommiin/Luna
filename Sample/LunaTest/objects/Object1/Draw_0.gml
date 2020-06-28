@@ -1,1 +1,1 @@
-draw_circle(x, y, 8, false);
+draw_sprite(LunaIcon,0,x,y);

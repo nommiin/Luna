@@ -69,8 +69,8 @@
     {"visible":true,"isLocked":false,"blendMode":0,"opacity":100.0,"displayName":"default","resourceVersion":"1.0","name":"4c414008-1b0b-473c-8438-b82190ff804e","tags":[],"resourceType":"GMImageLayer",},
   ],
   "parent": {
-    "name": "sanaesequence",
-    "path": "folders/sanaesequence.yy",
+    "name": "LunaTest",
+    "path": "LunaTest.yyp",
   },
   "resourceVersion": "1.0",
   "name": "LunaIcon",
