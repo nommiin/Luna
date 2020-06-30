@@ -1,5 +1,8 @@
 {
-  "spriteId": null,
+  "spriteId": {
+    "name": "LunaIcon",
+    "path": "sprites/LunaIcon/LunaIcon.yy",
+  },
   "solid": false,
   "visible": true,
   "spriteMaskId": null,

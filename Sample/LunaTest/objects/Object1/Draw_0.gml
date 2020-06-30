@@ -1,1 +1,1 @@
-draw_sprite(LunaIcon,0,x,y);
+draw_self();

@@ -556,6 +556,12 @@ namespace Luna.Instructions {
     [InstructionDefinition(LOpcode.mod)]
     class Modulo : Instruction {
         public Modulo(Int32 _instruction, Game _game, LCode _code, BinaryReader _reader) : base(_instruction) { }
+        public override void Perform(Game _assets, Domain _environment, LCode _code, Stack<LValue> _stack) {
+            LValue _valRight = _stack.Pop();
+            LValue _valLeft = _stack.Pop();
+            if (_valRight.Number == 0 || _valLeft.Number == 0) _stack.Push(_valLeft);
+            else _stack.Push(LValue.Real(_valLeft.Number % _valRight.Number));
+        }
     }
 
     [InstructionDefinition(LOpcode.xor)]

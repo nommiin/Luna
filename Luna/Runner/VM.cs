@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using Luna.Assets;
 using Luna.Runner;
 using Luna.Types;
-using Luna.Assets;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Luna {
     static class VM {
@@ -44,6 +45,35 @@ namespace Luna {
                 _roomEnvironment.ExecuteCode(_assets, _room.CreationCode);
             }
         }
+
+        public static void DrawDefaultObject(Game _assets, LInstance _inst) {
+            LValue _index = _inst.Variables["sprite_index"];
+            LValue _image = _inst.Variables["image_index"];
+            if (_index.I32 >= 0 && _index < _assets.SpriteMapping.Count) {
+                LSprite _sprite = _assets.SpriteMapping[_index];
+                double _x = _inst.Variables["x"];
+                double _y = _inst.Variables["y"];
+                GL.PushMatrix();
+                GL.Translate(_x,_y,0);
+                GL.Rotate(_inst.Variables["image_angle"].Number,0,0,1);
+                GL.Enable(EnableCap.Texture2D);
+                GL.BindTexture(TextureTarget.Texture2D, _assets.TextureEntries[_image].GLTexture);
+                GL.Begin(PrimitiveType.TriangleStrip);
+                byte[] _color = BitConverter.GetBytes((int)_inst.Variables["image_blend"].Number);
+                GL.Color4(_color[2] / 255d, _color[1] / 255d, _color[0] / 255d, _inst.Variables["image_alpha"]);
+                GL.TexCoord2(0.0,0.0);
+                GL.Vertex2(-_sprite.XOrigin, -_sprite.YOrigin);
+                GL.TexCoord2(1.0,0.0);
+                GL.Vertex2(-_sprite.XOrigin+_sprite.Width, -_sprite.YOrigin);
+                GL.TexCoord2(0.0,1.0);
+                GL.Vertex2(-_sprite.XOrigin, -_sprite.YOrigin+_sprite.Height);
+                GL.TexCoord2(1.0,1.0);
+                GL.Vertex2(-_sprite.XOrigin+_sprite.Width, -_sprite.YOrigin+_sprite.Height);
+                GL.End();
+                GL.Disable(EnableCap.Texture2D);
+                GL.PopMatrix();
+            }
+        }
     }
 
     /// <summary>
@@ -64,7 +94,7 @@ namespace Luna {
         
         private static int state_i;
         private static List<uint> State = Enumerable.Repeat(0u,R).ToList();
-        private static uint seed;//should never be 0 ever, that's why i set it to a funny number
+        private static uint seed;//should never be 0 ever, that's why i set it to a funny number in the constructor
 
         public static uint Seed
         {
@@ -78,7 +108,7 @@ namespace Luna {
 
         static WellGenerator()
         {
-            Seed = 8008132;//i know, total comedian aren't i
+            Seed = 8008135;//i know, total comedian aren't i
         }
 
         private static uint z0, z1, z2;

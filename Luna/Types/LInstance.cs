@@ -34,6 +34,8 @@ namespace Luna.Types {
                 ["y"] = new LValue(LType.Number, _y),
                 ["xprevious"] = new LValue(LType.Number, _x),
                 ["yprevious"] = new LValue(LType.Number, _y),
+                ["xstart"] = LValue.Real(_x),
+                ["ystart"] = LValue.Real(_y),
 
                 ["id"] = new LValue(LType.Number, ID),
                 ["solid"] = new LValue(LType.Number, (double)(_object.Solid ? 1 : 0)),
@@ -49,7 +51,7 @@ namespace Luna.Types {
                 ["sprite_xoffset"] = new LValue(LType.Number, (double)(_object.Sprite != null ? _object.Sprite.XOrigin : 0)),
                 ["sprite_yoffset"] = new LValue(LType.Number, (double)(_object.Sprite != null ? _object.Sprite.YOrigin : 0)),
                 ["image_alpha"] = new LValue(LType.Number, (double)1),
-                ["image_angle"] = new LValue(LType.Number, (double)0),
+                ["image_angle"] = new LValue(LType.Number, (double)30),
                 ["image_blend"] = new LValue(LType.Number, (double)0xFFFFFF),
                 ["image_index"] = new LValue(LType.Number, (double)0),
                 ["image_number"] = new LValue(LType.Number, (double)(_object.Sprite != null ? _object.Sprite.FrameCount : 0)),

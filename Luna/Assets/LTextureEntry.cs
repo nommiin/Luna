@@ -43,16 +43,14 @@ namespace Luna.Assets
 
         public void PrepareGlTexture() {
             SubImage = TexturePage.BitmapData.Clone(new Rectangle(X, Y, Width, Height), TexturePage.BitmapData.PixelFormat);
-            Console.WriteLine(SubImage.PixelFormat);
             GLTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, GLTexture);
-            BitmapData _bmp = SubImage.LockBits(new Rectangle(X, Y, Width, Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData _bmp = SubImage.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.ReadOnly, SubImage.PixelFormat);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, SubImage.Width, SubImage.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, _bmp.Scan0);
             SubImage.UnlockBits(_bmp);
             GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
             GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-            //GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-            SubImage.Save($"Sprite{GLTexture}.png",ImageFormat.Png);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
     }
 }

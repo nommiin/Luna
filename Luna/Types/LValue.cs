@@ -124,16 +124,18 @@ namespace Luna {
         #region Conditionals
         public static LValue operator ==(LValue a, LValue b) {
             switch (a.Type) {
-                case LType.Number: return LValue.Real(a.Number == b.Number ? 1 : 0);
-                case LType.String: return LValue.Real(a.String == b.String ? 1 : 0);
+                case LType.Number: return LValue.Bool(Math.Abs(a.Number - b.Number) < 0.00001f);
+                case LType.String: return LValue.Bool(a.String == b.String);
+                case LType.Undefined: return LValue.Bool(b.Type == LType.Undefined);
             }
             throw new Exception(String.Format("Could not check if {0} (Type: {2}) is equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }
 
         public static LValue operator !=(LValue a, LValue b) {
             switch (a.Type) {
-                case LType.Number: return LValue.Real(a.Number != b.Number ? 1 : 0);
+                case LType.Number: return LValue.Real(Math.Abs(a.Number - b.Number) > 0.00001 ? 1 : 0);
                 case LType.String: return LValue.Real(a.String != b.String ? 1 : 0);
+                case LType.Undefined: return LValue.Bool(b.Type != LType.Undefined);
             }
             throw new Exception(String.Format("Could not check if {0} (Type: {2}) is not equal to {1} (Type: {3})", a.ToString(), b.ToString(), a.Type, b.Type));
         }

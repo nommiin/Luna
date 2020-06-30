@@ -175,6 +175,7 @@ namespace Luna {
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
                 if (_instGet.Draw != null) _instGet.Environment.ExecuteCode(this, _instGet.Draw);
+                else VM.DrawDefaultObject(this,_instGet);
             }
 
             GL.Flush();
