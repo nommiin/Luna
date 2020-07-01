@@ -1,8 +1,8 @@
 {
   "resources": [
-    {"id":{"name":"Object1","path":"objects/Object1/Object1.yy",},"order":2,},
-    {"id":{"name":"Object2","path":"objects/Object2/Object2.yy",},"order":3,},
-    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":1,},
+    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":4,},
+    {"id":{"name":"Object1","path":"objects/Object1/Object1.yy",},"order":3,},
+    {"id":{"name":"LunaIcon","path":"sprites/LunaIcon/LunaIcon.yy",},"order":2,},
   ],
   "Options": [
     {"name":"Amazon Fire","path":"options/amazonfire/options_amazonfire.yy",},
@@ -35,10 +35,11 @@
   ],
   "TextureGroups": [
     {"isScaled":true,"autocrop":true,"border":2,"mipsToGenerate":0,"targets":461609314234257646,"resourceVersion":"1.0","name":"Default","resourceType":"GMTextureGroup",},
+    {"isScaled":true,"autocrop":true,"border":2,"mipsToGenerate":0,"targets":461609314234257646,"resourceVersion":"1.0","name":"texturegroup1","resourceType":"GMTextureGroup",},
   ],
   "IncludedFiles": [],
   "MetaData": {
-    "IDEVersion": "23.1.1.149",
+    "IDEVersion": "23.1.1.157",
   },
   "resourceVersion": "1.3",
   "name": "LunaTest",

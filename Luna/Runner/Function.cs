@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Luna.Types;
 using Luna.Assets;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 
 namespace Luna.Runner {
     [AttributeUsage(AttributeTargets.Method)]
@@ -92,6 +93,16 @@ namespace Luna.Runner {
         public static LValue keyboard_check_released(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             return new LValue(LType.Number, (double)(Input.KeyReleased(_arguments[0]) == true ? 1 : 0));
         }
+
+        [FunctionDefinition("mouse_wheel_up")]
+        public static LValue mouse_wheel_up(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Bool(Mouse.GetState().Wheel > 0);
+        }
+
+        [FunctionDefinition("mouse_wheel_down")]
+        public static LValue mouse_wheel_down(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Bool(Mouse.GetState().Wheel > 0);
+        }
         #endregion
 
         #region Rendering
@@ -123,25 +134,67 @@ namespace Luna.Runner {
 
         [FunctionDefinition("draw_set_colour")]
         public static LValue draw_set_colour(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            _assets.CurrentColor = new LColour((int)_arguments[0].Number);
+            int _col = _arguments[0].I32;
+            byte _r = (byte) (_col & 0xFF);
+            byte _g = (byte) ((_col >> 8) & 0xFF);
+            byte _b = (byte) ((_col >> 16) & 0xFF);
+            _assets.CurrentColor = new LColour(_r,_g,_b,0xFF);//this is a cast btw
             return LValue.Real(0);
+        }
+        
+        [FunctionDefinition("draw_set_alpha")]
+        public static LValue draw_set_alpha(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            _assets.CurrentColor.Alpha = (byte) Math.Floor(_arguments[0].Number*255);
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("draw_get_colour")]
+        public static LValue draw_get_colour(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            int col = 0;
+            col += _assets.CurrentColor.Red;
+            col = col << 8;
+            col += _assets.CurrentColor.Green;
+            col = col << 8;
+            col += _assets.CurrentColor.Blue;
+            return LValue.Real(col);
+        }
+        
+        [FunctionDefinition("draw_get_alpha")]
+        public static LValue draw_get_alpha(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(_assets.CurrentColor.Alpha/255f);
         }
 
         [FunctionDefinition("draw_sprite")]
         public static LValue draw_sprite(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
-            GL.Begin(PrimitiveType.TriangleFan);
-            GL.Color4((OpenTK.Graphics.Color4)_assets.CurrentColor);
-
+            LSprite _sprite = _assets.SpriteMapping[(int) _arguments[0].Number];
+            int _subimg = (int) _arguments[1].Number;
             double _x = _arguments[2].Number;
             double _y = _arguments[3].Number;
-            double _r = 32;// _arguments[2].Number;
+            int _texid = _sprite.TextureEntries[_subimg].GLTexture;
+            GL.Enable (EnableCap.Texture2D);
+            GL.BindTexture (TextureTarget.Texture2D, _texid);
+            GL.Begin(PrimitiveType.TriangleStrip);
+            GL.Color4((OpenTK.Graphics.Color4)_assets.CurrentColor);
 
-            GL.Vertex2(_x, _y);
-            for (int _i = 0; _i <= 360; _i += 360 / _assets.CirclePrecision) {
-                GL.Vertex2(_x + (Math.Cos(_i * (Math.PI / 180)) * _r), _y + (Math.Sin(_i * (Math.PI / 180)) * _r));
-            }
+            //the best way to do this right now is to just draw the triangles in a strip
+            GL.TexCoord2(0.0,0.0);
+            GL.Vertex2(_x-_sprite.XOrigin, _y-_sprite.YOrigin);
+            GL.TexCoord2(1.0,0.0);
+            GL.Vertex2(_x-_sprite.XOrigin+_sprite.Width, _y-_sprite.YOrigin);
+            GL.TexCoord2(0.0,1.0);
+            GL.Vertex2(_x-_sprite.XOrigin, _y-_sprite.YOrigin+_sprite.Height);
+            GL.TexCoord2(1.0,1.0);
+            GL.Vertex2(_x-_sprite.XOrigin+_sprite.Width, _y-_sprite.YOrigin+_sprite.Height);
 
             GL.End();
+            GL.Disable(EnableCap.Texture2D);
+            return LValue.Real(0);
+        }
+
+        [FunctionDefinition("draw_self")]
+        public static LValue draw_self(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            VM.DrawDefaultObject(_assets, _environment.Instance);
+            
             return LValue.Real(0);
         }
         #endregion
@@ -191,7 +244,7 @@ namespace Luna.Runner {
 
         #endregion
         
-        #region Analysis
+        #region Statistics
         
         [FunctionDefinition("max")]
         public static LValue max(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
@@ -261,7 +314,7 @@ namespace Luna.Runner {
         [FunctionDefinition("choose")]
         public static LValue choose(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             if (_count == 0) return LValue.Undef();
-            var choice = WellGenerator.ENext(_count);
+            int choice = WellGenerator.ENext(_count);
             return _arguments[choice];
         }
         
@@ -476,6 +529,16 @@ namespace Luna.Runner {
             }
             return new LValue(LType.Number, (double)0);
         }
+        #endregion
+        
+        #region String Manipulation
+        
+        //todo ord lol
+        [FunctionDefinition("ord")]
+        public static LValue ord(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
+            return LValue.Real(_arguments[0].String.ToLower()[0]);
+        }
+        
         #endregion
 
         #region Types
@@ -794,15 +857,13 @@ namespace Luna.Runner {
         [FunctionDefinition("ds_map_find_next")]
         public static LValue ds_map_find_next(Game _assets, Domain _environment, LValue[] _arguments, Int32 _count, Stack<LValue> _stack) {
             Dictionary<LValue, LValue> _mapFind = VM.Maps[(int)_arguments[0].Number];
-            int _keyInd = 0;
+            bool _keyFound = false;
             foreach(KeyValuePair<LValue, LValue> _mapKey in _mapFind) {
-                if (_keyInd == 0) {
+                if (_keyFound == false) {
                     if (_mapKey.Key == _arguments[1]) {
-                        _keyInd++;
+                        _keyFound = true;
                     }
-                } else if (_keyInd == 1) {
-                    return _mapKey.Key;
-                }
+                } else return _mapKey.Key;//
             }
             return LValue.Undef();
         }

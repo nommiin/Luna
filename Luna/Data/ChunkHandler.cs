@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Luna {
         }
 
         public delegate void ChunkList(Int32 _offset);
-        public static void HandleList(Game _asset, BinaryReader _reader, ChunkList _handler) {
+        public static void HandleList(Game _assets, BinaryReader _reader, ChunkList _handler) {
             Int32 _listOffset = _reader.ReadInt32(), _listBase = (Int32)_reader.BaseStream.Position;
             _reader.BaseStream.Seek(_listOffset, SeekOrigin.Begin);
             Int32 _itemCount = _reader.ReadInt32();
@@ -30,6 +31,15 @@ namespace Luna {
                 _reader.BaseStream.Seek(_itemBase, SeekOrigin.Begin);
             }
             _reader.BaseStream.Seek(_listBase, SeekOrigin.Begin);
+        }
+        
+        //gonna have to be serious got no idea if this works
+        public delegate void ChunkZeus();
+        public static void HandleZeus(Game _assets, BinaryReader _reader, ChunkZeus _handler) {
+            int _count = _reader.ReadInt32();
+            for (int i = 0; i < _count; i++) {
+                _handler();
+            }
         }
 
         public static void STRG(Game _assets, BinaryReader _reader, Chunk _chunk) {
@@ -86,7 +96,7 @@ namespace Luna {
 
         public static void TXTR(Game _assets, BinaryReader _reader, Chunk _chunk) {
             // Collect textures
-            List<LTexture> _textureList = new List<LTexture>();
+            List<LTexture> _textureList = _assets.TexturePages;//i'm lazy lmao, don't wanna deal with this
             HandleKVP(_assets, _reader, delegate (Int32 _offset) {
                 _textureList.Add(new LTexture(_reader));
             });
@@ -98,25 +108,16 @@ namespace Luna {
                 } else {
                     _textureList[i].Length = (int)((_chunk.Base + _chunk.Length) - _textureList[i].Offset);
                 }
+
+                _reader.BaseStream.Seek(_textureList[i].Offset, SeekOrigin.Begin);
+                _textureList[i].LoadImage(_reader);
             }
+        }
 
-            // PNG Data @ (LTexture.Offset + LTexture.Length)
-
-            /*
-            HandleKVP(_assets, _reader, delegate (Int32 _offset) {
-                Console.WriteLine("Offset: {0}", _offset);
-                Int32 _textureScale = _reader.ReadInt32();
-                Int32 _textureMipmaps = _reader.ReadInt32();
-                Int32 _textureOffset = _reader.ReadInt32();
-                long _streamBase = _reader.BaseStream.Position;
-
-                _reader.BaseStream.Seek(_streamBase, SeekOrigin.Begin);
-                //Console.WriteLine(ASCIIEncoding.ASCII.GetString(_reader.ReadBytes(8)));
-            });*/
-            //for(int i = 0, _i = _reader.ReadInt32(); i < _i; i++) {
-            //    Console.WriteLine("Int32: {0}", _reader.ReadInt32());
-            //}
-            //Console.WriteLine("FirstInt32: {0}", _reader.ReadInt32());
+        public static void TPAG(Game _assets, BinaryReader _reader, Chunk _chunk) {
+            HandleKVP(_assets,_reader, delegate(Int32 _offset) {
+                _assets.TextureEntries.Add(new LTexturePageEntry(_assets,_reader));
+            });
         }
 
         public static void VARI(Game _assets, BinaryReader _reader, Chunk _chunk) {

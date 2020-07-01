@@ -57,6 +57,7 @@ namespace Luna {
         public Dictionary<string, LSprite> Sprites = new Dictionary<string, LSprite>();
         public Dictionary<string, LObject> Objects = new Dictionary<string, LObject>();
         public Dictionary<string, LRoom> Rooms = new Dictionary<string, LRoom>();
+        public Dictionary<string, LSequence> Sequences = new Dictionary<string, LSequence>();
 
         public List<LString> StringMapping = new List<LString>();
         public List<LCode> CodeMapping = new List<LCode>();
@@ -64,6 +65,9 @@ namespace Luna {
         public List<LSprite> SpriteMapping = new List<LSprite>();
         public List<LObject> ObjectMapping = new List<LObject>();
         public List<LRoom> RoomMapping = new List<LRoom>();
+        public List<LSequence> SequenceMapping = new List<LSequence>();
+        public List<LTexturePageEntry> TextureEntries = new List<LTexturePageEntry>(); 
+        public List<LTexture> TexturePages = new List<LTexture>(); 
 
         // Code
         public Int32 LocalVariables = 0;
@@ -132,6 +136,10 @@ namespace Luna {
 
         #region OpenTK Events
         private void OnLoad(object sender, EventArgs e) {
+            //keep this until todo: on-demand sprite texture generation is being worked on
+            for (int i = 0; i < this.TextureEntries.Count; i++) {
+                this.TextureEntries[i].PrepareGlTexture();
+            }
             for(int i = 0; i < this.GlobalScripts.Count; i++) {
                 this.GlobalScope.Environment.ExecuteCode(this, this.GlobalScripts[i]);
             }
@@ -167,6 +175,7 @@ namespace Luna {
             for (int i = 0; i < this.InstanceList.Count; i++) {
                 LInstance _instGet = this.InstanceList[i];
                 if (_instGet.Draw != null) _instGet.Environment.ExecuteCode(this, _instGet.Draw);
+                else VM.DrawDefaultObject(this,_instGet);
             }
 
             GL.Flush();
