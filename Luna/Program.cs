@@ -26,7 +26,7 @@ namespace Luna {
             }
 
             if (Program.GameLocation == null) {
-                if (args.Length == 1 && File.Exists(args[0])) {
+                if (args.Length == 1 && File.Exists(args[0]) == true) {
                     Program.GameLocation = args[0];
                 } else Program.GameLocation = Path.GetDirectoryName(Program.Arguments[0]) + "\\data.win";
             }
