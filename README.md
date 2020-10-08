@@ -1,3 +1,5 @@
+# This repo is NOT abandoned, development has just been set aside for now. Contributions are still welcome!
+
 ![Banner](https://github.com/nommiin/Luna/raw/master/Assets/LunaBanner.png)
 <p align="center">
   <b>A custom implementation of the GameMaker 2.3 runtime in C#</b>
